@@ -1,0 +1,739 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>GeoReview Studio v083</title>
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="topbar app-header">
+      <div class="brand-block">
+        <span class="eyebrow">Local GIS review workbench</span>
+        <h1>GeoReview Studio</h1>
+        <p>Safe Access Israel · infrastructure risk indicators</p>
+      </div>
+      <nav class="topnav" aria-label="Primary workspace links">
+        <a href="#mapPanel">Map</a>
+        <a href="#reviewQueuePanel">Review queue</a>
+        <a href="#controlPanel">Workflow</a>
+        <a href="#evidencePanel">Evidence</a>
+      </nav>
+      <div class="status" id="status" role="status" aria-live="polite">Loading</div>
+    </header>
+
+    <section class="overview-band" aria-label="Workspace overview">
+      <div class="overview-copy">
+        <span class="eyebrow">Infrastructure indicators, not crash prediction</span>
+        <h2>Field-review prioritization for pedestrian access around generators.</h2>
+        <p>This workspace separates mapped risk indicators from OSM data-quality gaps and keeps the approved on-site review wording visible.</p>
+      </div>
+      <div class="overview-metrics" aria-label="Current workspace metrics">
+        <div class="overview-metric">
+          <span>Generators</span>
+          <b id="overviewGeneratorCount">--</b>
+        </div>
+        <div class="overview-metric">
+          <span>Crossings</span>
+          <b id="overviewCrossingCount">--</b>
+        </div>
+        <div class="overview-metric">
+          <span>Major roads</span>
+          <b id="overviewMajorRoadCount">--</b>
+        </div>
+        <div class="overview-metric">
+          <span>Validation</span>
+          <b id="overviewValidationStatus">--</b>
+        </div>
+      </div>
+    </section>
+
+    <main class="layout" id="workspace">
+      <aside class="panel controls" id="controlPanel" aria-label="Workflow controls">
+        <section>
+          <h2>Workspace</h2>
+          <label>
+            Dashboard workspace
+            <select id="dashboardWorkspaceSelect"></select>
+          </label>
+          <label>
+            Dataset source
+            <select id="sourceSelect"></select>
+          </label>
+          <label>
+            Analysis template
+            <select id="templateSelect"></select>
+          </label>
+          <div class="small-note" id="sourceHint"></div>
+          <div class="workflow-actions" aria-label="Quick workflow links">
+            <a href="#mapPanel">Open map</a>
+            <a href="#reviewQueuePanel">Review candidates</a>
+            <button id="buildSelectedPilotShortcut" type="button">Build selected pilot</button>
+          </div>
+          <label class="check compact-toggle">
+            <input id="showAdvancedControls" type="checkbox" />
+            Show advanced evidence operations
+          </label>
+        </section>
+
+        <section id="pilotAreaSection">
+          <h2>Source Onboarding</h2>
+          <button id="refreshSourceOnboarding" type="button">Refresh source scan</button>
+          <div class="small-note runner-status" id="sourceOnboardingStatus">Source scan loading.</div>
+          <div id="sourceOnboardingBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Local Intake</h2>
+          <label>
+            Local path
+            <input id="localIntakePath" type="text" value="" placeholder="Paste a local GIS source path outside analysis_output" />
+          </label>
+          <button id="previewLocalIntake" type="button">Preview local path</button>
+          <button id="createLocalIntakePlan" type="button">Create intake plan</button>
+          <div class="small-note runner-status" id="localIntakeStatus">Local intake loading.</div>
+          <div id="localIntakeBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Source Import Guardrails</h2>
+          <button id="refreshSourceImportGuardrails" type="button">Refresh guardrails</button>
+          <button id="previewSourceImportGuardrails" type="button">Preview guardrails</button>
+          <button id="createSourceImportReview" type="button">Create review packet</button>
+          <button id="approveSourceImportReview" type="button">Approve metadata-only import</button>
+          <div class="small-note runner-status" id="sourceImportGuardrailsStatus">Source import guardrails loading.</div>
+          <div id="sourceImportGuardrailsBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Source Handoff</h2>
+          <button id="refreshSourceHandoff" type="button">Refresh handoff</button>
+          <button id="createSourceHandoff" type="button">Create planned handoff</button>
+          <div class="small-note runner-status" id="sourceHandoffStatus">Source handoff loading.</div>
+          <div id="sourceHandoffBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Source Handoff Execution</h2>
+          <button id="refreshSourceHandoffExecution" type="button">Refresh execution</button>
+          <button id="executeSourceHandoff" type="button">Execute approved handoff</button>
+          <div class="small-note runner-status" id="sourceHandoffExecutionStatus">Source handoff execution loading.</div>
+          <div id="sourceHandoffExecutionBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Execution Evidence Package</h2>
+          <button id="refreshExecutionEvidencePackage" type="button">Refresh package</button>
+          <button id="createExecutionEvidencePackage" type="button">Create evidence package</button>
+          <div class="small-note runner-status" id="executionEvidencePackageStatus">Execution evidence package loading.</div>
+          <div id="executionEvidencePackageBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Execution Result Diff</h2>
+          <button id="refreshExecutionResultDiff" type="button">Refresh diffs</button>
+          <button id="createExecutionResultDiff" type="button">Create result diff</button>
+          <div class="small-note runner-status" id="executionResultDiffStatus">Execution result diff loading.</div>
+          <div id="executionResultDiffBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Execution Diff Gallery</h2>
+          <button id="refreshExecutionDiffGallery" type="button">Refresh gallery</button>
+          <button id="createExecutionDiffGallery" type="button">Create gallery artifact</button>
+          <div class="small-note runner-status" id="executionDiffGalleryStatus">Execution diff gallery loading.</div>
+          <div id="executionDiffGalleryBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Execution Diff Detail</h2>
+          <button id="refreshExecutionDiffDetail" type="button">Refresh detail</button>
+          <button id="createExecutionDiffDetail" type="button">Create drilldown</button>
+          <div class="small-note runner-status" id="executionDiffDetailStatus">Execution diff detail loading.</div>
+          <div id="executionDiffDetailBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Reproducibility Audit Packet</h2>
+          <button id="refreshReproducibilityAuditPacket" type="button">Refresh packets</button>
+          <button id="createReproducibilityAuditPacket" type="button">Create audit packet</button>
+          <div class="small-note runner-status" id="reproducibilityAuditPacketStatus">Reproducibility audit packet loading.</div>
+          <div id="reproducibilityAuditPacketBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Reviewer Audit Index</h2>
+          <button id="refreshReviewerAuditIndex" type="button">Refresh index</button>
+          <button id="createReviewerAuditIndex" type="button">Create reviewer index</button>
+          <div class="small-note runner-status" id="reviewerAuditIndexStatus">Reviewer audit index loading.</div>
+          <div id="reviewerAuditIndexBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Portfolio Export Launcher</h2>
+          <button id="refreshPortfolioExportLauncher" type="button">Refresh launcher</button>
+          <button id="createPortfolioExportLauncher" type="button">Create launcher</button>
+          <div class="small-note runner-status" id="portfolioExportLauncherStatus">Portfolio export launcher loading.</div>
+          <div id="portfolioExportLauncherBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Portable Release Package</h2>
+          <button id="refreshPortableReleasePackage" type="button">Refresh package</button>
+          <button id="createPortableReleasePackage" type="button">Create package ZIP</button>
+          <div class="small-note runner-status" id="portableReleasePackageStatus">Portable release package loading.</div>
+          <div id="portableReleasePackageBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Demo Script Pack</h2>
+          <button id="refreshDemoScriptPack" type="button">Refresh script pack</button>
+          <button id="createDemoScriptPack" type="button">Create script pack</button>
+          <div class="small-note runner-status" id="demoScriptPackStatus">Demo script pack loading.</div>
+          <div id="demoScriptPackBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Visual QA Snapshot Ledger</h2>
+          <button id="refreshVisualQALedger" type="button">Refresh QA ledger</button>
+          <button id="createVisualQALedger" type="button">Create QA ledger</button>
+          <div class="small-note runner-status" id="visualQALedgerStatus">Visual QA ledger loading.</div>
+          <div id="visualQALedgerBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Visual Baseline Comparison</h2>
+          <button id="refreshVisualBaselineComparison" type="button">Refresh comparison</button>
+          <button id="createVisualBaselineComparison" type="button">Create comparison</button>
+          <div class="small-note runner-status" id="visualBaselineComparisonStatus">Visual baseline comparison loading.</div>
+          <div id="visualBaselineComparisonBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Demo Artifact Completeness</h2>
+          <button id="refreshDemoArtifactCompleteness" type="button">Refresh completeness</button>
+          <button id="createDemoArtifactCompleteness" type="button">Create completeness check</button>
+          <div class="small-note runner-status" id="demoArtifactCompletenessStatus">Demo artifact completeness loading.</div>
+          <div id="demoArtifactCompletenessBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Visual Evidence Capture</h2>
+          <button id="refreshVisualEvidenceCapture" type="button">Refresh captures</button>
+          <button id="createVisualEvidenceCapture" type="button">Capture screenshots</button>
+          <div class="small-note runner-status" id="visualEvidenceCaptureStatus">Visual evidence capture loading.</div>
+          <div id="visualEvidenceCaptureBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Visual Evidence Review Diff</h2>
+          <button id="refreshVisualEvidenceReviewDiff" type="button">Refresh diffs</button>
+          <button id="createVisualEvidenceReviewDiff" type="button">Create review diff</button>
+          <div class="small-note runner-status" id="visualEvidenceReviewDiffStatus">Visual evidence review diff loading.</div>
+          <div id="visualEvidenceReviewDiffBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Visual Evidence Review Annotations</h2>
+          <button id="refreshVisualEvidenceReviewAnnotations" type="button">Refresh annotations</button>
+          <button id="createVisualEvidenceReviewAnnotations" type="button">Create annotations</button>
+          <div class="small-note runner-status" id="visualEvidenceReviewAnnotationsStatus">Visual evidence review annotations loading.</div>
+          <div id="visualEvidenceReviewAnnotationsBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Visual Evidence Sign-Off Packet</h2>
+          <button id="refreshVisualEvidenceSignoffPacket" type="button">Refresh sign-off packets</button>
+          <button id="createVisualEvidenceSignoffPacket" type="button">Create sign-off packet</button>
+          <div class="small-note runner-status" id="visualEvidenceSignoffPacketStatus">Visual evidence sign-off packet loading.</div>
+          <div id="visualEvidenceSignoffPacketBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Final Reviewer Launch Checklist</h2>
+          <button id="refreshFinalReviewerLaunchChecklist" type="button">Refresh launch checklist</button>
+          <button id="createFinalReviewerLaunchChecklist" type="button">Create launch checklist</button>
+          <div class="small-note runner-status" id="finalReviewerLaunchChecklistStatus">Final reviewer launch checklist loading.</div>
+          <div id="finalReviewerLaunchChecklistBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Recruiter-Facing Demo Brief</h2>
+          <button id="refreshRecruiterDemoBrief" type="button">Refresh demo brief</button>
+          <button id="createRecruiterDemoBrief" type="button">Create demo brief</button>
+          <div class="small-note runner-status" id="recruiterDemoBriefStatus">Recruiter-facing demo brief loading.</div>
+          <div id="recruiterDemoBriefBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Public Portfolio Package</h2>
+          <button id="refreshPublicPortfolioPackage" type="button">Refresh package</button>
+          <button id="createPublicPortfolioPackage" type="button">Create package</button>
+          <div class="small-note runner-status" id="publicPortfolioPackageStatus">Public portfolio package loading.</div>
+          <div id="publicPortfolioPackageBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Demo Review Playbook</h2>
+          <button id="refreshDemoReviewPlaybook" type="button">Refresh playbook</button>
+          <button id="createDemoReviewPlaybook" type="button">Create playbook</button>
+          <div class="small-note runner-status" id="demoReviewPlaybookStatus">Demo review playbook loading.</div>
+          <div id="demoReviewPlaybookBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>GitHub-ready Publication Bundle</h2>
+          <button id="refreshGithubPublicationBundle" type="button">Refresh publication bundle</button>
+          <button id="createGithubPublicationBundle" type="button">Create publication bundle</button>
+          <div class="small-note runner-status" id="githubPublicationBundleStatus">GitHub publication bundle loading.</div>
+          <div id="githubPublicationBundleBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Repository Publication QA</h2>
+          <button id="refreshRepositoryPublicationQa" type="button">Refresh repository QA</button>
+          <button id="createRepositoryPublicationQa" type="button">Create repository QA</button>
+          <div class="small-note runner-status" id="repositoryPublicationQaStatus">Repository publication QA loading.</div>
+          <div id="repositoryPublicationQaBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Repository Export Handoff</h2>
+          <button id="refreshRepositoryExportHandoff" type="button">Refresh handoff</button>
+          <button id="createRepositoryExportHandoff" type="button">Create handoff</button>
+          <div class="small-note runner-status" id="repositoryExportHandoffStatus">Repository export handoff loading.</div>
+          <div id="repositoryExportHandoffBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Repository Dry-Run Review</h2>
+          <button id="refreshRepositoryDryRunReview" type="button">Refresh dry-run</button>
+          <button id="createRepositoryDryRunReview" type="button">Create dry-run</button>
+          <div class="small-note runner-status" id="repositoryDryRunReviewStatus">Repository dry-run review loading.</div>
+          <div id="repositoryDryRunReviewBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Repository Final Package Review</h2>
+          <button id="refreshRepositoryFinalPackageReview" type="button">Refresh final review</button>
+          <button id="createRepositoryFinalPackageReview" type="button">Create final review</button>
+          <div class="small-note runner-status" id="repositoryFinalPackageReviewStatus">Repository final package review loading.</div>
+          <div id="repositoryFinalPackageReviewBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Public README Cleanup Review</h2>
+          <button id="refreshPublicReadmeCleanupReview" type="button">Refresh README cleanup</button>
+          <button id="createPublicReadmeCleanupReview" type="button">Create README cleanup</button>
+          <div class="small-note runner-status" id="publicReadmeCleanupReviewStatus">Public README cleanup review loading.</div>
+          <div id="publicReadmeCleanupReviewBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Public Repository Polish Package</h2>
+          <button id="refreshPublicRepositoryPolishPackage" type="button">Refresh polish package</button>
+          <button id="createPublicRepositoryPolishPackage" type="button">Create polish package</button>
+          <div class="small-note runner-status" id="publicRepositoryPolishPackageStatus">Public repository polish package loading.</div>
+          <div id="publicRepositoryPolishPackageBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Repository Export Checklist</h2>
+          <button id="refreshRepositoryExportChecklist" type="button">Refresh export checklist</button>
+          <button id="createRepositoryExportChecklist" type="button">Create export checklist</button>
+          <div class="small-note runner-status" id="repositoryExportChecklistStatus">Repository export checklist loading.</div>
+          <div id="repositoryExportChecklistBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Analysis Profiles</h2>
+          <button id="refreshAnalysisProfiles" type="button">Refresh profiles</button>
+          <div class="small-note runner-status" id="analysisProfilesStatus">Analysis profiles loading.</div>
+          <div id="analysisProfilesBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Profile Runners</h2>
+          <button id="runTransitProfile" type="button">Run transit access profile</button>
+          <button id="runParkProfile" type="button">Run park/playground profile</button>
+          <button id="refreshProfileWorkspaces" type="button">Refresh profile outputs</button>
+          <div class="small-note runner-status" id="profileRunnerStatus">No profile runner started.</div>
+          <div id="profileWorkspacesBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Product Architecture</h2>
+          <button id="refreshProductArchitecture" type="button">Refresh architecture</button>
+          <div class="small-note runner-status" id="productArchitectureStatus">Architecture blueprint loading.</div>
+          <div id="productArchitectureBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Release Readiness</h2>
+          <button id="refreshReleaseReadiness" type="button">Refresh readiness</button>
+          <button id="createReleaseReadinessSnapshot" type="button">Create readiness snapshot</button>
+          <div class="small-note runner-status" id="releaseReadinessStatus">Release readiness loading.</div>
+          <div id="releaseReadinessBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Portfolio Demo</h2>
+          <button id="refreshPortfolioDemo" type="button">Refresh demo</button>
+          <button id="createPortfolioDemoSnapshot" type="button">Create demo snapshot</button>
+          <div class="small-note runner-status" id="portfolioDemoStatus">Portfolio demo loading.</div>
+          <div id="portfolioDemoBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Portfolio Evidence Bundle</h2>
+          <button id="refreshPortfolioEvidenceBundle" type="button">Refresh bundle</button>
+          <button id="createPortfolioEvidenceBundle" type="button">Create evidence bundle</button>
+          <div class="small-note runner-status" id="portfolioEvidenceBundleStatus">Portfolio evidence bundle loading.</div>
+          <div id="portfolioEvidenceBundleBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Bundle Review Checklist</h2>
+          <button id="refreshBundleReviewChecklist" type="button">Refresh checklist</button>
+          <button id="createBundleReviewChecklist" type="button">Create checklist</button>
+          <div class="small-note runner-status" id="bundleReviewChecklistStatus">Bundle review checklist loading.</div>
+          <div id="bundleReviewChecklistBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Portfolio Narrative</h2>
+          <button id="refreshPortfolioNarrative" type="button">Refresh narrative</button>
+          <button id="createPortfolioNarrative" type="button">Create narrative</button>
+          <div class="small-note runner-status" id="portfolioNarrativeStatus">Portfolio narrative loading.</div>
+          <div id="portfolioNarrativeBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Portfolio Handoff</h2>
+          <button id="refreshPortfolioHandoff" type="button">Refresh handoff</button>
+          <button id="createPortfolioHandoff" type="button">Create handoff page</button>
+          <div class="small-note runner-status" id="portfolioHandoffStatus">Portfolio handoff loading.</div>
+          <div id="portfolioHandoffBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Portfolio Gallery</h2>
+          <button id="refreshPortfolioEvidenceGallery" type="button">Refresh gallery</button>
+          <button id="createPortfolioEvidenceGallery" type="button">Create gallery page</button>
+          <div class="small-note runner-status" id="portfolioEvidenceGalleryStatus">Portfolio gallery loading.</div>
+          <div id="portfolioEvidenceGalleryBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Multi-Pilot Comparison</h2>
+          <button id="refreshMultiPilotComparison" type="button">Refresh comparison</button>
+          <button id="createMultiPilotComparison" type="button">Create comparison page</button>
+          <div class="small-note runner-status" id="multiPilotComparisonStatus">Multi-pilot comparison loading.</div>
+          <div id="multiPilotComparisonBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Comparison Map Exports</h2>
+          <button id="refreshComparisonMapExports" type="button">Refresh map exports</button>
+          <button id="createComparisonMapExport" type="button">Create map export</button>
+          <div class="small-note runner-status" id="comparisonMapExportsStatus">Comparison map exports loading.</div>
+          <div id="comparisonMapExportsBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Profile Dashboard</h2>
+          <label>
+            Result profile
+            <select id="profileDashboardSelect"></select>
+          </label>
+          <button id="refreshProfileDashboard" type="button">Refresh profile results</button>
+          <div class="small-note runner-status" id="profileDashboardStatus">Profile results loading.</div>
+          <div id="profileDashboardBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Scoring Rules</h2>
+          <button id="refreshScoringRules" type="button">Audit selected profile</button>
+          <div class="small-note runner-status" id="scoringRulesStatus">Scoring rules loading.</div>
+          <div id="scoringRulesBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>PostGIS Backend</h2>
+          <button id="refreshPostgisBackend" type="button">Refresh PostGIS plan</button>
+          <button id="createPostgisPlan" type="button">Create migration plan</button>
+          <div class="small-note runner-status" id="postgisBackendStatus">PostGIS planning loading.</div>
+          <div id="postgisBackendBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Profile Mapper SDK</h2>
+          <button id="refreshProfileMapper" type="button">Refresh mapper contracts</button>
+          <button id="createProfileMapperPlan" type="button">Create mapper plan</button>
+          <div class="small-note runner-status" id="profileMapperStatus">Profile mapper loading.</div>
+          <div id="profileMapperBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Contract Execution</h2>
+          <button id="refreshContractExecution" type="button">Refresh dry run</button>
+          <button id="createContractDryRun" type="button">Create dry run</button>
+          <div class="small-note runner-status" id="contractExecutionStatus">Contract execution loading.</div>
+          <div id="contractExecutionBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>OSM Tag Quality</h2>
+          <button id="refreshOsmTagQuality" type="button">Refresh tag quality</button>
+          <button id="runOsmTagQuality" type="button">Run tag quality profile</button>
+          <div class="small-note runner-status" id="osmTagQualityStatus">OSM tag quality loading.</div>
+          <div id="osmTagQualityBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Template Authoring</h2>
+          <button id="refreshTemplateAuthoring" type="button">Refresh templates</button>
+          <button id="createTemplateDraft" type="button">Draft cycling profile</button>
+          <div class="small-note runner-status" id="templateAuthoringStatus">Template authoring loading.</div>
+          <div id="templateAuthoringBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Authored Profile Runner</h2>
+          <button id="refreshAuthoredProfileRunner" type="button">Refresh authored runner</button>
+          <button id="runAuthoredProfile" type="button">Run latest draft</button>
+          <button id="enqueueAuthoredDraft" type="button">Queue latest draft</button>
+          <div class="small-note runner-status" id="authoredProfileRunnerStatus">Authored runner loading.</div>
+          <div id="authoredProfileRunnerBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Profile Promotion</h2>
+          <button id="refreshProfilePromotion" type="button">Refresh promotion</button>
+          <button id="createProfilePromotionProposal" type="button">Create proposal</button>
+          <button id="approveProfilePromotionProposal" type="button">Approve proposal</button>
+          <button id="rejectProfilePromotionProposal" type="button">Reject proposal</button>
+          <button id="createProfileContractDiff" type="button">Create contract diff</button>
+          <button id="createProfileApplicationPlan" type="button">Create application plan</button>
+          <button id="createProfileConfigApplyProposal" type="button">Create apply proposal</button>
+          <button id="createProfileRegressionPreview" type="button">Create regression preview</button>
+          <div class="small-note runner-status" id="profilePromotionStatus">Profile promotion loading.</div>
+          <div id="profilePromotionBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Execution Queue</h2>
+          <button id="refreshExecutionQueue" type="button">Refresh queue</button>
+          <button id="enqueueExecutionQueueJob" type="button">Enqueue OSM tag quality</button>
+          <div class="small-note runner-status" id="executionQueueStatus">Execution queue loading.</div>
+          <div id="executionQueueBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Dataset Packages</h2>
+          <button id="refreshDatasetPackages" type="button">Refresh packages</button>
+          <button id="createDatasetPackage" type="button">Create dataset package</button>
+          <div class="small-note runner-status" id="datasetPackagesStatus">Dataset packages loading.</div>
+          <div id="datasetPackagesBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Pilot Area</h2>
+          <label>
+            Search
+            <input id="pilotSearch" type="search" value="Kfar Saba" />
+          </label>
+          <label>
+            Area
+            <select id="pilotAreaSelect"></select>
+          </label>
+          <label class="check">
+            <input id="pilotRouteAware" type="checkbox" checked />
+            Route-aware workspace
+          </label>
+          <button id="buildPilotWorkspace" type="button">Build selected pilot</button>
+          <div class="small-note runner-status" id="pilotStatus">Pilot catalog loading.</div>
+          <div class="preflight-box" id="pilotPreflight"></div>
+        </section>
+
+        <section>
+          <h2>Create Analysis</h2>
+          <button id="planAnalysisWorkflow" type="button">Plan selected analysis</button>
+          <button id="startAnalysisWorkflow" type="button">Start analysis job</button>
+          <div class="small-note runner-status" id="analysisWorkflowStatus">No analysis plan loaded.</div>
+          <div class="preflight-box" id="analysisWorkflowBody"></div>
+        </section>
+
+        <section>
+          <h2>Portfolio Reports</h2>
+          <button id="generatePortfolioReport" type="button">Generate latest report</button>
+          <button id="generateTransitPortfolioReport" type="button">Generate transit report</button>
+          <button id="generateParkPortfolioReport" type="button">Generate park report</button>
+          <button id="generateProfileComparisonReport" type="button">Compare profiles</button>
+          <button id="generateProfileExportBundle" type="button">Generate profile bundle</button>
+          <button id="comparePortfolioRuns" type="button">Compare latest runs</button>
+          <button id="refreshPortfolioReports" type="button">Refresh reports</button>
+          <div class="small-note runner-status" id="portfolioReportsStatus">Portfolio reports loading.</div>
+          <div id="portfolioReportsBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Analysis Runs</h2>
+          <button id="refreshAnalysisRuns" type="button">Refresh analysis runs</button>
+          <div class="small-note runner-status" id="analysisRunsStatus">Analysis runs loading.</div>
+          <div id="analysisRunsBody" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Run History</h2>
+          <button id="refreshJobs" type="button">Refresh jobs</button>
+          <div class="small-note runner-status" id="jobStatus">No job selected.</div>
+          <div id="jobHistory" class="workspace-body"></div>
+        </section>
+
+        <section>
+          <h2>Workspace Runner</h2>
+          <button id="buildWorkspace" type="button">Register current MVP workspace</button>
+          <button id="buildGenericWorkspace" type="button">Build PBF-enriched workspace</button>
+          <button id="buildRouteAwareWorkspace" type="button">Build route-aware workspace</button>
+          <div class="small-note runner-status" id="buildStatus">No run started.</div>
+        </section>
+
+        <section>
+          <h2>Candidate Filters</h2>
+          <label>
+            Generator type
+            <select id="generatorType">
+              <option value="">All</option>
+            </select>
+          </label>
+          <label>
+            Minimum score
+            <input id="minScore" type="range" min="0" max="100" value="0" step="5" />
+            <span id="minScoreValue">0</span>
+          </label>
+          <label class="check">
+            <input id="noCrossing" type="checkbox" />
+            No mapped crossing within 150 m
+          </label>
+          <label class="check">
+            <input id="majorRoad" type="checkbox" />
+            Major road within 150 m
+          </label>
+        </section>
+
+        <section>
+          <h2>Metrics</h2>
+          <div class="metrics" id="metrics"></div>
+        </section>
+
+        <section>
+          <h2>Interpretation</h2>
+          <p class="note" id="reviewWording"></p>
+          <p class="note">Missing OSM tags are data-quality gaps, not proof that infrastructure is absent.</p>
+        </section>
+      </aside>
+
+      <section class="map-area" id="mapPanel">
+        <div class="map-toolbar">
+          <div><span class="eyebrow">Kfar Saba pilot</span><h2>Safe Access Review Map</h2></div>
+          <div class="legend">
+            <span><i class="dot red"></i>Top candidates</span>
+            <span><i class="dot blue"></i>Generators</span>
+            <span><i class="dot green"></i>Crossings</span>
+            <span><i class="dot orange"></i>Major road refs</span>
+          </div>
+        </div>
+        <svg id="map" role="img" aria-label="Kfar Saba review map"></svg>
+      </section>
+
+      <section class="panel profile-panel">
+        <div class="panel-title">
+          <h2>Dataset Profile</h2>
+          <span id="profileStatus" class="badge">Waiting</span>
+        </div>
+        <div id="sourceProfile" class="profile-grid"></div>
+      </section>
+
+      <section class="panel table-panel" id="reviewQueuePanel">
+        <div class="table-header">
+          <h2>Review Candidates</h2>
+          <button id="exportCsv" type="button">Export visible CSV</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Type</th>
+                <th>Name</th>
+                <th>Crossing</th>
+                <th>Major road</th>
+                <th>Score</th>
+                <th>Flags</th>
+              </tr>
+            </thead>
+            <tbody id="candidateRows"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel detail" id="candidatePanel">
+        <h2>Selected Candidate</h2>
+        <div id="candidateDetail" class="detail-body">Select a row or marker.</div>
+      </section>
+
+      <section class="panel template-panel">
+        <div class="panel-title">
+          <h2>Template Readiness</h2>
+          <span id="templateStatus" class="badge">Waiting</span>
+        </div>
+        <div id="templateReadiness" class="template-body"></div>
+      </section>
+
+      <section class="panel profile-results-panel" id="evidencePanel">
+        <div class="panel-title">
+          <h2>Universal Profile Results</h2>
+          <span id="profileResultsStatus" class="badge">Waiting</span>
+        </div>
+        <div class="table-wrap profile-result-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Profile</th>
+                <th>ID</th>
+                <th>Type</th>
+                <th>Name</th>
+                <th>Crossing m</th>
+                <th>Route m</th>
+                <th>Major road m</th>
+                <th>Score</th>
+                <th>Flags</th>
+              </tr>
+            </thead>
+            <tbody id="profileResultRows"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel architecture-panel">
+        <div class="panel-title">
+          <h2>Product Architecture</h2>
+          <span id="architectureStatus" class="badge">Waiting</span>
+        </div>
+        <div id="productArchitecturePanel" class="workspace-body"></div>
+      </section>
+
+      <section class="panel workspace-panel">
+        <div class="panel-title">
+          <h2>Workspace Registry</h2>
+          <span id="workspaceStatus" class="badge">Waiting</span>
+        </div>
+        <div id="workspaceRegistry" class="workspace-body"></div>
+      </section>
+    </main>
+
+    <script src="/app.js"></script>
+  </body>
+</html>

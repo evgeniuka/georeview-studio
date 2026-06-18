@@ -1,0 +1,37 @@
+# Local runtime state
+*.log
+server_*.log
+__pycache__/
+*.py[cod]
+
+# Internal design-review captures (not product assets)
+ui_review/*.png
+
+# Browser automation profiles and caches
+ui_review/chrome_profile*/
+ui_review/*profile*/
+ui_review/*cache*/
+ui_review/dump_dom.txt
+ui_review/chrome_dump_err.txt
+# Headless-browser profile state can be regenerated under any artifact dir
+**/browser_profile/
+**/chrome_profile*/
+
+# Environment, auth, and session material
+.env
+.env.*
+auth.json
+cap_sid
+installation_id
+*session*
+*capability*
+
+# Source GIS data must stay outside public repository packages
+*.osm.pbf
+*.shp
+*.shp.zip
+*.dbf
+*.prj
+*.cpg
+*.gpkg
+source_data/

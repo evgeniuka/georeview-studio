@@ -1,0 +1,278 @@
+{
+  "profile_mapper_contracts_version": "profile_mapper_contracts_v001",
+  "contract_policy": "Profile mapper contracts describe inputs, canonical outputs, scoring links, and claim boundaries. They do not execute source GIS mutation.",
+  "default_dataset_id": "israel-and-palestine-260521-free-shp-zip",
+  "required_contract_fields": [
+    "profile_id",
+    "domain",
+    "status",
+    "runner_status",
+    "source_layer_requirements",
+    "canonical_outputs",
+    "result_contract",
+    "claim_boundaries",
+    "missing_data_policy"
+  ],
+  "canonical_result_fields": [
+    "profile_id",
+    "workspace_id",
+    "result_id",
+    "entity_type",
+    "name",
+    "primary_metric",
+    "primary_score",
+    "flags",
+    "data_quality_flags",
+    "review_wording",
+    "lon",
+    "lat",
+    "source_evidence",
+    "source_gis_modified"
+  ],
+  "contracts": [
+    {
+      "profile_id": "safe_access_pedestrian_review",
+      "domain": "pedestrian_access",
+      "status": "implemented",
+      "runner_status": "implemented_for_selected_pilot",
+      "mapper_type": "canonical_workspace_builder",
+      "source_layer_requirements": {
+        "required_groups": [
+          "places",
+          "roads",
+          "traffic",
+          "transport",
+          "pois",
+          "landuse"
+        ],
+        "optional_groups": [
+          "osm_pbf_enrichment"
+        ],
+        "required_tags": [
+          "highway",
+          "amenity",
+          "leisure",
+          "public_transport"
+        ],
+        "optional_tags": [
+          "sidewalk",
+          "lit",
+          "maxspeed",
+          "traffic_calming",
+          "crossing",
+          "kerb",
+          "tactile_paving"
+        ]
+      },
+      "canonical_outputs": [
+        "pedestrian_generators",
+        "crossings",
+        "road_segments",
+        "risk_assessment_results"
+      ],
+      "result_contract": "profile_dashboard_contract_v001",
+      "scoring_profile_id": "safe_access_pedestrian_review",
+      "implementation_entrypoint": "WorkspaceRunner.ensure_workspace",
+      "claim_boundaries": [
+        "infrastructure risk indicators",
+        "field-review prioritization",
+        "mapped OSM evidence"
+      ],
+      "missing_data_policy": "Missing OSM tags create data-quality flags and do not add risk points by default."
+    },
+    {
+      "profile_id": "transit_stop_walk_access",
+      "domain": "public_transport_access",
+      "status": "implemented",
+      "runner_status": "implemented_from_safe_access_workspace",
+      "mapper_type": "derived_profile_runner",
+      "source_layer_requirements": {
+        "required_groups": [
+          "transport",
+          "roads",
+          "traffic"
+        ],
+        "optional_groups": [
+          "osm_pbf_enrichment"
+        ],
+        "required_tags": [
+          "highway",
+          "public_transport",
+          "bus"
+        ],
+        "optional_tags": [
+          "shelter",
+          "bench",
+          "crossing",
+          "lit",
+          "sidewalk"
+        ]
+      },
+      "canonical_outputs": [
+        "transit_stop_access_results"
+      ],
+      "result_contract": "profile_dashboard_contract_v001",
+      "scoring_profile_id": "transit_stop_walk_access",
+      "implementation_entrypoint": "TransitAccessAnalyzer.ensure_workspace",
+      "claim_boundaries": [
+        "walk-access infrastructure indicators",
+        "mapped transit stop evidence"
+      ],
+      "missing_data_policy": "Missing stop amenities remain data-quality flags unless explicitly tagged as negative evidence."
+    },
+    {
+      "profile_id": "park_playground_access",
+      "domain": "public_space_access",
+      "status": "implemented",
+      "runner_status": "implemented_from_safe_access_workspace",
+      "mapper_type": "derived_profile_runner",
+      "source_layer_requirements": {
+        "required_groups": [
+          "landuse",
+          "pois",
+          "roads",
+          "traffic"
+        ],
+        "optional_groups": [
+          "osm_pbf_enrichment"
+        ],
+        "required_tags": [
+          "leisure",
+          "landuse",
+          "amenity",
+          "highway"
+        ],
+        "optional_tags": [
+          "crossing",
+          "lit",
+          "sidewalk",
+          "traffic_calming"
+        ]
+      },
+      "canonical_outputs": [
+        "park_playground_access_results"
+      ],
+      "result_contract": "profile_dashboard_contract_v001",
+      "scoring_profile_id": "park_playground_access",
+      "implementation_entrypoint": "ParkPlaygroundAccessAnalyzer.ensure_workspace",
+      "claim_boundaries": [
+        "public-space access indicators",
+        "mapped park and playground evidence"
+      ],
+      "missing_data_policy": "Missing detail tags are data-quality gaps, not real-world absence claims."
+    },
+    {
+      "profile_id": "cycling_micromobility_access",
+      "domain": "cycling_access",
+      "status": "planned",
+      "runner_status": "not_yet_implemented",
+      "mapper_type": "future_profile_contract",
+      "source_layer_requirements": {
+        "required_groups": [
+          "roads"
+        ],
+        "optional_groups": [
+          "traffic",
+          "osm_pbf_enrichment"
+        ],
+        "required_tags": [
+          "highway"
+        ],
+        "optional_tags": [
+          "cycleway",
+          "cycleway:left",
+          "cycleway:right",
+          "bicycle",
+          "segregated",
+          "surface"
+        ]
+      },
+      "canonical_outputs": [
+        "cycling_access_results"
+      ],
+      "result_contract": "profile_dashboard_contract_v001",
+      "scoring_profile_id": "",
+      "implementation_entrypoint": "",
+      "claim_boundaries": [
+        "mapped cycling infrastructure indicators",
+        "tag coverage evidence"
+      ],
+      "missing_data_policy": "Missing cycleway tags cannot prove absence of cycling infrastructure."
+    },
+    {
+      "profile_id": "osm_tag_quality",
+      "domain": "data_quality",
+      "status": "implemented",
+      "runner_status": "implemented_read_only_runner",
+      "mapper_type": "read_only_audit_contract",
+      "source_layer_requirements": {
+        "required_groups": [],
+        "optional_groups": [
+          "places",
+          "roads",
+          "traffic",
+          "transport",
+          "pois",
+          "landuse",
+          "osm_pbf_enrichment"
+        ],
+        "required_tags": [],
+        "optional_tags": [
+          "highway",
+          "amenity",
+          "leisure",
+          "public_transport",
+          "sidewalk",
+          "lit",
+          "maxspeed"
+        ]
+      },
+      "canonical_outputs": [
+        "tag_quality_summary",
+        "tag_presence_summary",
+        "source_scope_summary"
+      ],
+      "result_contract": "profile_dashboard_contract_v001",
+      "scoring_profile_id": "",
+      "implementation_entrypoint": "OSMTagQualityAnalyzer.ensure_workspace",
+      "claim_boundaries": [
+        "data-quality evidence",
+        "tag coverage indicators"
+      ],
+      "missing_data_policy": "The audit reports unknown mapping coverage, not real-world absence."
+    },
+    {
+      "profile_id": "generic_layer_inventory",
+      "domain": "data_inventory",
+      "status": "profile_ready",
+      "runner_status": "read_only_profile_available",
+      "mapper_type": "read_only_inventory_contract",
+      "source_layer_requirements": {
+        "required_groups": [],
+        "optional_groups": [
+          "places",
+          "roads",
+          "traffic",
+          "transport",
+          "pois",
+          "landuse",
+          "osm_pbf_enrichment"
+        ],
+        "required_tags": [],
+        "optional_tags": []
+      },
+      "canonical_outputs": [
+        "layer_inventory_summary"
+      ],
+      "result_contract": "profile_dashboard_contract_v001",
+      "scoring_profile_id": "",
+      "implementation_entrypoint": "",
+      "claim_boundaries": [
+        "source inventory",
+        "format suitability",
+        "schema evidence"
+      ],
+      "missing_data_policy": "Inventory gaps should be reported as unknown from current data."
+    }
+  ]
+}

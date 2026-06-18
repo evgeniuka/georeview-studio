@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>GeoReview Studio Portfolio Report</title>
+    <link rel="icon" href="data:," />
+    <style>
+      :root {
+        --bg: #f8fafc;
+        --panel: #ffffff;
+        --surface: #f1f5f9;
+        --ink: #0f172a;
+        --muted: #64748b;
+        --muted-soft: #94a3b8;
+        --line: #e2e8f0;
+        --line-strong: #cbd5e1;
+        --accent: #4f46e5;
+        --accent-strong: #4338ca;
+        --accent-soft: #eef2ff;
+        --accent-soft-line: #c7d2fe;
+        --accent-ink: #3730a3;
+        --r-sm: 6px;
+        --r-md: 8px;
+        --r-lg: 12px;
+        --shadow-1: 0 1px 2px rgba(15, 23, 42, 0.04);
+        --shadow-2: 0 1px 2px rgba(15, 23, 42, 0.04), 0 4px 12px rgba(15, 23, 42, 0.04);
+        --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, Inter, sans-serif;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: var(--font-sans);
+        font-size: 14px;
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
+      }
+      .wrap { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+      header {
+        padding: 40px 0 28px;
+        border-bottom: 1px solid var(--line);
+        background: var(--panel);
+      }
+      .eyebrow {
+        display: inline-block;
+        margin-bottom: 8px;
+        color: var(--accent-ink);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+      h1 {
+        margin: 0 0 8px;
+        font-size: 30px;
+        font-weight: 650;
+        letter-spacing: -0.02em;
+        line-height: 1.12;
+      }
+      h2 {
+        margin: 0 0 16px;
+        font-size: 16px;
+        font-weight: 650;
+        letter-spacing: -0.005em;
+      }
+      p { margin: 0; color: var(--muted); line-height: 1.55; }
+      .subtitle { max-width: 760px; font-size: 15px; }
+      main { padding: 28px 0 56px; display: grid; gap: 20px; }
+      .metrics {
+        display: grid;
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        gap: 12px;
+      }
+      .metric {
+        display: grid;
+        align-content: start;
+        gap: 8px;
+        padding: 16px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: var(--r-md);
+        box-shadow: var(--shadow-1);
+      }
+      .metric span { color: var(--muted); font-size: 12px; font-weight: 500; }
+      .metric b {
+        color: var(--ink);
+        font-size: 30px;
+        font-weight: 650;
+        letter-spacing: -0.02em;
+        line-height: 1;
+        font-variant-numeric: tabular-nums;
+      }
+      section {
+        padding: 24px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: var(--r-lg);
+        box-shadow: var(--shadow-2);
+      }
+      img {
+        width: 100%;
+        max-height: 640px;
+        object-fit: contain;
+        border: 1px solid var(--line);
+        border-radius: var(--r-md);
+        background: var(--bg);
+      }
+      table { width: 100%; border-collapse: collapse; font-size: 13px; }
+      th, td {
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--line);
+        text-align: left;
+        vertical-align: top;
+        font-variant-numeric: tabular-nums;
+      }
+      th {
+        background: var(--bg);
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+        border-bottom: 1px solid var(--line-strong);
+      }
+      tbody tr:last-child td { border-bottom: 0; }
+      .table-frame {
+        border: 1px solid var(--line);
+        border-radius: var(--r-md);
+        overflow: hidden;
+      }
+      .review-callout {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        margin-top: 18px;
+        padding: 14px 16px;
+        border: 1px solid var(--accent-soft-line);
+        border-radius: var(--r-md);
+        background: var(--accent-soft);
+      }
+      .review-callout span.dot {
+        flex: 0 0 auto;
+        width: 8px;
+        height: 8px;
+        margin-top: 6px;
+        border-radius: 50%;
+        background: var(--accent);
+      }
+      .review-callout p { color: var(--accent-ink); }
+      .note { font-size: 13px; color: var(--muted); }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="wrap">
+        <span class="eyebrow">Local GIS review workbench</span>
+        <h1>GeoReview Studio: Safe Access Kfar Saba</h1>
+        <p class="subtitle">Infrastructure risk indicator workflow built from OpenStreetMap / Geofabrik data with PBF tag enrichment and OSM road-network proxy distances.</p>
+      </div>
+    </header>
+    <main class="wrap">
+      <div class="metrics"><div class='metric'><span>Pedestrian generators</span><b>391</b></div>
+<div class='metric'><span>Crossings</span><b>342</b></div>
+<div class='metric'><span>Road segments</span><b>2603</b></div>
+<div class='metric'><span>Traffic signals</span><b>121</b></div>
+<div class='metric'><span>Traffic calming</span><b>11</b></div>
+<div class='metric'><span>PBF points read</span><b>1509</b></div>
+<div class='metric'><span>Route median m</span><b>218.6</b></div>
+<div class='metric'><span>Route &gt;250 m</span><b>169</b></div></div>
+      <section>
+        <h2>Static map preview</h2>
+        <img src="assets/kfar_saba_static_map.svg" alt="Static map preview" />
+      </section>
+      <section>
+        <h2>Top review candidates</h2>
+        <div class="table-frame">
+          <table>
+            <thead><tr><th>ID</th><th>Type</th><th>Name</th><th>Straight m</th><th>Route m</th><th>Ratio</th><th>Route score</th><th>Flags</th></tr></thead>
+            <tbody><tr><td>gen_0388</td><td>school</td><td>רחל המשוררת</td><td>170.8</td><td>430.6</td><td>2.26</td><td>110</td><td>generator_far_from_network_proxy, high_network_detour_ratio, route_nearest_crossing_over_250m</td></tr><tr><td>gen_0301</td><td>park</td><td></td><td>226.7</td><td>472.5</td><td>2.08</td><td>105</td><td>high_network_detour_ratio, route_nearest_crossing_over_250m</td></tr><tr><td>gen_0372</td><td>school</td><td>חטיבת שרת</td><td>339.7</td><td>477.0</td><td>1.37</td><td>100</td><td>generator_far_from_network_proxy, route_nearest_crossing_over_250m</td></tr><tr><td>gen_0366</td><td>school</td><td>חטיבת הביניים ע&quot;ש יורם טהרלב</td><td>254.5</td><td>409.2</td><td>1.50</td><td>100</td><td>generator_far_from_network_proxy, route_nearest_crossing_over_250m</td></tr><tr><td>gen_0373</td><td>school</td><td>חטיבת שז&quot;ר</td><td>270.6</td><td>334.0</td><td>1.19</td><td>100</td><td>generator_far_from_network_proxy, route_nearest_crossing_over_250m</td></tr><tr><td>gen_0379</td><td>school</td><td></td><td>221.0</td><td>273.4</td><td>1.20</td><td>100</td><td>generator_far_from_network_proxy, route_nearest_crossing_over_250m</td></tr><tr><td>gen_0190</td><td>kindergarten</td><td></td><td>668.6</td><td>1028.6</td><td>1.54</td><td>95</td><td>route_nearest_crossing_over_250m</td></tr><tr><td>gen_0168</td><td>bus_stop</td><td>דמרי סנטר/ספיר</td><td>720.3</td><td>984.6</td><td>1.37</td><td>95</td><td>route_nearest_crossing_over_250m</td></tr><tr><td>gen_0158</td><td>bus_stop</td><td>דמרי סנטר/שלמה וחיה אנגל</td><td>660.0</td><td>861.8</td><td>1.31</td><td>95</td><td>route_nearest_crossing_over_250m</td></tr><tr><td>gen_0215</td><td>kindergarten</td><td>גן אפיק, יובל, מעיין, נחל</td><td>660.4</td><td>812.0</td><td>1.23</td><td>95</td><td>route_nearest_crossing_over_250m</td></tr></tbody>
+          </table>
+        </div>
+        <div class="review-callout">
+          <span class="dot" aria-hidden="true"></span>
+          <p>This location has infrastructure risk indicators and should be reviewed on-site.</p>
+        </div>
+      </section>
+      <section>
+        <h2>Data quality note</h2>
+        <p>Missing OSM tags are tracked as data-quality flags, not proof that real-world infrastructure is absent.</p>
+      </section>
+    </main>
+  </body>
+</html>

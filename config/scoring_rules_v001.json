@@ -1,0 +1,176 @@
+{
+  "scoring_rules_version": "scoring_rules_v001",
+  "scoring_policy": "Transparent field-review priority score. Missing OSM tags stay in data_quality_flags and do not add points unless an explicit negative tag exists.",
+  "approved_review_wording": "This location has infrastructure risk indicators and should be reviewed on-site.",
+  "claim_boundaries": [
+    "Infrastructure review indicators only.",
+    "Not a crash prediction model.",
+    "Missing OSM tags are data-quality gaps, not proof that infrastructure is absent."
+  ],
+  "rule_groups": {
+    "common_infrastructure_v001": {
+      "label": "Common infrastructure indicators",
+      "rules": [
+        {
+          "rule_id": "major_road_within_150m",
+          "points": 25,
+          "condition": {
+            "type": "flag_present",
+            "flag": "major_road_within_150m"
+          },
+          "evidence": "mapped major road proximity"
+        },
+        {
+          "rule_id": "no_mapped_crossing_within_150m",
+          "points": 25,
+          "condition": {
+            "type": "flag_present",
+            "flag": "no_mapped_crossing_within_150m"
+          },
+          "evidence": "no mapped crossing within 150 m"
+        },
+        {
+          "rule_id": "nearest_crossing_near_major_road_without_signal_within_50m",
+          "points": 15,
+          "condition": {
+            "type": "flag_present",
+            "flag": "nearest_crossing_near_major_road_without_signal_within_50m"
+          },
+          "evidence": "nearest mapped crossing on or near major road without mapped signal evidence"
+        },
+        {
+          "rule_id": "no_mapped_traffic_calming_within_100m_weak_indicator",
+          "points": 10,
+          "condition": {
+            "type": "flag_present",
+            "flag": "no_mapped_traffic_calming_within_100m_weak_indicator"
+          },
+          "evidence": "weak indicator from mapped traffic-calming evidence"
+        },
+        {
+          "rule_id": "explicit_sidewalk_no_within_50m",
+          "points": 10,
+          "condition": {
+            "type": "flag_present",
+            "flag": "explicit_sidewalk_no_within_50m"
+          },
+          "evidence": "explicit sidewalk=no nearby"
+        },
+        {
+          "rule_id": "explicit_lit_no_within_50m",
+          "points": 5,
+          "condition": {
+            "type": "flag_present",
+            "flag": "explicit_lit_no_within_50m"
+          },
+          "evidence": "explicit lit=no nearby"
+        }
+      ]
+    },
+    "route_proxy_v001": {
+      "label": "Route proxy indicators",
+      "rules": [
+        {
+          "rule_id": "route_nearest_crossing_over_250m",
+          "points": 20,
+          "condition": {
+            "type": "flag_present",
+            "flag": "route_nearest_crossing_over_250m"
+          },
+          "evidence": "OSM road-network proxy route to crossing is over 250 m"
+        },
+        {
+          "rule_id": "high_network_detour_ratio",
+          "points": 10,
+          "condition": {
+            "type": "all",
+            "conditions": [
+              {
+                "type": "field_gte",
+                "field": "route_vs_straight_ratio",
+                "value": 1.8
+              },
+              {
+                "type": "field_gt",
+                "field": "route_nearest_crossing_m",
+                "value": 150
+              }
+            ]
+          },
+          "evidence": "network proxy ratio is at least 1.8 and route distance is over 150 m"
+        },
+        {
+          "rule_id": "generator_far_from_network_proxy",
+          "points": 5,
+          "condition": {
+            "type": "flag_present",
+            "flag": "generator_far_from_network_proxy"
+          },
+          "evidence": "generator attachment to network proxy is far"
+        }
+      ]
+    },
+    "zero_point_context_v001": {
+      "label": "Context flags that do not add score by default",
+      "rules": [
+        {
+          "rule_id": "no_mapped_signal_within_50m",
+          "points": 0,
+          "condition": {
+            "type": "flag_present",
+            "flag": "no_mapped_signal_within_50m"
+          },
+          "evidence": "signal context flag only"
+        },
+        {
+          "rule_id": "no_mapped_crossing_within_100m",
+          "points": 0,
+          "condition": {
+            "type": "flag_present",
+            "flag": "no_mapped_crossing_within_100m"
+          },
+          "evidence": "public-space context flag only"
+        },
+        {
+          "rule_id": "no_reachable_crossing_on_network_proxy",
+          "points": 0,
+          "condition": {
+            "type": "flag_present",
+            "flag": "no_reachable_crossing_on_network_proxy"
+          },
+          "evidence": "network-proxy unreachability is a data-quality flag, not a risk indicator (the proxy graph may be incomplete); see data_quality_flags.route_network_proxy_unavailable_for_generator"
+        }
+      ]
+    }
+  },
+  "profiles": {
+    "safe_access_pedestrian_review": {
+      "profile_name": "Safe Access pedestrian review",
+      "score_field": "route_review_priority_score",
+      "rule_groups": [
+        "common_infrastructure_v001",
+        "route_proxy_v001",
+        "zero_point_context_v001"
+      ]
+    },
+    "transit_stop_walk_access": {
+      "profile_name": "Transit stop walk-access review",
+      "score_field": "transit_review_priority_score",
+      "rule_groups": [
+        "common_infrastructure_v001",
+        "route_proxy_v001",
+        "zero_point_context_v001"
+      ]
+    },
+    "park_playground_access": {
+      "profile_name": "Park and playground access review",
+      "score_field": "public_space_review_priority_score",
+      "rule_groups": [
+        "common_infrastructure_v001",
+        "route_proxy_v001",
+        "zero_point_context_v001"
+      ]
+    }
+  },
+  "source_gis_modified": false
+}

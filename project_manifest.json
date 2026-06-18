@@ -1,0 +1,1149 @@
+{
+  "project": "GeoReview Studio",
+  "version": "v083_2026-06-01",
+  "domain": "GIS infrastructure risk indicators for pedestrian access review",
+  "product_summary": "Scans OSM/Geofabrik data for a pilot area and ranks pedestrian destinations (schools, kindergartens, parks, bus stops) by how far they sit from a mapped signalised crossing, to prioritise on-site field review. Field-review prioritisation only, not crash prediction.",
+  "target_user": "Municipal road-safety planners, pedestrian-access reviewers and GIS analysts.",
+  "core_workflow": [
+    "source onboarding",
+    "selected-pilot preflight",
+    "run analysis profile",
+    "dashboard candidates and selected-candidate evidence",
+    "portfolio report"
+  ],
+  "surface_note": "The core product is the GIS review workflow (source onboarding, profiles, analysis runs, dashboard, scoring, portfolio reports). The publication, handoff, QA, release-readiness and reviewer-audit scopes listed below are an internal tooling layer used to package and review the project itself, not product features.",
+  "default_workspace": "safe_access_kfar_saba_route_aware_v001",
+  "local_url": "http://127.0.0.1:8847",
+  "source_data_policy": "Source GIS files are read-only. Generated artifacts are written under analysis_output.",
+  "approved_review_wording": "This location has infrastructure risk indicators and should be reviewed on-site.",
+  "main_components": {
+    "backend": "backend/app.py",
+    "frontend": "frontend/static",
+    "analysis_runs": "backend/analysis_runs.py",
+    "analysis_profiles": "backend/analysis_profiles.py",
+    "portfolio_report_builder": "backend/portfolio_report_builder.py",
+    "analysis_workflow": "backend/analysis_workflow.py",
+    "source_onboarding": "backend/source_onboarding.py",
+    "preflight": "backend/preflight.py",
+    "mapper": "backend/generic_safe_access_mapper.py",
+    "runner": "backend/workspace_runner.py",
+    "pilot_area_catalog": "backend/pilot_area_catalog.py",
+    "run_job_manager": "backend/run_job_manager.py",
+    "route_network_analyzer": "backend/route_network_analyzer.py",
+    "transit_access_analyzer": "backend/transit_access_analyzer.py",
+    "park_playground_access_analyzer": "backend/park_playground_access_analyzer.py",
+    "validation": "tests/validate_app.py",
+    "api_contract_tests": "tests/test_api_contract.py",
+    "universal_architecture_plan": "docs/universal_gis_analytics_architecture.md",
+    "portfolio": "portfolio",
+    "product_architecture": "backend/product_architecture.py",
+    "product_architecture_docs": "docs/product_architecture.md",
+    "profile_dashboard": "backend/profile_dashboard.py",
+    "profile_result_contract_docs": "docs/profile_result_contract.md",
+    "local_intake": "backend/local_intake.py",
+    "profile_export_bundle": "backend/profile_export_bundle.py",
+    "local_intake_docs": "docs/local_intake_wizard.md",
+    "profile_export_bundle_docs": "docs/profile_export_bundle.md",
+    "scoring_rules": "backend/scoring_rules.py",
+    "scoring_rules_config": "config/scoring_rules_v001.json",
+    "scoring_rules_docs": "docs/scoring_rules.md",
+    "postgis_backend": "backend/postgis_backend.py",
+    "postgis_schema": "config/postgis_schema_v001.sql",
+    "postgis_backend_docs": "docs/postgis_backend.md",
+    "profile_mapper": "backend/profile_mapper.py",
+    "profile_mapper_contracts": "config/profile_mapper_contracts_v001.json",
+    "profile_mapper_docs": "docs/profile_mapper_sdk.md",
+    "contract_execution": "backend/contract_execution.py",
+    "contract_execution_docs": "docs/contract_execution.md",
+    "osm_tag_quality": "backend/osm_tag_quality.py",
+    "osm_tag_quality_docs": "docs/osm_tag_quality.md",
+    "template_authoring": "backend/template_authoring.py",
+    "template_authoring_docs": "docs/template_authoring.md",
+    "execution_queue": "backend/execution_queue.py",
+    "execution_queue_docs": "docs/execution_queue.md",
+    "dataset_package": "backend/dataset_package.py",
+    "dataset_package_docs": "docs/dataset_package.md",
+    "authored_profile_runner": "backend/authored_profile_runner.py",
+    "authored_profile_runner_docs": "docs/authored_profile_runner.md",
+    "authored_dashboard_contract_docs": "docs/authored_dashboard_contract.md",
+    "profile_promotion": "backend/profile_promotion.py",
+    "profile_promotion_docs": "docs/profile_promotion_wizard.md",
+    "proposal_acceptance_docs": "docs/proposal_acceptance_workflow.md",
+    "accepted_contract_application_plan_docs": "docs/accepted_contract_application_plan.md",
+    "profile_contract_diff_docs": "docs/profile_contract_diff_review.md",
+    "guarded_config_apply_proposal_docs": "docs/guarded_config_apply_proposal.md",
+    "profile_contract_regression_preview_docs": "docs/profile_contract_regression_preview.md",
+    "release_readiness": "backend/release_readiness.py",
+    "release_readiness_docs": "docs/release_readiness_dashboard.md",
+    "portfolio_demo": "backend/portfolio_demo.py",
+    "portfolio_demo_docs": "docs/portfolio_demo_walkthrough.md",
+    "portfolio_evidence_bundle": "backend/portfolio_evidence_bundle.py",
+    "portfolio_evidence_bundle_docs": "docs/portfolio_evidence_bundle.md",
+    "bundle_review_checklist": "backend/bundle_review_checklist.py",
+    "bundle_review_checklist_docs": "docs/bundle_review_checklist.md",
+    "portfolio_narrative_export": "backend/portfolio_narrative_export.py",
+    "portfolio_narrative_export_docs": "docs/portfolio_narrative_export.md",
+    "portfolio_handoff_page": "backend/portfolio_handoff_page.py",
+    "portfolio_handoff_page_docs": "docs/portfolio_handoff_page.md",
+    "portfolio_evidence_gallery": "backend/portfolio_evidence_gallery.py",
+    "portfolio_evidence_gallery_docs": "docs/portfolio_evidence_gallery.md",
+    "multi_pilot_comparison": "backend/multi_pilot_comparison.py",
+    "multi_pilot_comparison_docs": "docs/multi_pilot_comparison.md",
+    "comparison_map_exports": "backend/comparison_map_exports.py",
+    "comparison_map_exports_docs": "docs/comparison_map_exports.md",
+    "source_import_guardrails": "backend/source_import_guardrails.py",
+    "source_import_guardrails_docs": "docs/source_import_guardrails.md",
+    "source_handoff": "backend/source_handoff.py",
+    "source_handoff_docs": "docs/source_handoff.md",
+    "source_handoff_execution": "backend/source_handoff_execution.py",
+    "source_handoff_execution_docs": "docs/source_handoff_execution.md",
+    "execution_evidence_package": "backend/execution_evidence_package.py",
+    "execution_evidence_package_docs": "docs/execution_evidence_package.md",
+    "execution_result_diff": "backend/execution_result_diff.py",
+    "execution_result_diff_docs": "docs/execution_result_diff.md",
+    "execution_diff_gallery": "backend/execution_diff_gallery.py",
+    "execution_diff_gallery_docs": "docs/execution_diff_gallery.md",
+    "execution_diff_detail": "backend/execution_diff_detail.py",
+    "execution_diff_detail_docs": "docs/execution_diff_detail.md",
+    "reproducibility_audit_packet": "backend/reproducibility_audit_packet.py",
+    "reproducibility_audit_packet_docs": "docs/reproducibility_audit_packet.md",
+    "reviewer_audit_index": "backend/reviewer_audit_index.py",
+    "reviewer_audit_index_docs": "docs/reviewer_audit_index.md",
+    "portfolio_export_launcher": "backend/portfolio_export_launcher.py",
+    "portfolio_export_launcher_docs": "docs/portfolio_export_launcher.md",
+    "portable_release_package": "backend/portable_release_package.py",
+    "portable_release_package_docs": "docs/portable_release_package.md",
+    "demo_script_pack": "backend/demo_script_pack.py",
+    "demo_script_pack_docs": "docs/demo_script_pack.md",
+    "demo_artifact_completeness": "backend/demo_artifact_completeness.py",
+    "demo_artifact_completeness_docs": "docs/demo_artifact_completeness.md",
+    "visual_evidence_capture": "backend/visual_evidence_capture.py",
+    "visual_evidence_capture_docs": "docs/visual_evidence_capture.md",
+    "visual_evidence_review_diff": "backend/visual_evidence_review_diff.py",
+    "visual_evidence_review_diff_docs": "docs/visual_evidence_review_diff.md",
+    "visual_evidence_review_annotations": "backend/visual_evidence_review_annotations.py",
+    "visual_evidence_review_annotations_docs": "docs/visual_evidence_review_annotations.md",
+    "visual_evidence_signoff_packet": "backend/visual_evidence_signoff_packet.py",
+    "visual_evidence_signoff_packet_docs": "docs/visual_evidence_signoff_packet.md",
+    "final_reviewer_launch_checklist": "backend/final_reviewer_launch_checklist.py",
+    "final_reviewer_launch_checklist_docs": "docs/final_reviewer_launch_checklist.md",
+    "recruiter_demo_brief": "backend/recruiter_demo_brief.py",
+    "recruiter_demo_brief_docs": "docs/recruiter_demo_brief.md",
+    "public_portfolio_package": "backend/public_portfolio_interview_package.py",
+    "public_portfolio_package_docs": "docs/public_portfolio_interview_package.md",
+    "demo_review_playbook": "backend/demo_review_playbook.py",
+    "demo_review_playbook_docs": "docs/demo_review_playbook.md",
+    "github_publication_bundle": "backend/github_publication_bundle.py",
+    "github_publication_bundle_docs": "docs/github_publication_bundle.md",
+    "repository_publication_qa": "backend/repository_publication_qa.py",
+    "repository_publication_qa_docs": "docs/repository_publication_qa.md",
+    "repository_export_handoff": "backend/repository_export_handoff.py",
+    "repository_export_handoff_docs": "docs/repository_export_handoff.md",
+    "repository_dry_run_review": "backend/repository_dry_run_review.py",
+    "repository_dry_run_review_docs": "docs/repository_dry_run_review.md",
+    "repository_final_package_review": "backend/repository_final_package_review.py",
+    "repository_final_package_review_docs": "docs/repository_final_package_review.md",
+    "public_readme_cleanup_review": "backend/public_readme_cleanup_review.py",
+    "public_readme_cleanup_review_docs": "docs/public_readme_cleanup_review.md",
+    "public_repository_polish_package": "backend/public_repository_polish_package.py",
+    "public_repository_polish_package_docs": "docs/public_repository_polish_package.md",
+    "repository_export_checklist": "backend/repository_export_checklist.py",
+    "repository_export_checklist_docs": "docs/repository_export_checklist.md"
+  },
+  "validated_counts": {
+    "pedestrian_generators": 391,
+    "childcare": 1,
+    "crossings": 342,
+    "road_segments": 2603,
+    "traffic_calming_features": 11
+  },
+  "public_space_profile_scope": {
+    "profile_id": "park_playground_access",
+    "default_workspace": "park_playground_access_kfar_saba_v001",
+    "base_workspace": "safe_access_kfar_saba_route_aware_v001",
+    "validated_counts": {
+      "public_spaces": 145,
+      "parks": 103,
+      "playgrounds": 39,
+      "community_centres": 2,
+      "recreation_grounds": 1
+    },
+    "claim_boundary": "Public-space profile metrics are infrastructure review indicators from mapped OSM evidence, not proof of real-world access conditions."
+  },
+  "profile_comparison_scope": {
+    "api": "POST /api/portfolio-reports/profile-comparison",
+    "report_type": "profile_comparison",
+    "default_profiles": [
+      "safe_access_pedestrian_review",
+      "transit_stop_walk_access",
+      "park_playground_access"
+    ],
+    "purpose": "Portfolio evidence that the same validated source and pilot area support multiple reusable GIS analytics profiles.",
+    "source_gis_modified": false
+  },
+  "route_aware_scope": {
+    "method": "OSM road-network proxy shortest path",
+    "base_workspace": "safe_access_kfar_saba_pbf_enriched_v001",
+    "route_workspace": "safe_access_kfar_saba_route_aware_v001",
+    "claim_boundary": "Network metrics are infrastructure review indicators, not verified pedestrian routing or crash prediction."
+  },
+  "pilot_area_import_scope": {
+    "source_layer": "gis_osm_places_a_free_1",
+    "catalog_output": "analysis_output/georeview_studio_pilot_catalog/pilot_areas.csv",
+    "api": [
+      "GET /api/pilot-areas",
+      "GET /api/pilot-areas/{osm_id}",
+      "GET /api/preflight/safe-access-pilot",
+      "POST /api/runs/safe-access-pilot"
+    ],
+    "claim_boundary": "Pilot areas are OSM/Geofabrik place polygons, not official municipal boundaries."
+  },
+  "job_history_scope": {
+    "runs_dir": "analysis_output/georeview_studio_runs",
+    "api": [
+      "POST /api/jobs/safe-access-pilot",
+      "GET /api/jobs",
+      "GET /api/jobs/{job_id}"
+    ],
+    "purpose": "Background execution and durable run records for longer selected-pilot workspace builds."
+  },
+  "preflight_scope": {
+    "api": [
+      "GET /api/preflight/safe-access-pilot",
+      "POST /api/preflight/safe-access-pilot"
+    ],
+    "checks": [
+      "selected pilot metadata",
+      "required Geofabrik layers",
+      "raw PBF availability",
+      "workspace ids and existing manifests",
+      "runtime class",
+      "claim boundaries"
+    ],
+    "source_gis_modified": false
+  },
+  "source_onboarding_scope": {
+    "output_dir": "analysis_output/georeview_studio_source_onboarding",
+    "api": [
+      "GET /api/source-onboarding",
+      "GET /api/source-onboarding/sources",
+      "GET /api/source-onboarding/sources/{dataset_id}",
+      "POST /api/source-onboarding/refresh"
+    ],
+    "checks": [
+      "recursive maps folder scan excluding analysis_output",
+      "ZIP archive member and shapefile header profiling",
+      "PBF enrichment-source detection",
+      "template readiness and blockers"
+    ],
+    "source_gis_modified": false
+  },
+  "analysis_workflow_scope": {
+    "api": [
+      "GET /api/analysis-workflow/plan",
+      "POST /api/analysis-workflow/plan",
+      "POST /api/analysis-workflow/start"
+    ],
+    "flow": [
+      "source onboarding readiness",
+      "selected pilot metadata",
+      "safe access preflight",
+      "background job start",
+      "active dashboard workspace"
+    ],
+    "source_gis_modified": false
+  },
+  "analysis_runs_scope": {
+    "api": [
+      "GET /api/analysis-runs",
+      "GET /api/analysis-runs/{run_id}",
+      "GET /api/analysis-runs/{run_id}/outputs",
+      "GET /api/analysis-runs/{run_id}/outputs/{output_id}",
+      "POST /api/analysis-runs/{run_id}/rerun"
+    ],
+    "purpose": "Product-level run registry with status, inputs, active workspace, output links, and rerun support.",
+    "source_gis_modified": false
+  },
+  "analysis_profiles_scope": {
+    "api": [
+      "GET /api/analysis-profiles",
+      "GET /api/analysis-profiles/{profile_id}",
+      "GET /api/analysis-profiles/{profile_id}/readiness",
+      "POST /api/analysis-profiles/{profile_id}/plan"
+    ],
+    "profiles": [
+      "safe_access_pedestrian_review",
+      "transit_stop_walk_access",
+      "park_playground_access",
+      "cycling_micromobility_access",
+      "osm_tag_quality",
+      "generic_layer_inventory"
+    ],
+    "purpose": "Generic product capability registry that separates implemented runners from planned GIS analysis profiles.",
+    "source_gis_modified": false
+  },
+  "profile_runner_scope": {
+    "api": [
+      "GET /api/profile-runners",
+      "POST /api/profile-runners/{profile_id}/run",
+      "GET /api/profile-workspaces",
+      "GET /api/profile-workspaces/{workspace_id}/summary",
+      "GET /api/profile-workspaces/{workspace_id}/results",
+      "GET /api/profile-workspaces/{workspace_id}/download/{output_id}",
+      "POST /api/authored-profile-runner/run"
+    ],
+    "implemented_runners": [
+      "safe_access_pedestrian_review",
+      "transit_stop_walk_access",
+      "park_playground_access",
+      "osm_tag_quality",
+      "authored_profile_audit"
+    ],
+    "default_transit_workspace": "transit_stop_walk_access_kfar_saba_v001",
+    "default_park_playground_workspace": "park_playground_access_kfar_saba_v001",
+    "purpose": "Runs implemented analysis profiles and exposes profile-specific output workspaces.",
+    "source_gis_modified": false,
+    "default_osm_tag_quality_workspace": "osm_tag_quality_kfar_saba_v001"
+  },
+  "portfolio_report_scope": {
+    "output_dir": "analysis_output/georeview_studio_portfolio_reports",
+    "api": [
+      "GET /api/portfolio-reports",
+      "GET /api/portfolio-reports/{report_id}",
+      "GET /api/portfolio-reports/{report_id}/download",
+      "POST /api/portfolio-reports/from-run",
+      "POST /api/portfolio-reports/from-profile-workspace",
+      "POST /api/portfolio-reports/profile-comparison",
+      "POST /api/portfolio-reports/compare"
+    ],
+    "profile_workspace_support": [
+      "transit_stop_walk_access_kfar_saba_v001",
+      "park_playground_access_kfar_saba_v001"
+    ],
+    "purpose": "Evidence-based Markdown and JSON reporting for completed analysis runs, profile workspaces, and run comparison.",
+    "source_gis_modified": false
+  },
+  "product_architecture_scope": {
+    "api": [
+      "GET /api/product-architecture",
+      "GET /api/product-architecture/variants",
+      "GET /api/product-architecture/roadmap",
+      "POST /api/product-architecture/implementation-plan"
+    ],
+    "recommended_variant": "universal_gis_review_studio",
+    "top_options": [
+      "universal_gis_review_studio",
+      "safe_access_israel",
+      "open_mobility_evidence_lab"
+    ],
+    "purpose": "Makes the reusable GIS analytics platform direction explicit while preserving Safe Access as the first implemented profile.",
+    "source_gis_modified": false
+  },
+  "profile_dashboard_scope": {
+    "api": [
+      "GET /api/profile-dashboard",
+      "GET /api/profile-dashboard/profiles",
+      "GET /api/profile-dashboard/{profile_id}/summary",
+      "GET /api/profile-dashboard/{profile_id}/results"
+    ],
+    "contract_version": "profile_dashboard_contract_v001",
+    "implemented_profiles": [
+      "safe_access_pedestrian_review",
+      "transit_stop_walk_access",
+      "park_playground_access",
+      "dynamic_authored_profile_audits"
+    ],
+    "purpose": "One normalized dashboard row contract across implemented profile outputs and authored profile audit workspaces.",
+    "source_gis_modified": false
+  },
+  "local_intake_scope": {
+    "output_dir": "analysis_output/georeview_studio_local_intake",
+    "api": [
+      "GET /api/local-intake",
+      "GET /api/local-intake/sources",
+      "POST /api/local-intake/preview",
+      "POST /api/local-intake/plan"
+    ],
+    "policy": "Preview local paths under maps root, reject analysis_output, write only small metadata plans.",
+    "source_gis_modified": false
+  },
+  "profile_export_bundle_scope": {
+    "output_dir": "analysis_output/georeview_studio_portfolio_reports",
+    "api": [
+      "POST /api/export-bundles/profile-dashboard",
+      "GET /api/export-bundles",
+      "GET /api/export-bundles/{bundle_id}",
+      "GET /api/export-bundles/{bundle_id}/download"
+    ],
+    "profiles": [
+      "safe_access_pedestrian_review",
+      "transit_stop_walk_access",
+      "park_playground_access"
+    ],
+    "purpose": "Small portfolio bundle over the normalized profile dashboard result contract.",
+    "source_gis_modified": false
+  },
+  "scoring_rules_scope": {
+    "config": "config/scoring_rules_v001.json",
+    "api": [
+      "GET /api/scoring-rules",
+      "GET /api/scoring-rules/{profile_id}",
+      "GET /api/scoring-rules/{profile_id}/audit",
+      "POST /api/scoring-rules/{profile_id}/audit"
+    ],
+    "profiles": [
+      "safe_access_pedestrian_review",
+      "transit_stop_walk_access",
+      "park_playground_access"
+    ],
+    "purpose": "Versioned transparent scoring rule contract with expected-vs-actual score audit.",
+    "source_gis_modified": false
+  },
+  "postgis_backend_scope": {
+    "schema": "config/postgis_schema_v001.sql",
+    "output_dir": "analysis_output/georeview_studio_postgis_plans",
+    "api": [
+      "GET /api/postgis-backend",
+      "GET /api/postgis-backend/schema",
+      "GET /api/postgis-backend/migration-plan",
+      "POST /api/postgis-backend/migration-plan",
+      "GET /api/postgis-backend/plans",
+      "GET /api/postgis-backend/{plan_id}"
+    ],
+    "purpose": "Planning-only PostGIS backend option for larger-region storage and spatial indexing.",
+    "connection_status": "not_configured",
+    "source_gis_modified": false
+  },
+  "profile_mapper_scope": {
+    "api": [
+      "GET /api/profile-mapper",
+      "GET /api/profile-mapper/contracts",
+      "GET /api/profile-mapper/contracts/{profile_id}",
+      "GET /api/profile-mapper/compatibility",
+      "GET /api/profile-mapper/plan",
+      "POST /api/profile-mapper/plan",
+      "GET /api/profile-mapper/plans",
+      "GET /api/profile-mapper/plans/{plan_id}"
+    ],
+    "contract_version": "profile_mapper_contracts_v001",
+    "contract_count": 6,
+    "purpose": "Make reusable GIS review profile requirements explicit through versioned contracts, source compatibility checks, and mapper plans.",
+    "source_gis_modified": false
+  },
+  "contract_execution_scope": {
+    "api": [
+      "GET /api/contract-execution",
+      "GET /api/contract-execution/adapters",
+      "GET /api/contract-execution/dry-run",
+      "POST /api/contract-execution/dry-run",
+      "GET /api/contract-execution/dry-runs",
+      "GET /api/contract-execution/dry-runs/{dry_run_id}"
+    ],
+    "version": "contract_execution_v001",
+    "adapter_count": 6,
+    "executable_now_count": 4,
+    "purpose": "Dry-run validated profile mapper contracts against existing or planned backend runners before real execution.",
+    "source_gis_modified": false
+  },
+  "osm_tag_quality_scope": {
+    "api": [
+      "GET /api/osm-tag-quality",
+      "GET /api/osm-tag-quality/summary",
+      "GET /api/osm-tag-quality/results",
+      "POST /api/profile-runners/osm_tag_quality/run",
+      "GET /api/profile-workspaces/{workspace_id}/download/tag_quality_summary"
+    ],
+    "input_files": [
+      "analysis_output/osm_tag_counts.csv",
+      "analysis_output/layer_summary.csv"
+    ],
+    "default_workspace": "osm_tag_quality_kfar_saba_v001",
+    "purpose": "Read-only profile workspace for OSM tag coverage, simplified-schema gaps and PBF enrichment evidence.",
+    "source_gis_modified": false
+  },
+  "template_authoring_scope": {
+    "api": [
+      "GET /api/template-authoring",
+      "GET /api/template-authoring/options",
+      "POST /api/template-authoring/draft",
+      "GET /api/template-authoring/drafts",
+      "GET /api/template-authoring/drafts/{draft_id}"
+    ],
+    "output_dir": "analysis_output/georeview_studio_template_authoring",
+    "mode": "draft_only_no_config_mutation",
+    "purpose": "Draft new GIS review profile mapper contracts from controlled blueprints before implementation.",
+    "source_gis_modified": false
+  },
+  "execution_queue_scope": {
+    "api": [
+      "GET /api/execution-queue",
+      "POST /api/execution-queue/enqueue",
+      "GET /api/execution-queue/jobs",
+      "GET /api/execution-queue/jobs/{job_id}",
+      "POST /api/execution-queue/enqueue-authored-draft"
+    ],
+    "output_dir": "analysis_output/georeview_studio_execution_queue",
+    "mode": "controlled_local_execution",
+    "allowed_profiles": [
+      "safe_access_pedestrian_review",
+      "transit_stop_walk_access",
+      "park_playground_access",
+      "osm_tag_quality"
+    ],
+    "purpose": "Convert validated contract dry-runs and authored drafts into queued local runner actions with persisted job evidence.",
+    "source_gis_modified": false
+  },
+  "dataset_package_scope": {
+    "api": [
+      "GET /api/dataset-packages",
+      "POST /api/dataset-packages/create",
+      "GET /api/dataset-packages/packages",
+      "GET /api/dataset-packages/packages/{package_id}",
+      "GET /api/dataset-packages/packages/{package_id}/download"
+    ],
+    "output_dir": "analysis_output/georeview_studio_dataset_packages",
+    "purpose": "Create reusable evidence packages for selected source datasets.",
+    "components": [
+      "source_readiness",
+      "local_intake_plan",
+      "template_authoring_draft",
+      "execution_queue_job",
+      "dataset_package_report"
+    ],
+    "source_gis_modified": false
+  },
+  "authored_profile_runner_scope": {
+    "api": [
+      "GET /api/authored-profile-runner",
+      "POST /api/authored-profile-runner/run",
+      "GET /api/authored-profile-runner/workspaces",
+      "POST /api/execution-queue/enqueue-authored-draft",
+      "GET /api/profile-workspaces/{workspace_id}/summary",
+      "GET /api/profile-workspaces/{workspace_id}/results",
+      "GET /api/profile-workspaces/{workspace_id}/download/authored_profile_results"
+    ],
+    "output_dir": "analysis_output/georeview_studio_workspaces",
+    "mode": "read_only_draft_audit_runner",
+    "purpose": "Execute Template Authoring drafts as tag and layer evidence audit workspaces through direct API or the controlled queue.",
+    "source_gis_modified": false
+  },
+  "authored_dashboard_contract_scope": {
+    "api": [
+      "GET /api/profile-dashboard",
+      "GET /api/profile-dashboard/profiles",
+      "GET /api/profile-dashboard/{authored_profile_id}/summary",
+      "GET /api/profile-dashboard/{authored_profile_id}/results",
+      "POST /api/portfolio-reports/from-profile-workspace",
+      "POST /api/export-bundles/profile-dashboard"
+    ],
+    "mode": "dynamic_authored_profile_workspace_normalization",
+    "purpose": "Expose authored profile audit workspaces through the same dashboard, report, and export bundle contract as implemented profiles.",
+    "source_gis_modified": false
+  },
+  "profile_promotion_scope": {
+    "api": [
+      "GET /api/profile-promotion",
+      "GET /api/profile-promotion/candidates",
+      "GET /api/profile-promotion/candidates/{workspace_id}",
+      "POST /api/profile-promotion/propose",
+      "GET /api/profile-promotion/proposals",
+      "GET /api/profile-promotion/proposals/{proposal_id}"
+    ],
+    "output_dir": "analysis_output/georeview_studio_profile_promotions",
+    "purpose": "Create manual-review profile contract proposals from successful authored audit workspaces.",
+    "source_gis_modified": false,
+    "profile_mapper_config_modified": false
+  },
+  "proposal_acceptance_scope": {
+    "api": [
+      "GET /api/profile-promotion/review-queue",
+      "GET /api/profile-promotion/decisions",
+      "GET /api/profile-promotion/proposals/{proposal_id}/decision",
+      "POST /api/profile-promotion/proposals/{proposal_id}/decision"
+    ],
+    "output_dir": "analysis_output/georeview_studio_profile_promotions/{proposal_id}/acceptance_decisions",
+    "purpose": "Record manual approve/reject decisions for promotion proposals without applying config changes.",
+    "source_gis_modified": false,
+    "profile_mapper_config_modified": false
+  },
+  "accepted_contract_application_plan_scope": {
+    "api": [
+      "GET /api/profile-promotion/application-candidates",
+      "POST /api/profile-promotion/application-plan",
+      "GET /api/profile-promotion/application-plans",
+      "GET /api/profile-promotion/application-plans/{plan_id}"
+    ],
+    "output_dir": "analysis_output/georeview_studio_profile_promotions/{proposal_id}/application_plans",
+    "purpose": "Generate planning-only config patch previews for approved profile promotion decisions.",
+    "source_gis_modified": false,
+    "profile_mapper_config_modified": false
+  },
+  "profile_contract_diff_scope": {
+    "api": [
+      "GET /api/profile-promotion/diff-candidates",
+      "POST /api/profile-promotion/contract-diff",
+      "GET /api/profile-promotion/contract-diffs",
+      "GET /api/profile-promotion/contract-diffs/{diff_id}"
+    ],
+    "purpose": "Review current-vs-proposed profile mapper contract fields before any explicit config-change task.",
+    "outputs": [
+      "profile_contract_diff_*.json",
+      "profile_contract_diff_*_review.md",
+      "latest_contract_diff.json"
+    ],
+    "source_gis_modified": false,
+    "mutates_config": false
+  },
+  "guarded_config_apply_proposal_scope": {
+    "api": [
+      "GET /api/profile-promotion/apply-candidates",
+      "POST /api/profile-promotion/config-apply-proposal",
+      "GET /api/profile-promotion/config-apply-proposals",
+      "GET /api/profile-promotion/config-apply-proposals/{apply_id}"
+    ],
+    "purpose": "Generate proposed mapper config previews, hashes, gates and manual approval checklist before any explicit config-change task.",
+    "outputs": [
+      "profile_config_apply_proposal_*.json",
+      "profile_config_apply_proposal_*_proposed_config_preview.json",
+      "profile_config_apply_proposal_*_manual_approval_checklist.md",
+      "latest_config_apply_proposal.json"
+    ],
+    "source_gis_modified": false,
+    "mutates_config": false
+  },
+  "profile_contract_regression_preview_scope": {
+    "api": [
+      "GET /api/profile-promotion/regression-candidates",
+      "POST /api/profile-promotion/regression-preview",
+      "GET /api/profile-promotion/regression-previews",
+      "GET /api/profile-promotion/regression-previews/{preview_id}"
+    ],
+    "purpose": "Validate proposed mapper config previews against contract invariants before any explicit config-change task.",
+    "outputs": [
+      "profile_contract_regression_preview_*.json",
+      "profile_contract_regression_preview_*_report.md",
+      "latest_contract_regression_preview.json"
+    ],
+    "source_gis_modified": false,
+    "mutates_config": false
+  },
+  "release_readiness_scope": {
+    "api": [
+      "GET /api/release-readiness",
+      "GET /api/release-readiness/gates",
+      "POST /api/release-readiness/snapshot",
+      "GET /api/release-readiness/snapshots",
+      "GET /api/release-readiness/snapshots/{snapshot_id}"
+    ],
+    "output_dir": "analysis_output/georeview_studio_release_readiness",
+    "purpose": "Summarize release gates, validation status, API coverage, source read-only evidence and profile-promotion lifecycle evidence for a local portfolio demo.",
+    "source_gis_modified": false,
+    "mutates_config": false
+  },
+  "portfolio_demo_scope": {
+    "api": [
+      "GET /api/portfolio-demo",
+      "GET /api/portfolio-demo/steps",
+      "POST /api/portfolio-demo/snapshot",
+      "GET /api/portfolio-demo/snapshots",
+      "GET /api/portfolio-demo/snapshots/{snapshot_id}"
+    ],
+    "output_dir": "analysis_output/georeview_studio_portfolio_demo",
+    "purpose": "Guide a local portfolio presentation across data evidence, profile outputs, quality gates, reports and roadmap.",
+    "source_gis_modified": false,
+    "mutates_config": false
+  },
+  "portfolio_evidence_bundle_scope": {
+    "api": [
+      "GET /api/portfolio-evidence-bundle",
+      "POST /api/portfolio-evidence-bundle/create",
+      "GET /api/portfolio-evidence-bundle/bundles",
+      "GET /api/portfolio-evidence-bundle/bundles/{bundle_id}",
+      "GET /api/portfolio-evidence-bundle/bundles/{bundle_id}/download"
+    ],
+    "output_dir": "analysis_output/georeview_studio_portfolio_evidence_bundles",
+    "purpose": "Package generated readiness, demo, validation, API and portfolio evidence into a shareable review bundle.",
+    "source_gis_modified": false,
+    "mutates_config": false
+  },
+  "bundle_review_checklist_scope": {
+    "api": [
+      "GET /api/bundle-review-checklist",
+      "POST /api/bundle-review-checklist/create",
+      "GET /api/bundle-review-checklist/checklists",
+      "GET /api/bundle-review-checklist/checklists/{checklist_id}",
+      "GET /api/bundle-review-checklist/checklists/{checklist_id}/download"
+    ],
+    "output_dir": "analysis_output/georeview_studio_bundle_review_checklists",
+    "purpose": "Review a portfolio evidence bundle for completeness, current validation/API evidence, claim boundaries and remediation actions.",
+    "source_gis_modified": false,
+    "mutates_config": false
+  },
+  "portfolio_narrative_export_scope": {
+    "api": [
+      "GET /api/portfolio-narrative-export",
+      "POST /api/portfolio-narrative-export/create",
+      "GET /api/portfolio-narrative-export/narratives",
+      "GET /api/portfolio-narrative-export/narratives/{narrative_id}",
+      "GET /api/portfolio-narrative-export/narratives/{narrative_id}/download"
+    ],
+    "output_dir": "analysis_output/georeview_studio_portfolio_narratives",
+    "purpose": "Turn a checked evidence bundle into a concise reviewer-facing portfolio narrative and talk track.",
+    "source_gis_modified": false,
+    "mutates_config": false
+  },
+  "portfolio_handoff_page_scope": {
+    "api": [
+      "GET /api/portfolio-handoff-page",
+      "POST /api/portfolio-handoff-page/create",
+      "GET /api/portfolio-handoff-page/pages",
+      "GET /api/portfolio-handoff-page/pages/{page_id}",
+      "GET /api/portfolio-handoff-page/pages/{page_id}/download"
+    ],
+    "output_dir": "analysis_output/georeview_studio_portfolio_handoff_pages",
+    "purpose": "Render a ready portfolio narrative into a compact standalone local HTML handoff page.",
+    "source_gis_modified": false,
+    "mutates_config": false
+  },
+  "portfolio_evidence_gallery_scope": {
+    "api": [
+      "GET /api/portfolio-evidence-gallery",
+      "POST /api/portfolio-evidence-gallery/create",
+      "GET /api/portfolio-evidence-gallery/galleries",
+      "GET /api/portfolio-evidence-gallery/galleries/{gallery_id}",
+      "GET /api/portfolio-evidence-gallery/galleries/{gallery_id}/download"
+    ],
+    "output_dir": "analysis_output/georeview_studio_portfolio_evidence_galleries",
+    "purpose": "Index handoff pages, narratives, evidence bundles and portfolio reports into a standalone local HTML gallery.",
+    "source_gis_modified": false,
+    "mutates_config": false
+  },
+  "multi_pilot_comparison_scope": {
+    "api": [
+      "GET /api/multi-pilot-comparison",
+      "POST /api/multi-pilot-comparison/create",
+      "GET /api/multi-pilot-comparison/comparisons",
+      "GET /api/multi-pilot-comparison/comparisons/{comparison_id}",
+      "GET /api/multi-pilot-comparison/comparisons/{comparison_id}/download"
+    ],
+    "default_pilots": [
+      {
+        "name": "Kfar Saba",
+        "osm_id": "53796999",
+        "workspace": "safe_access_kfar_saba_route_aware_v001"
+      },
+      {
+        "name": "Raanana",
+        "osm_id": "10550854",
+        "workspace": "safe_access_pilot_10550854_route_aware_v001"
+      }
+    ],
+    "purpose": "Portfolio evidence that the same Safe Access contract runs over more than one pilot area.",
+    "source_gis_modified": false
+  },
+  "comparison_map_exports_scope": {
+    "api": [
+      "GET /api/comparison-map-exports",
+      "POST /api/comparison-map-exports/create",
+      "GET /api/comparison-map-exports/exports",
+      "GET /api/comparison-map-exports/exports/{export_id}",
+      "GET /api/comparison-map-exports/exports/{export_id}/download"
+    ],
+    "outputs": [
+      "HTML",
+      "SVG",
+      "CSV",
+      "JSON"
+    ],
+    "default_pilots": [
+      {
+        "name": "Kfar Saba",
+        "workspace": "safe_access_kfar_saba_route_aware_v001"
+      },
+      {
+        "name": "Raanana",
+        "workspace": "safe_access_pilot_10550854_route_aware_v001"
+      }
+    ],
+    "source_gis_modified": false
+  },
+  "source_import_guardrails_scope": {
+    "api": [
+      "GET /api/source-import-guardrails",
+      "POST /api/source-import-guardrails/preview",
+      "POST /api/source-import-guardrails/request",
+      "GET /api/source-import-guardrails/requests",
+      "GET /api/source-import-guardrails/requests/{request_id}",
+      "GET /api/source-import-guardrails/requests/{request_id}/download",
+      "POST /api/source-import-guardrails/requests/{request_id}/decision"
+    ],
+    "output_dir": "analysis_output/georeview_studio_source_import_guardrails",
+    "mode": "metadata_only_manual_approval_gate",
+    "purpose": "Create review packets and approval decisions before a local source is handed to mapper or execution workflows.",
+    "source_gis_modified": false,
+    "mutates_config": false
+  },
+  "source_handoff_scope": {
+    "api": [
+      "GET /api/source-handoff",
+      "GET /api/source-handoff/candidates",
+      "POST /api/source-handoff/create",
+      "GET /api/source-handoff/handoffs",
+      "GET /api/source-handoff/handoffs/{handoff_id}",
+      "GET /api/source-handoff/handoffs/{handoff_id}/download"
+    ],
+    "output_dir": "analysis_output/georeview_studio_source_handoffs",
+    "mode": "approved_source_to_mapper_plan_dry_run_and_planned_queue_job",
+    "purpose": "Connect an approved source import request to mapper planning, contract dry-run evidence, and a controlled queue job with execute_now=false.",
+    "source_gis_modified": false,
+    "mutates_config": false
+  },
+  "source_handoff_execution_scope": {
+    "api": [
+      "GET /api/source-handoff-execution",
+      "GET /api/source-handoff-execution/candidates",
+      "POST /api/source-handoff-execution/execute",
+      "GET /api/source-handoff-execution/executions",
+      "GET /api/source-handoff-execution/executions/{execution_id}",
+      "GET /api/source-handoff-execution/executions/{execution_id}/download"
+    ],
+    "output_dir": "analysis_output/georeview_studio_source_handoff_executions",
+    "mode": "explicit_acknowledged_execution_from_approved_handoff",
+    "purpose": "Run an approved source handoff through the controlled execution queue and compare generated workspace outputs to handoff evidence.",
+    "source_gis_modified": false,
+    "mutates_config": false
+  },
+  "execution_evidence_package_scope": {
+    "status": "implemented_in_v054",
+    "purpose": "Package verified source handoff executions into reviewer-ready JSON and Markdown evidence indexes.",
+    "output_dir": "analysis_output/georeview_studio_execution_evidence_packages",
+    "source_gis_modified": false,
+    "mutates_config": false
+  },
+  "execution_result_diff_scope": {
+    "status": "implemented_in_v055",
+    "purpose": "Compare reviewer-ready execution evidence packages for reproducibility and result-difference review.",
+    "output_dir": "analysis_output/georeview_studio_execution_result_diffs",
+    "source_gis_modified": false,
+    "mutates_config": false
+  },
+  "current_release_focus": "ui_ux_landing_repair",
+  "reproducibility_audit_packet_scope": {
+    "output_dir": "analysis_output/georeview_studio_reproducibility_audit_packets",
+    "api": [
+      "GET /api/reproducibility-audit-packet",
+      "GET /api/reproducibility-audit-packet/candidates",
+      "POST /api/reproducibility-audit-packet/create",
+      "GET /api/reproducibility-audit-packet/packets",
+      "GET /api/reproducibility-audit-packet/packets/{packet_id}",
+      "GET /api/reproducibility-audit-packet/packets/{packet_id}/download"
+    ],
+    "purpose": "Bundle diff detail, result diff, gallery and release evidence into one reviewer-facing packet.",
+    "source_gis_modified": false
+  },
+  "reviewer_audit_index_scope": {
+    "output_dir": "analysis_output/georeview_studio_reviewer_audit_indexes",
+    "api": [
+      "GET /api/reviewer-audit-index",
+      "POST /api/reviewer-audit-index/create",
+      "GET /api/reviewer-audit-index/indexes",
+      "GET /api/reviewer-audit-index/indexes/{index_id}",
+      "GET /api/reviewer-audit-index/indexes/{index_id}/download"
+    ],
+    "purpose": "Index ready audit packets and portfolio evidence links for reviewer navigation.",
+    "source_gis_modified": false
+  },
+  "portfolio_export_launcher_scope": {
+    "output_dir": "analysis_output/georeview_studio_portfolio_export_launchers",
+    "api": [
+      "GET /api/portfolio-export-launcher",
+      "POST /api/portfolio-export-launcher/create",
+      "GET /api/portfolio-export-launcher/launchers",
+      "GET /api/portfolio-export-launcher/launchers/{launcher_id}",
+      "GET /api/portfolio-export-launcher/launchers/{launcher_id}/download"
+    ],
+    "purpose": "Start-here launcher over reviewer audit indexes, audit packets and portfolio artifacts.",
+    "source_gis_modified": false,
+    "mutates_config": false
+  },
+  "portable_release_package_scope": {
+    "output_dir": "analysis_output/georeview_studio_portable_release_packages",
+    "api": [
+      "GET /api/portable-release-package",
+      "POST /api/portable-release-package/create",
+      "GET /api/portable-release-package/packages",
+      "GET /api/portable-release-package/packages/{package_id}",
+      "GET /api/portable-release-package/packages/{package_id}/download"
+    ],
+    "purpose": "Create a small reviewer-ready ZIP from launcher and evidence artifacts.",
+    "includes_source_gis": false,
+    "source_gis_modified": false,
+    "mutates_config": false
+  },
+  "demo_script_pack_scope": {
+    "output_dir": "analysis_output/georeview_studio_demo_script_packs",
+    "api": [
+      "GET /api/demo-script-pack",
+      "POST /api/demo-script-pack/create",
+      "GET /api/demo-script-pack/packs",
+      "GET /api/demo-script-pack/packs/{pack_id}",
+      "GET /api/demo-script-pack/packs/{pack_id}/download"
+    ],
+    "purpose": "Create a repeatable reviewer walkthrough script and screenshot smoke plan.",
+    "source_gis_modified": false,
+    "mutates_config": false
+  },
+  "visual_qa_snapshot_ledger_scope": {
+    "output_dir": "analysis_output/georeview_studio_visual_qa_ledgers",
+    "api": [
+      "GET /api/visual-qa-snapshot-ledger",
+      "POST /api/visual-qa-snapshot-ledger/create",
+      "GET /api/visual-qa-snapshot-ledger/ledgers",
+      "GET /api/visual-qa-snapshot-ledger/ledgers/{ledger_id}",
+      "GET /api/visual-qa-snapshot-ledger/ledgers/{ledger_id}/download"
+    ],
+    "purpose": "Track manual visual QA capture status and reviewer observations for demo screenshot targets.",
+    "source_gis_modified": false,
+    "mutates_config": false
+  },
+  "visual_baseline_comparison_scope": {
+    "output_dir": "analysis_output/georeview_studio_visual_baseline_comparisons",
+    "api": [
+      "GET /api/visual-baseline-comparison",
+      "POST /api/visual-baseline-comparison/create",
+      "GET /api/visual-baseline-comparison/comparisons",
+      "GET /api/visual-baseline-comparison/comparisons/{comparison_id}",
+      "GET /api/visual-baseline-comparison/comparisons/{comparison_id}/download"
+    ],
+    "purpose": "Compare generated Visual QA ledgers across releases and identify demo target deltas.",
+    "source_gis_modified": false,
+    "mutates_config": false
+  },
+  "demo_artifact_completeness_scope": {
+    "output_dir": "analysis_output/georeview_studio_demo_artifact_completeness",
+    "api": [
+      "GET /api/demo-artifact-completeness",
+      "POST /api/demo-artifact-completeness/create",
+      "GET /api/demo-artifact-completeness/checks",
+      "GET /api/demo-artifact-completeness/checks/{check_id}",
+      "GET /api/demo-artifact-completeness/checks/{check_id}/download"
+    ],
+    "purpose": "Verify generated demo, package, QA and comparison artifacts before local portfolio sharing.",
+    "source_gis_modified": false,
+    "mutates_config": false
+  },
+  "visual_evidence_capture_scope": {
+    "output_dir": "analysis_output/georeview_studio_visual_evidence_captures",
+    "api": [
+      "GET /api/visual-evidence-capture",
+      "POST /api/visual-evidence-capture/create",
+      "GET /api/visual-evidence-capture/captures",
+      "GET /api/visual-evidence-capture/captures/{capture_id}",
+      "GET /api/visual-evidence-capture/captures/{capture_id}/download"
+    ],
+    "purpose": "Capture browser screenshots for Visual QA ledger targets and package contact-sheet evidence.",
+    "source_gis_modified": false,
+    "mutates_config": false
+  },
+  "visual_evidence_review_diff_scope": {
+    "output_dir": "analysis_output/georeview_studio_visual_evidence_review_diffs",
+    "api": [
+      "GET /api/visual-evidence-review-diff",
+      "POST /api/visual-evidence-review-diff/create",
+      "GET /api/visual-evidence-review-diff/diffs",
+      "GET /api/visual-evidence-review-diff/diffs/{diff_id}",
+      "GET /api/visual-evidence-review-diff/diffs/{diff_id}/download"
+    ],
+    "purpose": "Compare ready Visual Evidence Capture screenshot sets for reviewer-facing visual QA diffs.",
+    "source_gis_modified": false,
+    "mutates_config": false
+  },
+  "visual_evidence_review_annotations_scope": {
+    "output_dir": "analysis_output/georeview_studio_visual_evidence_review_annotations",
+    "api": [
+      "GET /api/visual-evidence-review-annotations",
+      "POST /api/visual-evidence-review-annotations/create",
+      "GET /api/visual-evidence-review-annotations/annotations",
+      "GET /api/visual-evidence-review-annotations/annotations/{annotation_id}",
+      "GET /api/visual-evidence-review-annotations/annotations/{annotation_id}/download"
+    ],
+    "purpose": "Create reviewer annotation artifacts from ready Visual Evidence Review Diff targets.",
+    "source_gis_modified": false,
+    "mutates_config": false
+  },
+  "visual_evidence_signoff_packet_scope": {
+    "output_dir": "analysis_output/georeview_studio_visual_evidence_signoff_packets",
+    "api": [
+      "GET /api/visual-evidence-signoff-packet",
+      "POST /api/visual-evidence-signoff-packet/create",
+      "GET /api/visual-evidence-signoff-packet/packets",
+      "GET /api/visual-evidence-signoff-packet/packets/{packet_id}",
+      "GET /api/visual-evidence-signoff-packet/packets/{packet_id}/download"
+    ],
+    "purpose": "Create reviewer sign-off packets from visual evidence annotations and validation/API evidence.",
+    "source_gis_modified": false,
+    "mutates_config": false
+  },
+  "final_reviewer_launch_checklist_scope": {
+    "output_dir": "analysis_output/georeview_studio_final_reviewer_launch_checklists",
+    "api": [
+      "GET /api/final-reviewer-launch-checklist",
+      "POST /api/final-reviewer-launch-checklist/create",
+      "GET /api/final-reviewer-launch-checklist/checklists",
+      "GET /api/final-reviewer-launch-checklist/checklists/{checklist_id}",
+      "GET /api/final-reviewer-launch-checklist/checklists/{checklist_id}/download"
+    ],
+    "purpose": "Create a final reviewer launch checklist from sign-off packets, validation evidence and API coverage.",
+    "source_gis_modified": false,
+    "mutates_config": false
+  },
+  "recruiter_demo_brief_scope": {
+    "output_dir": "analysis_output/georeview_studio_recruiter_demo_briefs",
+    "api": [
+      "GET /api/recruiter-demo-brief",
+      "POST /api/recruiter-demo-brief/create",
+      "GET /api/recruiter-demo-brief/briefs",
+      "GET /api/recruiter-demo-brief/briefs/{brief_id}",
+      "GET /api/recruiter-demo-brief/briefs/{brief_id}/download"
+    ],
+    "purpose": "Create a recruiter-facing one-page demo brief from final launch checklist evidence.",
+    "source_gis_modified": false,
+    "mutates_config": false
+  },
+  "public_portfolio_package_scope": {
+    "output_dir": "analysis_output/georeview_studio_public_portfolio_packages",
+    "endpoints": [
+      "GET /api/public-portfolio-package",
+      "POST /api/public-portfolio-package/create",
+      "GET /api/public-portfolio-package/packages",
+      "GET /api/public-portfolio-package/packages/{package_id}",
+      "GET /api/public-portfolio-package/packages/{package_id}/download"
+    ],
+    "source_dependency": "ready recruiter demo brief",
+    "source_gis_modified": false
+  },
+  "demo_review_playbook_scope": {
+    "output_dir": "analysis_output/georeview_studio_demo_review_playbooks",
+    "api": [
+      "GET /api/demo-review-playbook",
+      "POST /api/demo-review-playbook/create",
+      "GET /api/demo-review-playbook/playbooks",
+      "GET /api/demo-review-playbook/playbooks/{playbook_id}",
+      "GET /api/demo-review-playbook/playbooks/{playbook_id}/download"
+    ],
+    "source_dependency": "ready public portfolio package",
+    "purpose": "Create final demo agenda, sharing checklist and likely reviewer question prep from the public portfolio package.",
+    "source_gis_modified": false,
+    "mutates_config": false
+  },
+  "github_publication_bundle_scope": {
+    "output_dir": "analysis_output/georeview_studio_github_publication_bundles",
+    "api": [
+      "GET /api/github-publication-bundle",
+      "POST /api/github-publication-bundle/create",
+      "GET /api/github-publication-bundle/bundles",
+      "GET /api/github-publication-bundle/bundles/{bundle_id}",
+      "GET /api/github-publication-bundle/bundles/{bundle_id}/download"
+    ],
+    "source_dependency": "ready demo review playbook",
+    "purpose": "Create GitHub-ready README export, portfolio case study, repository manifest, HTML overview and ZIP without source GIS data.",
+    "includes_source_gis": false,
+    "source_gis_modified": false,
+    "mutates_config": false
+  },
+  "scope": {
+    "repository_publication_qa_scope": {
+      "description": "Repository publication QA and public sharing walkthrough built from the GitHub-ready publication bundle.",
+      "output_dir": "analysis_output/georeview_studio_repository_publication_qa",
+      "api_endpoints": [
+        "GET /api/repository-publication-qa",
+        "POST /api/repository-publication-qa/create",
+        "GET /api/repository-publication-qa/reviews",
+        "GET /api/repository-publication-qa/reviews/{review_id}",
+        "GET /api/repository-publication-qa/reviews/{review_id}/download"
+      ],
+      "source_gis_modified": false,
+      "includes_source_gis": false
+    },
+    "repository_export_handoff_scope": {
+      "description": "Repository export handoff with include/exclude file plan, screenshot references and license decision checklist.",
+      "output_dir": "analysis_output/georeview_studio_repository_export_handoffs",
+      "api_endpoints": [
+        "GET /api/repository-export-handoff",
+        "POST /api/repository-export-handoff/create",
+        "GET /api/repository-export-handoff/handoffs",
+        "GET /api/repository-export-handoff/handoffs/{handoff_id}",
+        "GET /api/repository-export-handoff/handoffs/{handoff_id}/download"
+      ],
+      "source_gis_modified": false,
+      "includes_source_gis": false
+    },
+    "repository_dry_run_review_scope": {
+      "purpose": "Create a local repository archive dry-run review before public sharing.",
+      "output_dir": "analysis_output/georeview_studio_repository_dry_run_reviews",
+      "source_gis_policy": "read_only_and_excluded_from_public_archive",
+      "api_endpoints": [
+        "GET /api/repository-dry-run-review",
+        "POST /api/repository-dry-run-review/create",
+        "GET /api/repository-dry-run-review/reviews",
+        "GET /api/repository-dry-run-review/reviews/{review_id}",
+        "GET /api/repository-dry-run-review/reviews/{review_id}/download"
+      ]
+    },
+    "repository_final_package_review_scope": {
+      "purpose": "Create a final local repository package review with redacted path evidence before public sharing.",
+      "output_dir": "analysis_output/georeview_studio_repository_final_package_reviews",
+      "source_gis_policy": "read_only_and_excluded_from_public_archive",
+      "api_endpoints": [
+        "GET /api/repository-final-package-review",
+        "POST /api/repository-final-package-review/create",
+        "GET /api/repository-final-package-review/reviews",
+        "GET /api/repository-final-package-review/reviews/{review_id}",
+        "GET /api/repository-final-package-review/reviews/{review_id}/download"
+      ]
+    },
+    "public_readme_cleanup_review_scope": {
+      "purpose": "Create a public README path cleanup review and screenshot evidence checklist before public sharing.",
+      "output_dir": "analysis_output/georeview_studio_public_readme_cleanup_reviews",
+      "source_gis_policy": "read_only_and_excluded_from_public_archive",
+      "api_endpoints": [
+        "GET /api/public-readme-cleanup-review",
+        "POST /api/public-readme-cleanup-review/create",
+        "GET /api/public-readme-cleanup-review/reviews",
+        "GET /api/public-readme-cleanup-review/reviews/{review_id}",
+        "GET /api/public-readme-cleanup-review/reviews/{review_id}/download"
+      ]
+    },
+    "public_repository_polish_package_scope": {
+      "purpose": "Create a final public repository polish package with file plan, manual screenshot capture package, sharing checklist and repository-ready README.",
+      "output_dir": "analysis_output/georeview_studio_public_repository_polish_packages",
+      "source_gis_policy": "read_only_and_excluded_from_public_repository_package",
+      "api_endpoints": [
+        "GET /api/public-repository-polish-package",
+        "POST /api/public-repository-polish-package/create",
+        "GET /api/public-repository-polish-package/packages",
+        "GET /api/public-repository-polish-package/packages/{package_id}",
+        "GET /api/public-repository-polish-package/packages/{package_id}/download"
+      ]
+    }
+  },
+  "repository_export_checklist_scope": {
+    "status": "implemented",
+    "purpose": "prepare final public repository export checklist and screenshot capture pass from the public repository polish package",
+    "output_dir": "analysis_output/georeview_studio_repository_export_checklists",
+    "source_gis_modified": false,
+    "mutates_config": false
+  },
+  "ui_ux_landing_repair_scope": {
+    "status": "implemented_in_v083",
+    "purpose": "Make the first screen read as a Figma-aligned product-grade GIS review workbench instead of an internal debug console.",
+    "changes": [
+      "dashboard-first overview metrics",
+      "map and review queue placed before internal operations",
+      "advanced evidence operations hidden behind an explicit control",
+      "responsive layout and button wrapping",
+      "review queue and selected-candidate panel placed together in the first dashboard flow"
+    ],
+    "source_gis_modified": false
+  }
+}

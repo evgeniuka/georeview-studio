@@ -1,0 +1,28 @@
+{
+  "generated": true,
+  "workspace_id": "safe_access_kfar_saba_route_aware_v001",
+  "portfolio_dir": "portfolio",
+  "artifacts": [
+    "index.html",
+    "assets/kfar_saba_static_map.svg",
+    "sample_review_candidates_top20.csv",
+    "case_study.md",
+    "portfolio_pitch.md"
+  ],
+  "counts": {
+    "pedestrian_generators": 391,
+    "schools": 28,
+    "kindergartens": 37,
+    "childcare": 1,
+    "bus_stops": 180,
+    "parks": 103,
+    "playgrounds": 39,
+    "community_centres": 2,
+    "crossings": 342,
+    "traffic_signals": 121,
+    "street_lamps": 0,
+    "road_segments": 2603,
+    "major_roads": 374,
+    "traffic_calming_features": 11
+  }
+}
