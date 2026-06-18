@@ -412,7 +412,7 @@ class RouteNetworkAnalyzer:
                 unreachable += 1
                 continue
 
-            crossing = crossing_by_id.get(best["crossing_id"], {})
+            _crossing = crossing_by_id.get(best["crossing_id"], {})
             route_m = best["route_m"]
             straight_to_route = best["straight_to_route_m"]
             ratio = route_m / straight_to_route if straight_to_route > 0 else 0.0

@@ -113,7 +113,7 @@ class DatasetPackageBuilder:
             return {**source, "source_gis_modified": False}
 
         package_id = self.next_package_id(dataset_id)
-        package_dir = self.package_dir(package_id)
+        _package_dir = self.package_dir(package_id)
         source_readiness = {
             "ok": True,
             "dataset_package_version": DATASET_PACKAGE_VERSION,

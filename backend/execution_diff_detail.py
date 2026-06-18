@@ -238,7 +238,6 @@ class ExecutionDiffDetailDrilldownBuilder:
 
     def build_drilldown(self, target: dict, baseline: dict) -> dict:
         comparison = target.get("comparison", {}) if isinstance(target.get("comparison"), dict) else {}
-        baseline_comparison = baseline.get("comparison", {}) if isinstance(baseline.get("comparison"), dict) else {}
         table_breakdown = self.table_breakdown(comparison.get("table_diffs", []))
         output_breakdown = self.output_breakdown(comparison.get("output_diff", {}))
         quality_breakdown = self.quality_breakdown(comparison.get("quality_check_diffs", []), target.get("quality_checks", []))

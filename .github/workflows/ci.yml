@@ -1,0 +1,40 @@
+name: CI
+
+# Static checks that need no data store. GeoReview Studio is stdlib-only, so there
+# is nothing to install for the app itself. The full functional suites
+# (tests/validate_app.py = 84 gates, tests/test_api_contract.py = 362 endpoint
+# checks) depend on the local analysis_output artifact store (~0.5 GB, intentionally
+# not committed) and on a headless browser, so they are run locally via
+# scripts/validate.ps1 + scripts/test_api_contract.ps1, not in this workflow.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  static-checks:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install lint tool
+        run: python -m pip install --upgrade ruff
+
+      - name: Lint (ruff)
+        run: ruff check .
+
+      - name: Byte-compile all modules
+        run: python -m compileall -q backend tests scripts

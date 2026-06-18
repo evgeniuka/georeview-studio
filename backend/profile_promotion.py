@@ -670,7 +670,7 @@ class ProfilePromotionWizard:
         if not proposed_contract or not profile_id:
             return {"ok": False, "error": "profile_config_apply_proposal_not_ready", "proposal_id": proposal_id, "detail": "Proposed contract is missing", "source_gis_modified": False}
 
-        current_config = self.mapper_config()
+        _current_config = self.mapper_config()
         proposed_config, operation, contract_count_before, contract_count_after = self.proposed_mapper_config(profile_id, proposed_contract)
         proposed_config_text = json.dumps(proposed_config, ensure_ascii=False, indent=2)
         current_config_sha256 = self.file_sha256(self.mapper_config_path)

@@ -1,0 +1,44 @@
+# GeoReview Studio - project metadata and tooling configuration.
+#
+# This is a stdlib-only application, run with `python backend/app.py` (see README).
+# It is intentionally NOT a pip-installable package, so there is no [build-system];
+# the [project] table documents the runtime contract (notably requires-python) and
+# this file hosts the lint / type-check configuration.
+
+[project]
+name = "georeview-studio"
+version = "0.83.0"
+description = "Local-first GIS review workbench: pedestrian-access infrastructure-risk indicators for on-site field review (Safe Access Israel)."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { file = "LICENSE" }
+authors = [{ name = "Yageni Karavkin" }]
+keywords = ["gis", "openstreetmap", "pedestrian-safety", "road-safety", "local-first"]
+
+[tool.ruff]
+target-version = "py39"
+line-length = 120
+extend-exclude = ["**/__pycache__"]
+
+[tool.ruff.lint]
+# Conservative, high-signal set: pyflakes (real errors) + pycodestyle errors/warnings.
+select = ["E", "F", "W"]
+ignore = [
+    "E501",  # long lines are pervasive in the routing/data tables; not worth churning now
+    "E741",  # ambiguous variable names (occasional, low value)
+]
+
+[tool.ruff.lint.per-file-ignores]
+# app.py runs a Python-version guard before importing local modules, by design.
+"backend/app.py" = ["E402"]
+# the test suites insert backend/ onto sys.path before importing app.
+"tests/*.py" = ["E402"]
+
+# Runtime floor is 3.9 (requires-python); mypy analyses against 3.10 (its minimum
+# supported analysis target). Best-effort: this is a large, largely-untyped codebase.
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
+check_untyped_defs = false
+warn_unused_ignores = false
+exclude = ['(^|/)__pycache__/']

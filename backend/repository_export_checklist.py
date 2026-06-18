@@ -127,7 +127,7 @@ class RepositoryExportChecklistBuilder:
 
         validation = read_json(self.project_dir / "validation_summary.json")
         api_contract = read_json(self.project_dir / "api_contract_summary.json")
-        manifest = safe_call(self.manifest_reader, {})
+        _manifest = safe_call(self.manifest_reader, {})
         visual = self.latest_visual_capture_summary()
         screenshot_targets = self.screenshot_targets(polish_package, visual)
         repository_tree = self.repository_tree(polish_package)

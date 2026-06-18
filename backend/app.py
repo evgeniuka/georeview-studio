@@ -4,6 +4,14 @@ import csv
 import json
 import mimetypes
 import re
+import sys
+
+if sys.version_info < (3, 9):  # noqa: UP036 - runtime floor: str.removeprefix() is 3.9+
+    raise SystemExit(
+        "GeoReview Studio requires Python 3.9 or newer; "
+        f"detected {sys.version_info.major}.{sys.version_info.minor}."
+    )
+
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, unquote, urlparse
