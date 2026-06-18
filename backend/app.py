@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import csv
 import json
+import logging
 import mimetypes
+import os
 import re
 import sys
 
@@ -85,6 +87,8 @@ from workspace_runner import WorkspaceRunner
 
 
 APP_VERSION = "v083"
+LOGGER = logging.getLogger("georeview")
+MAX_REQUEST_BODY_BYTES = 8 * 1024 * 1024  # reject JSON request bodies larger than 8 MiB
 APP_DIR = Path(__file__).resolve().parent
 PROJECT_DIR = APP_DIR.parent
 STATIC_DIR = PROJECT_DIR / "frontend" / "static"
@@ -101,7 +105,17 @@ def infer_maps_root(project_dir: Path) -> Path:
     return project_dir.parent
 
 
-MAPS_ROOT = infer_maps_root(PROJECT_DIR)
+def is_within(path: Path, root: Path) -> bool:
+    """True if path resolves to root itself or a descendant of root (traversal-safe)."""
+    try:
+        path.resolve().relative_to(root.resolve())
+    except (ValueError, OSError):
+        return False
+    return True
+
+
+_DATA_ROOT_ENV = os.environ.get("GEOREVIEW_DATA_ROOT")
+MAPS_ROOT = Path(_DATA_ROOT_ENV).expanduser().resolve() if _DATA_ROOT_ENV else infer_maps_root(PROJECT_DIR)
 OUTPUT_ROOT = MAPS_ROOT / "analysis_output"
 MVP_DIR = OUTPUT_ROOT / "kfar_saba_mvp"
 PLAN_DIR = OUTPUT_ROOT / "georeview_studio_plan" / "v001_2026-05-27"
@@ -1531,7 +1545,7 @@ class Handler(BaseHTTPRequestHandler):
         segments = [segment for segment in path.split("/") if segment]
         try:
             if path == "/api/health":
-                self.json_response({"ok": True, "app_version": APP_VERSION, "workspace_id": WORKSPACE_ID})
+                self.json_response({"ok": True, "app_version": APP_VERSION, "workspace_id": WORKSPACE_ID, "data_root_ok": OUTPUT_ROOT.exists()})
             elif path == "/api/project-manifest":
                 self.json_or_error_response(project_manifest())
             elif path == "/api/product-architecture":
@@ -2135,7 +2149,8 @@ class Handler(BaseHTTPRequestHandler):
         except Exception as exc:  # pragma: no cover - visible local error response
             if self.is_client_abort(exc):
                 return
-            self.json_response({"error": "server_error", "detail": repr(exc)}, status=500)
+            LOGGER.exception("GET %s failed", path)
+            self.json_response({"error": "server_error"}, status=500)
 
     def do_POST(self) -> None:
         parsed = urlparse(self.path)
@@ -2325,10 +2340,11 @@ class Handler(BaseHTTPRequestHandler):
         except Exception as exc:  # pragma: no cover - visible local error response
             if self.is_client_abort(exc):
                 return
-            self.json_response({"error": "server_error", "detail": repr(exc)}, status=500)
+            LOGGER.exception("POST %s failed", path)
+            self.json_response({"error": "server_error"}, status=500)
 
     def log_message(self, fmt: str, *args: object) -> None:
-        print(f"{self.address_string()} - {fmt % args}")
+        LOGGER.info("%s - %s", self.address_string(), fmt % args)
 
     def json_response(self, data: object, status: int = 200) -> None:
         payload = json.dumps(data, ensure_ascii=False, indent=2).encode("utf-8")
@@ -3009,6 +3025,8 @@ class Handler(BaseHTTPRequestHandler):
         length = parse_int(self.headers.get("Content-Length"), 0)
         if length <= 0:
             return {}
+        if length > MAX_REQUEST_BODY_BYTES:
+            raise ApiBadRequest(f"request body too large (limit {MAX_REQUEST_BODY_BYTES} bytes)")
         body = self.rfile.read(length).decode("utf-8")
         if not body.strip():
             return {}
@@ -3024,7 +3042,7 @@ class Handler(BaseHTTPRequestHandler):
         else:
             rel = path.lstrip("/")
         target = (STATIC_DIR / rel).resolve()
-        if not str(target).startswith(str(STATIC_DIR.resolve())) or not target.exists() or target.is_dir():
+        if not is_within(target, STATIC_DIR) or not target.exists() or target.is_dir():
             self.json_response({"error": "static_not_found"}, status=404)
             return
         content = target.read_bytes()
@@ -3041,11 +3059,21 @@ class Handler(BaseHTTPRequestHandler):
 
 
 def main() -> None:
-    host = "127.0.0.1"
-    port = 8847
-    print(f"GeoReview Studio {APP_VERSION} running at http://{host}:{port}")
-    print(f"Workspace: {WORKSPACE_ID}")
-    ThreadingHTTPServer((host, port), Handler).serve_forever()
+    logging.basicConfig(
+        level=os.environ.get("GEOREVIEW_LOG_LEVEL", "INFO").upper(),
+        format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+    )
+    host = os.environ.get("GEOREVIEW_HOST", "127.0.0.1")
+    port = parse_int(os.environ.get("GEOREVIEW_PORT"), 8847)
+    server = ThreadingHTTPServer((host, port), Handler)
+    LOGGER.info("GeoReview Studio %s running at http://%s:%d", APP_VERSION, host, port)
+    LOGGER.info("Workspace: %s | data root: %s", WORKSPACE_ID, MAPS_ROOT)
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        LOGGER.info("Shutting down (keyboard interrupt)")
+    finally:
+        server.server_close()
 
 
 if __name__ == "__main__":

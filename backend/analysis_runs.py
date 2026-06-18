@@ -217,4 +217,8 @@ class AnalysisRuns:
             root = self.workspaces_dir.resolve()
         except OSError:
             return False
-        return str(resolved).startswith(str(root))
+        try:
+            resolved.relative_to(root)
+        except ValueError:
+            return False
+        return True
