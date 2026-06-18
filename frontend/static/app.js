@@ -8,6 +8,8 @@ const state = {
   summary: null,
   features: null,
   candidates: [],
+  decisions: {},
+  decisionSummary: null,
   sources: [],
   sourceOnboarding: null,
   localIntake: null,
@@ -792,6 +794,58 @@ async function loadCandidates() {
   }
 }
 
+const REVIEW_STATUS_LABELS = [
+  ["unreviewed", "Unreviewed"],
+  ["to_review", "To review"],
+  ["reviewed", "Reviewed"],
+  ["dismissed", "Dismissed"],
+];
+
+async function loadReviewDecisions() {
+  try {
+    const data = await getJson(`${dashboardBase()}/review-decisions`);
+    const map = {};
+    for (const decision of data.decisions || []) {
+      map[decision.generator_id] = decision;
+    }
+    state.decisions = map;
+    state.decisionSummary = data.summary || null;
+  } catch (err) {
+    state.decisions = {};
+    state.decisionSummary = null;
+  }
+}
+
+function reviewStatusDot(generatorId) {
+  const decision = state.decisions[generatorId];
+  const status = decision && decision.status ? decision.status : "unreviewed";
+  if (status === "unreviewed") {
+    return "";
+  }
+  return `<span class="rev-dot rev-${status}" title="Review status: ${status.replace("_", " ")}"></span>`;
+}
+
+async function saveReviewDecision(generatorId) {
+  const statusEl = document.getElementById("reviewStatus");
+  if (!statusEl) return;
+  const noteEl = document.getElementById("reviewNote");
+  const assigneeEl = document.getElementById("reviewAssignee");
+  try {
+    const result = await postJson(`${dashboardBase()}/review-decisions`, {
+      generator_id: generatorId,
+      status: statusEl.value,
+      note: noteEl ? noteEl.value : "",
+      assignee: assigneeEl ? assigneeEl.value : "",
+    });
+    state.decisions[generatorId] = result.decision;
+    await loadReviewDecisions();
+    selectCandidate(generatorId);
+    els.status.textContent = `Review state saved for ${generatorId}`;
+  } catch (err) {
+    els.status.textContent = `Review save failed: ${err.message}`;
+  }
+}
+
 async function loadDashboardWorkspace() {
   if (!state.activeWorkspaceId) {
     els.status.textContent = "No workspace selected";
@@ -806,6 +860,7 @@ async function loadDashboardWorkspace() {
   }
   renderMetrics();
   populateFilters();
+  await loadReviewDecisions();
   await loadCandidates();
   els.status.textContent = `Dashboard: ${state.activeWorkspaceId}`;
 }
@@ -4828,7 +4883,7 @@ function renderTable() {
     .map(
       (row) => `
         <tr data-id="${escapeHtml(row.generator_id)}" tabindex="0" role="button" aria-label="Select review candidate ${escapeHtml(row.name || row.generator_id)}" class="${state.selected && state.selected.generator_id === row.generator_id ? "selected-row" : ""}">
-          <td>${escapeHtml(row.generator_id)}</td>
+          <td>${reviewStatusDot(row.generator_id)}${escapeHtml(row.generator_id)}</td>
           <td>${escapeHtml(typeLabel(row.generator_type))}</td>
           <td>${escapeHtml(row.name || "")}</td>
           <td>${fmt(row.nearest_crossing_m, " m")}</td>
@@ -4930,6 +4985,13 @@ function selectCandidate(id) {
     || state.features.candidates.find((item) => item.generator_id === id);
   if (!row) return;
   state.selected = row;
+  const decision = state.decisions[id] || { status: "unreviewed", note: "", assignee: "", updated_at_utc: "" };
+  const reviewOptions = REVIEW_STATUS_LABELS
+    .map(([value, label]) => `<option value="${value}" ${decision.status === value ? "selected" : ""}>${label}</option>`)
+    .join("");
+  const reviewSummary = state.decisionSummary
+    ? `${state.decisionSummary.reviewed} reviewed · ${state.decisionSummary.to_review} queued · ${state.decisionSummary.dismissed} dismissed · ${state.decisionSummary.total_recorded} recorded`
+    : "no review decisions yet";
   const score = row.route_aware_available ? row.route_review_priority_score : row.risk_score;
   const scoreLabel = row.route_aware_available ? "Route priority score" : "Risk score";
   const riskFlags = flagPills(row.risk_flags);
@@ -4967,7 +5029,25 @@ function selectCandidate(id) {
     <div class="flag-section"><b>Risk flags</b><div>${riskFlags || `<span class="muted-inline">No mapped risk flags in current filter.</span>`}</div></div>
     ${row.route_aware_available ? `<div class="flag-section"><b>Network flags</b><div>${networkFlags || `<span class="muted-inline">No network flags.</span>`}</div></div>` : ""}
     <div class="flag-section"><b>Data-quality flags</b><div>${dataQualityFlags || `<span class="muted-inline">No data-quality flags.</span>`}</div></div>
+    <div class="review-form">
+      <div class="review-form-head"><b>Field review</b><span class="muted-inline">${escapeHtml(reviewSummary)}</span></div>
+      <label>Status
+        <select id="reviewStatus">${reviewOptions}</select>
+      </label>
+      <label>Assignee
+        <input id="reviewAssignee" type="text" value="${escapeHtml(decision.assignee)}" placeholder="who inspects on-site" />
+      </label>
+      <label>Notes
+        <textarea id="reviewNote" rows="3" placeholder="On-site review notes">${escapeHtml(decision.note)}</textarea>
+      </label>
+      <button id="saveReviewDecision" type="button">Save review state</button>
+      <div class="small-note">${decision.updated_at_utc ? `Last updated ${escapeHtml(decision.updated_at_utc)}` : "Not yet reviewed."}</div>
+    </div>
   `;
+  const saveButton = document.getElementById("saveReviewDecision");
+  if (saveButton) {
+    saveButton.addEventListener("click", () => saveReviewDecision(row.generator_id));
+  }
   renderTable();
   renderMap();
 }
