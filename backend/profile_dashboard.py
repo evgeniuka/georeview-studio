@@ -434,14 +434,36 @@ class ProfileDashboardStore:
             "source_gis_modified": False,
         }
 
+    def _resolve_stored_path(self, stored: str) -> Path:
+        """Resolve a stored path, tolerating relocation of the artifact store.
+
+        Manifests persist absolute paths. If the tree was moved (so the absolute
+        path no longer exists), re-root the portion after the ``analysis_output``
+        segment under the current store so the file is still found. On the
+        original machine the stored path exists and is returned unchanged, so
+        this is behaviour-preserving there.
+        """
+        path = Path(stored)
+        if path.exists():
+            return path
+        parts = path.parts
+        if "analysis_output" in parts:
+            idx = len(parts) - 1 - list(reversed(parts)).index("analysis_output")
+            tail = Path(*parts[idx + 1:]) if idx + 1 < len(parts) else Path()
+            candidate = self.workspaces_dir.parent / tail
+            if candidate.exists():
+                return candidate
+        return path
+
     def table_file(self, workspace_id: str, table_name: str) -> Path:
         workspace_dir = self.workspaces_dir / workspace_id
         manifest = read_json(workspace_dir / "manifest.json")
         for item in manifest.get("tables", []):
             if item.get("table") == table_name and item.get("file"):
-                path = Path(str(item["file"]))
-                if path.exists():
-                    return path
+                resolved = self._resolve_stored_path(str(item["file"]))
+                if resolved.exists():
+                    return resolved
+                break
         return workspace_dir / "tables" / f"{table_name}.csv"
 
     def normalize_profile_id(self, profile_id: str) -> str:
