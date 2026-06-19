@@ -42,3 +42,11 @@ ignore_missing_imports = true
 check_untyped_defs = false
 warn_unused_ignores = false
 exclude = ['(^|/)__pycache__/']
+
+# Unit tests under tests/unit are dependency-free (no analysis_output data store)
+# and run in CI. The two integration suites (tests/validate_app.py,
+# tests/test_api_contract.py) need the local data store + a headless browser and
+# are run via the scripts/*.ps1 wrappers, so they are not collected here.
+[tool.pytest.ini_options]
+testpaths = ["tests/unit"]
+addopts = "-q"
