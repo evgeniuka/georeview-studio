@@ -5203,83 +5203,94 @@ function exportVisibleCsv() {
   URL.revokeObjectURL(url);
 }
 
+async function safeStep(fn) {
+  // Per-panel isolation: a failure in one loader must not abort the rest of the
+  // boot, so the core map/review-queue still renders even if a secondary panel
+  // (mostly the internal tooling layer) errors.
+  try {
+    await fn();
+  } catch (error) {
+    console.error("init step failed:", error);
+  }
+}
+
 async function init() {
   setupControlVisibility();
   setupMapInteractions();
-  try {
+  await safeStep(async () => {
     state.sources = await getJson("/api/catalog/sources");
     state.templates = await getJson("/api/templates");
     populateCatalogControls();
-    await loadWorkspaceRegistry();
-    await loadDashboardWorkspace();
-    await loadPilotAreas();
-    await loadSourceOnboarding();
-    await loadLocalIntake();
-    await loadSourceImportGuardrails();
-    await loadSourceHandoff();
-    await loadSourceHandoffExecution();
-    await loadExecutionEvidencePackage();
-    await loadExecutionResultDiff();
-    await loadExecutionDiffGallery();
-    await loadExecutionDiffDetail();
-    await loadReproducibilityAuditPacket();
-    await loadReviewerAuditIndex();
-    await loadPortfolioExportLauncher();
-    await loadPortableReleasePackage();
-    await loadDemoScriptPack();
-    await loadVisualQALedger();
-    await loadVisualBaselineComparison();
-    await loadDemoArtifactCompleteness();
-    await loadVisualEvidenceCapture();
-    await loadVisualEvidenceReviewDiff();
-    await loadVisualEvidenceReviewAnnotations();
-    await loadVisualEvidenceSignoffPacket();
-    await loadFinalReviewerLaunchChecklist();
-    await loadRecruiterDemoBrief();
-    await loadPublicPortfolioPackage();
-    await loadDemoReviewPlaybook();
-    await loadGithubPublicationBundle();
-    await loadRepositoryPublicationQa();
-    await loadRepositoryExportHandoff();
-    await loadRepositoryDryRunReview();
-    await loadRepositoryFinalPackageReview();
-    await loadPublicReadmeCleanupReview();
-    await loadPublicRepositoryPolishPackage();
-    await loadRepositoryExportChecklist();
-    await loadPilotAreas();
-    await loadAnalysisProfiles();
-    await loadProfileWorkspaces();
-    await loadProductArchitecture();
-    await loadReleaseReadiness();
-    await loadPortfolioDemo();
-    await loadPortfolioEvidenceBundle();
-    await loadBundleReviewChecklist();
-    await loadPortfolioNarrative();
-    await loadPortfolioHandoff();
-    await loadPortfolioEvidenceGallery();
-    await loadMultiPilotComparison();
-    await loadComparisonMapExports();
-    await loadProfileDashboard();
-    await loadScoringRules();
-    await loadPostgisBackend();
-    await loadProfileMapper();
-    await loadContractExecution();
-    await loadOsmTagQuality();
-    await loadTemplateAuthoring();
-    await loadAuthoredProfileRunner();
-    await loadProfilePromotion();
-    await loadExecutionQueue();
-    await loadDatasetPackages();
-    await loadJobs();
-    await loadAnalysisRuns();
-    await loadPortfolioReports();
-    await loadWorkspaceRegistry();
-    await loadSourceProfile();
-    await loadDashboardWorkspace();
-  } catch (error) {
-    els.status.textContent = "Load failed";
-    els.detail.textContent = error.message;
+  });
+  const steps = [
+    loadWorkspaceRegistry,
+    loadDashboardWorkspace,
+    loadPilotAreas,
+    loadSourceOnboarding,
+    loadLocalIntake,
+    loadSourceImportGuardrails,
+    loadSourceHandoff,
+    loadSourceHandoffExecution,
+    loadExecutionEvidencePackage,
+    loadExecutionResultDiff,
+    loadExecutionDiffGallery,
+    loadExecutionDiffDetail,
+    loadReproducibilityAuditPacket,
+    loadReviewerAuditIndex,
+    loadPortfolioExportLauncher,
+    loadPortableReleasePackage,
+    loadDemoScriptPack,
+    loadVisualQALedger,
+    loadVisualBaselineComparison,
+    loadDemoArtifactCompleteness,
+    loadVisualEvidenceCapture,
+    loadVisualEvidenceReviewDiff,
+    loadVisualEvidenceReviewAnnotations,
+    loadVisualEvidenceSignoffPacket,
+    loadFinalReviewerLaunchChecklist,
+    loadRecruiterDemoBrief,
+    loadPublicPortfolioPackage,
+    loadDemoReviewPlaybook,
+    loadGithubPublicationBundle,
+    loadRepositoryPublicationQa,
+    loadRepositoryExportHandoff,
+    loadRepositoryDryRunReview,
+    loadRepositoryFinalPackageReview,
+    loadPublicReadmeCleanupReview,
+    loadPublicRepositoryPolishPackage,
+    loadRepositoryExportChecklist,
+    loadAnalysisProfiles,
+    loadProfileWorkspaces,
+    loadProductArchitecture,
+    loadReleaseReadiness,
+    loadPortfolioDemo,
+    loadPortfolioEvidenceBundle,
+    loadBundleReviewChecklist,
+    loadPortfolioNarrative,
+    loadPortfolioHandoff,
+    loadPortfolioEvidenceGallery,
+    loadMultiPilotComparison,
+    loadComparisonMapExports,
+    loadProfileDashboard,
+    loadScoringRules,
+    loadPostgisBackend,
+    loadProfileMapper,
+    loadContractExecution,
+    loadOsmTagQuality,
+    loadTemplateAuthoring,
+    loadAuthoredProfileRunner,
+    loadProfilePromotion,
+    loadExecutionQueue,
+    loadDatasetPackages,
+    loadJobs,
+    loadAnalysisRuns,
+    loadPortfolioReports,
+    loadSourceProfile,
+  ];
+  for (const step of steps) {
+    await safeStep(step);
   }
+  await safeStep(loadDashboardWorkspace);
 }
 
 for (const el of [els.generatorType, els.minScore, els.noCrossing, els.majorRoad]) {

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import csv
 import json
+import os
 import shutil
 import subprocess
 from datetime import datetime, timezone
@@ -367,13 +368,19 @@ class WorkspaceRunner:
 
     @staticmethod
     def _write_json(path: Path, data: dict) -> None:
-        path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+        # Atomic write: a concurrent reader on the threaded server must never see a
+        # half-written JSON, so write to a temp sibling and os.replace() it in.
+        tmp = path.with_name(f"{path.name}.tmp")
+        tmp.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+        os.replace(tmp, path)
 
     @staticmethod
     def _write_csv(path: Path, rows: list[list[str]]) -> None:
-        with path.open("w", encoding="utf-8", newline="") as f:
+        tmp = path.with_name(f"{path.name}.tmp")
+        with tmp.open("w", encoding="utf-8", newline="") as f:
             writer = csv.writer(f)
             writer.writerows(rows)
+        os.replace(tmp, path)
 
     @staticmethod
     def _count_csv_rows(path: Path) -> int:
