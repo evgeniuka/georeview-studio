@@ -10,6 +10,7 @@ const state = {
   candidates: [],
   decisions: {},
   decisionSummary: null,
+  mapView: null,
   sources: [],
   sourceOnboarding: null,
   localIntake: null,
@@ -503,10 +504,22 @@ function bounds(points) {
 }
 
 function project(point, b, width, height) {
+  // Uniform-scale Web-Mercator fit into width x height (preserves geographic
+  // proportions, unlike an independent per-axis stretch).
   const pad = 24;
-  const x = pad + ((point.lon - b.minX) / (b.maxX - b.minX || 1)) * (width - pad * 2);
-  const y = height - pad - ((point.lat - b.minY) / (b.maxY - b.minY || 1)) * (height - pad * 2);
-  return { x, y };
+  const lon2x = (lon) => (lon * Math.PI) / 180;
+  const lat2y = (lat) => Math.log(Math.tan(Math.PI / 4 + (lat * Math.PI) / 360));
+  const minX = lon2x(b.minX);
+  const minY = lat2y(b.minY);
+  const spanX = lon2x(b.maxX) - minX || 1;
+  const spanY = lat2y(b.maxY) - minY || 1;
+  const scale = Math.min((width - pad * 2) / spanX, (height - pad * 2) / spanY);
+  const offX = (width - scale * spanX) / 2;
+  const offY = (height - scale * spanY) / 2;
+  return {
+    x: offX + (lon2x(point.lon) - minX) * scale,
+    y: height - offY - (lat2y(point.lat) - minY) * scale,
+  };
 }
 
 function updateOverviewDeck(counts, route) {
@@ -4905,11 +4918,117 @@ function renderTable() {
   });
 }
 
+const MAP_BASE_W = 1000;
+const MAP_BASE_H = 640;
+let mapDragStart = null;
+
+function mapViewBoxString(view) {
+  return `${view.x.toFixed(2)} ${view.y.toFixed(2)} ${view.w.toFixed(2)} ${view.h.toFixed(2)}`;
+}
+
+function clampMapView() {
+  const view = state.mapView;
+  if (!view) return;
+  view.w = Math.max(80, Math.min(MAP_BASE_W, view.w));
+  view.h = view.w * (MAP_BASE_H / MAP_BASE_W);
+  const slackX = MAP_BASE_W * 0.25;
+  const slackY = MAP_BASE_H * 0.25;
+  view.x = Math.max(-slackX, Math.min(MAP_BASE_W + slackX - view.w, view.x));
+  view.y = Math.max(-slackY, Math.min(MAP_BASE_H + slackY - view.h, view.y));
+}
+
+function applyMapView() {
+  if (!els.map || !state.mapView) return;
+  clampMapView();
+  els.map.setAttribute("viewBox", mapViewBoxString(state.mapView));
+}
+
+function resetMapView() {
+  state.mapView = { x: 0, y: 0, w: MAP_BASE_W, h: MAP_BASE_H };
+  applyMapView();
+}
+
+function svgPointFromEvent(evt) {
+  if (!els.map.getScreenCTM) return null;
+  const ctm = els.map.getScreenCTM();
+  if (!ctm) return null;
+  const pt = els.map.createSVGPoint();
+  pt.x = evt.clientX;
+  pt.y = evt.clientY;
+  return pt.matrixTransform(ctm.inverse());
+}
+
+function zoomMapBy(factor, focus) {
+  if (!state.mapView) resetMapView();
+  const view = state.mapView;
+  const anchor = focus || { x: view.x + view.w / 2, y: view.y + view.h / 2 };
+  const rx = (anchor.x - view.x) / view.w;
+  const ry = (anchor.y - view.y) / view.h;
+  view.w *= factor;
+  view.h = view.w * (MAP_BASE_H / MAP_BASE_W);
+  view.x = anchor.x - rx * view.w;
+  view.y = anchor.y - ry * view.h;
+  applyMapView();
+}
+
+function setupMapInteractions() {
+  if (!els.map || els.map.dataset.interactive === "1") return;
+  els.map.dataset.interactive = "1";
+
+  els.map.addEventListener("wheel", (event) => {
+    event.preventDefault();
+    zoomMapBy(event.deltaY < 0 ? 0.85 : 1 / 0.85, svgPointFromEvent(event));
+  }, { passive: false });
+
+  els.map.addEventListener("pointerdown", (event) => {
+    if (event.target.classList && event.target.classList.contains("candidate")) return;
+    mapDragStart = { x: event.clientX, y: event.clientY };
+    els.map.classList.add("grabbing");
+    try {
+      els.map.setPointerCapture(event.pointerId);
+    } catch (err) {
+      /* pointer capture is best-effort */
+    }
+  });
+
+  els.map.addEventListener("pointermove", (event) => {
+    if (!mapDragStart || !state.mapView) return;
+    const rect = els.map.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    state.mapView.x -= (event.clientX - mapDragStart.x) * (state.mapView.w / rect.width);
+    state.mapView.y -= (event.clientY - mapDragStart.y) * (state.mapView.h / rect.height);
+    mapDragStart = { x: event.clientX, y: event.clientY };
+    applyMapView();
+  });
+
+  const endMapDrag = () => {
+    mapDragStart = null;
+    els.map.classList.remove("grabbing");
+  };
+  els.map.addEventListener("pointerup", endMapDrag);
+  els.map.addEventListener("pointercancel", endMapDrag);
+  els.map.addEventListener("pointerleave", endMapDrag);
+
+  const host = els.map.parentElement;
+  if (host && !host.querySelector(".map-zoom-controls")) {
+    const controls = document.createElement("div");
+    controls.className = "map-zoom-controls";
+    controls.innerHTML =
+      '<button type="button" data-zoom="in" aria-label="Zoom in">+</button>' +
+      '<button type="button" data-zoom="out" aria-label="Zoom out">−</button>' +
+      '<button type="button" data-zoom="reset" aria-label="Reset map view">⤢</button>';
+    controls.addEventListener("click", (event) => {
+      const action = event.target.dataset ? event.target.dataset.zoom : "";
+      if (action === "in") zoomMapBy(0.8, null);
+      else if (action === "out") zoomMapBy(1.25, null);
+      else if (action === "reset") resetMapView();
+    });
+    host.appendChild(controls);
+  }
+}
+
 function renderMap() {
-  if (!state.features) return;
-  const width = els.map.clientWidth || 900;
-  const height = els.map.clientHeight || 520;
-  els.map.setAttribute("viewBox", `0 0 ${width} ${height}`);
+  if (!els.map || !state.features) return;
   const allPoints = [
     ...state.features.generators,
     ...state.features.crossings,
@@ -4919,28 +5038,28 @@ function renderMap() {
   const b = bounds(allPoints);
 
   function circle(point, cls, r, extra = "", title = "") {
-    const p = project(point, b, width, height);
+    const p = project(point, b, MAP_BASE_W, MAP_BASE_H);
     const inner = title ? `<title>${title}</title>` : "";
-    return `<circle class="${cls}" cx="${p.x}" cy="${p.y}" r="${r}" ${extra}>${inner}</circle>`;
+    return `<circle class="${cls}" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${r}" ${extra}>${inner}</circle>`;
   }
 
   function square(point, cls, s, extra = "", title = "") {
-    const p = project(point, b, width, height);
+    const p = project(point, b, MAP_BASE_W, MAP_BASE_H);
     const inner = title ? `<title>${title}</title>` : "";
-    return `<rect class="${cls}" x="${p.x - s}" y="${p.y - s}" width="${s * 2}" height="${s * 2}" ${extra}>${inner}</rect>`;
+    return `<rect class="${cls}" x="${(p.x - s).toFixed(1)}" y="${(p.y - s).toFixed(1)}" width="${s * 2}" height="${s * 2}" ${extra}>${inner}</rect>`;
   }
 
   function triangle(point, cls, s, extra = "", title = "") {
-    const p = project(point, b, width, height);
+    const p = project(point, b, MAP_BASE_W, MAP_BASE_H);
     const inner = title ? `<title>${title}</title>` : "";
-    const pts = `${p.x},${p.y - s} ${p.x - s},${p.y + s} ${p.x + s},${p.y + s}`;
+    const pts = `${p.x.toFixed(1)},${(p.y - s).toFixed(1)} ${(p.x - s).toFixed(1)},${(p.y + s).toFixed(1)} ${(p.x + s).toFixed(1)},${(p.y + s).toFixed(1)}`;
     return `<polygon class="${cls}" points="${pts}" ${extra}>${inner}</polygon>`;
   }
 
   function diamond(point, cls, s, extra = "", title = "") {
-    const p = project(point, b, width, height);
+    const p = project(point, b, MAP_BASE_W, MAP_BASE_H);
     const inner = title ? `<title>${title}</title>` : "";
-    const pts = `${p.x},${p.y - s} ${p.x + s},${p.y} ${p.x},${p.y + s} ${p.x - s},${p.y}`;
+    const pts = `${p.x.toFixed(1)},${(p.y - s).toFixed(1)} ${(p.x + s).toFixed(1)},${p.y.toFixed(1)} ${p.x.toFixed(1)},${(p.y + s).toFixed(1)} ${(p.x - s).toFixed(1)},${p.y.toFixed(1)}`;
     return `<polygon class="${cls}" points="${pts}" ${extra}>${inner}</polygon>`;
   }
 
@@ -4969,12 +5088,16 @@ function renderMap() {
       .candidate { fill: #e11d48; stroke: #fff; stroke-width: 1.4; cursor: pointer; opacity: .95; }
       .selected-candidate { stroke: #0f172a; stroke-width: 2.2; opacity: 1; }
     </style>
-    <rect x="1" y="1" width="${width - 2}" height="${height - 2}" fill="none" stroke="#d8ded5"></rect>
+    <rect x="0.5" y="0.5" width="${MAP_BASE_W - 1}" height="${MAP_BASE_H - 1}" fill="none" stroke="#cbd5e1" rx="8"></rect>
     ${majorRoads.join("")}
     ${crossings.join("")}
     ${generators.join("")}
     ${candidates.join("")}
   `;
+  if (!state.mapView) {
+    state.mapView = { x: 0, y: 0, w: MAP_BASE_W, h: MAP_BASE_H };
+  }
+  applyMapView();
   [...els.map.querySelectorAll(".candidate")].forEach((node) => {
     node.addEventListener("click", () => selectCandidate(node.dataset.id));
   });
@@ -5082,6 +5205,7 @@ function exportVisibleCsv() {
 
 async function init() {
   setupControlVisibility();
+  setupMapInteractions();
   try {
     state.sources = await getJson("/api/catalog/sources");
     state.templates = await getJson("/api/templates");
