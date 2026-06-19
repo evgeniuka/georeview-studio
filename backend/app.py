@@ -115,6 +115,39 @@ def is_within(path: Path, root: Path) -> bool:
     return True
 
 
+# Product vs internal tooling surface. With GEOREVIEW_MODE=product only the core
+# GIS-review endpoints (plus the static frontend) are served; the ~50 internal
+# publication/QA "tooling layer" endpoints return 404. Default ("full") serves
+# everything and is what the two test suites run against - so this gate is inert
+# unless explicitly opted into. See docs/product_mode.md.
+PRODUCT_MODE = os.environ.get("GEOREVIEW_MODE", "full").strip().lower() == "product"
+PRODUCT_API_PREFIXES = (
+    "/api/health",
+    "/api/project-manifest",
+    "/api/catalog/sources",
+    "/api/templates",
+    "/api/pilot-areas",
+    "/api/dashboard-workspaces",
+    "/api/workspace-registry",
+    "/api/analysis-profiles",
+    "/api/analysis-runs",
+    "/api/runs",
+    "/api/jobs",
+    "/api/scoring-rules",
+    "/api/profile-dashboard",
+    "/api/profile-workspaces",
+    "/api/preflight",
+    "/api/osm-tag-quality",
+    "/api/portfolio-reports",
+)
+
+
+def served_in_product_mode(path: str) -> bool:
+    if not path.startswith("/api/"):
+        return True
+    return any(path == prefix or path.startswith(prefix + "/") for prefix in PRODUCT_API_PREFIXES)
+
+
 _DATA_ROOT_ENV = os.environ.get("GEOREVIEW_DATA_ROOT")
 MAPS_ROOT = Path(_DATA_ROOT_ENV).expanduser().resolve() if _DATA_ROOT_ENV else infer_maps_root(PROJECT_DIR)
 OUTPUT_ROOT = MAPS_ROOT / "analysis_output"
@@ -1545,6 +1578,9 @@ class Handler(BaseHTTPRequestHandler):
         path = unquote(parsed.path)
         query = parse_qs(parsed.query)
         segments = [segment for segment in path.split("/") if segment]
+        if PRODUCT_MODE and not served_in_product_mode(path):
+            self.json_response({"error": "not_found", "path": path}, status=404)
+            return
         try:
             if path == "/api/health":
                 self.json_response({"ok": True, "app_version": APP_VERSION, "workspace_id": WORKSPACE_ID, "data_root_ok": OUTPUT_ROOT.exists()})
@@ -2159,6 +2195,9 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self) -> None:
         parsed = urlparse(self.path)
         path = unquote(parsed.path)
+        if PRODUCT_MODE and not served_in_product_mode(path):
+            self.json_response({"error": "not_found", "path": path}, status=404)
+            return
         try:
             body = self.read_json_body()
             review_segments = [segment for segment in path.split("/") if segment]
