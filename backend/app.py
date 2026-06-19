@@ -137,6 +137,7 @@ PRODUCT_API_PREFIXES = (
     "/api/profile-dashboard",
     "/api/profile-workspaces",
     "/api/preflight",
+    "/api/analysis-workflow",
     "/api/osm-tag-quality",
     "/api/portfolio-reports",
 )
@@ -1583,7 +1584,7 @@ class Handler(BaseHTTPRequestHandler):
             return
         try:
             if path == "/api/health":
-                self.json_response({"ok": True, "app_version": APP_VERSION, "workspace_id": WORKSPACE_ID, "data_root_ok": OUTPUT_ROOT.exists()})
+                self.json_response({"ok": True, "app_version": APP_VERSION, "workspace_id": WORKSPACE_ID, "data_root_ok": OUTPUT_ROOT.exists(), "mode": "product" if PRODUCT_MODE else "full"})
             elif path == "/api/project-manifest":
                 self.json_or_error_response(project_manifest())
             elif path == "/api/product-architecture":

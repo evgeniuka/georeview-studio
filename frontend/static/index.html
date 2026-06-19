@@ -77,6 +77,7 @@
           </label>
         </section>
 
+        <div id="fullWorkbench">
         <section id="pilotAreaSection">
           <h2>Source Onboarding</h2>
           <button id="refreshSourceOnboarding" type="button">Refresh source scan</button>
@@ -537,6 +538,7 @@
           <div class="small-note runner-status" id="datasetPackagesStatus">Dataset packages loading.</div>
           <div id="datasetPackagesBody" class="workspace-body"></div>
         </section>
+        </div>
 
         <section>
           <h2>Pilot Area</h2>
@@ -565,7 +567,7 @@
           <div class="preflight-box" id="analysisWorkflowBody"></div>
         </section>
 
-        <section>
+        <section data-surface="tooling">
           <h2>Portfolio Reports</h2>
           <button id="generatePortfolioReport" type="button">Generate latest report</button>
           <button id="generateTransitPortfolioReport" type="button">Generate transit report</button>
@@ -592,7 +594,7 @@
           <div id="jobHistory" class="workspace-body"></div>
         </section>
 
-        <section>
+        <section data-surface="tooling">
           <h2>Workspace Runner</h2>
           <button id="buildWorkspace" type="button">Register current MVP workspace</button>
           <button id="buildGenericWorkspace" type="button">Build PBF-enriched workspace</button>
@@ -684,7 +686,7 @@
         <div id="candidateDetail" class="detail-body">Select a row or marker.</div>
       </section>
 
-      <section class="panel template-panel">
+      <section class="panel template-panel" data-surface="tooling">
         <div class="panel-title">
           <h2>Template Readiness</h2>
           <span id="templateStatus" class="badge">Waiting</span>
@@ -692,7 +694,7 @@
         <div id="templateReadiness" class="template-body"></div>
       </section>
 
-      <section class="panel profile-results-panel" id="evidencePanel">
+      <section class="panel profile-results-panel" id="evidencePanel" data-surface="tooling">
         <div class="panel-title">
           <h2>Universal Profile Results</h2>
           <span id="profileResultsStatus" class="badge">Waiting</span>
@@ -717,7 +719,7 @@
         </div>
       </section>
 
-      <section class="panel architecture-panel">
+      <section class="panel architecture-panel" data-surface="tooling">
         <div class="panel-title">
           <h2>Product Architecture</h2>
           <span id="architectureStatus" class="badge">Waiting</span>
@@ -725,7 +727,7 @@
         <div id="productArchitecturePanel" class="workspace-body"></div>
       </section>
 
-      <section class="panel workspace-panel">
+      <section class="panel workspace-panel" data-surface="tooling">
         <div class="panel-title">
           <h2>Workspace Registry</h2>
           <span id="workspaceStatus" class="badge">Waiting</span>

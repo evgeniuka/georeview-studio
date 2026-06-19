@@ -5217,6 +5217,18 @@ async function safeStep(fn) {
 async function init() {
   setupControlVisibility();
   setupMapInteractions();
+  // Read the backend run mode ("product" vs "full") at boot. /api/health is the
+  // one endpoint always served even in product mode, so this fetch is safe in
+  // both modes. Any failure (offline, parse error) falls back to full mode so
+  // the default workbench keeps behaving exactly as before.
+  let productMode = false;
+  try {
+    const health = await getJson("/api/health");
+    productMode = health.mode === "product";
+  } catch (error) {
+    productMode = false;
+  }
+  document.body.classList.toggle("product-mode", productMode);
   await safeStep(async () => {
     state.sources = await getJson("/api/catalog/sources");
     state.templates = await getJson("/api/templates");
@@ -5287,7 +5299,27 @@ async function init() {
     loadPortfolioReports,
     loadSourceProfile,
   ];
+  // P1a: in product mode run only the product-core loaders (their endpoints are
+  // in backend PRODUCT_API_PREFIXES, served in both modes); skipping the ~50
+  // tooling loaders avoids 404 console noise against the hidden #fullWorkbench.
+  // Full mode runs every loader in the original order. Nothing is removed.
+  const coreLoaders = new Set([
+    loadWorkspaceRegistry,
+    loadDashboardWorkspace,
+    loadPilotAreas,
+    loadAnalysisProfiles,
+    loadProfileWorkspaces,
+    loadProfileDashboard,
+    loadScoringRules,
+    loadOsmTagQuality,
+    loadJobs,
+    loadAnalysisRuns,
+    loadSourceProfile,
+  ]);
   for (const step of steps) {
+    if (productMode && !coreLoaders.has(step)) {
+      continue;
+    }
     await safeStep(step);
   }
   await safeStep(loadDashboardWorkspace);

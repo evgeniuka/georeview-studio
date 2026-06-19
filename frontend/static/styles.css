@@ -1470,3 +1470,23 @@ tr.selected-row:hover {
 .map-zoom-controls button:hover {
   background: var(--surface);
 }
+
+/* ---------- Product mode: hide internal publication/QA tooling ---------- */
+/* P1a SUBTRACT: when /api/health reports mode=="product", boot code sets
+   <body class="product-mode">. These rules collapse the full workbench to the
+   product-core surfaces. Nothing is deleted; every id stays resolvable so the
+   unguarded els.X.addEventListener calls in app.js still bind. Scoped strictly
+   under body.product-mode, so full mode (no class) is unaffected. */
+body.product-mode #fullWorkbench,
+body.product-mode [data-surface="tooling"] {
+  display: none !important;
+}
+
+/* Keep the decluttered controls aside looking intentional: once the contiguous
+   tooling block (#fullWorkbench) and any tooling sections are hidden, the flex
+   .controls aside must not show a trailing divider/padding on its last visible
+   product section. */
+body.product-mode .controls > section:not([data-surface="tooling"]):last-of-type {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
