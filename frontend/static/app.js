@@ -440,6 +440,9 @@ const els = {
   rows: document.getElementById("candidateRows"),
   detail: document.getElementById("candidateDetail"),
   exportCsv: document.getElementById("exportCsv"),
+  tabSetup: document.getElementById("tabSetup"),
+  tabReview: document.getElementById("tabReview"),
+  tabReports: document.getElementById("tabReports"),
 };
 
 async function getJson(url) {
@@ -5214,6 +5217,77 @@ async function safeStep(fn) {
   }
 }
 
+// P1b: product-mode named views (Setup / Review / Reports). The router sets one
+// body class (show-<view>) that the CSS uses to reveal only the active view's
+// sections. Active only in product mode; inert in full mode (the workbench).
+const VIEW_NAMES = ["setup", "review", "reports"];
+const VIEW_TABS = {
+  setup: function () { return els.tabSetup; },
+  review: function () { return els.tabReview; },
+  reports: function () { return els.tabReports; },
+};
+
+function setView(name) {
+  const view = VIEW_NAMES.includes(name) ? name : "review";
+  for (const candidate of VIEW_NAMES) {
+    document.body.classList.toggle("show-" + candidate, candidate === view);
+  }
+  for (const candidate of VIEW_NAMES) {
+    const tab = VIEW_TABS[candidate]();
+    if (!tab) continue;
+    const active = candidate === view;
+    tab.setAttribute("aria-selected", active ? "true" : "false");
+    tab.tabIndex = active ? 0 : -1;
+  }
+}
+
+function readHashView() {
+  const raw = (location.hash || "").replace(/^#/, "").trim().toLowerCase();
+  if (VIEW_NAMES.includes(raw)) {
+    return raw;
+  }
+  const workspaceActive = Boolean(state.activeWorkspaceId) || state.candidates.length > 0;
+  return workspaceActive ? "review" : "setup";
+}
+
+function initViewRouter() {
+  if (!document.body.classList.contains("product-mode")) {
+    return;
+  }
+  for (const candidate of VIEW_NAMES) {
+    const tab = VIEW_TABS[candidate]();
+    if (!tab) continue;
+    tab.addEventListener("click", function (event) {
+      event.preventDefault();
+      location.hash = "#" + candidate;
+    });
+    tab.addEventListener("keydown", function (event) {
+      const idx = VIEW_NAMES.indexOf(candidate);
+      let nextIdx = null;
+      if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+        nextIdx = (idx + 1) % VIEW_NAMES.length;
+      } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+        nextIdx = (idx - 1 + VIEW_NAMES.length) % VIEW_NAMES.length;
+      } else if (event.key === "Home") {
+        nextIdx = 0;
+      } else if (event.key === "End") {
+        nextIdx = VIEW_NAMES.length - 1;
+      }
+      if (nextIdx === null) {
+        return;
+      }
+      event.preventDefault();
+      location.hash = "#" + VIEW_NAMES[nextIdx];
+      const nextTab = VIEW_TABS[VIEW_NAMES[nextIdx]]();
+      if (nextTab) {
+        nextTab.focus();
+      }
+    });
+  }
+  window.addEventListener("hashchange", function () { setView(readHashView()); });
+  setView(readHashView());
+}
+
 async function init() {
   setupControlVisibility();
   setupMapInteractions();
@@ -5323,6 +5397,9 @@ async function init() {
     await safeStep(step);
   }
   await safeStep(loadDashboardWorkspace);
+  if (document.body.classList.contains("product-mode")) {
+    initViewRouter();
+  }
 }
 
 for (const el of [els.generatorType, els.minScore, els.noCrossing, els.majorRoad]) {

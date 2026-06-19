@@ -406,8 +406,10 @@ th {
   gap: var(--s-2);
 }
 
-/* Advanced sections hidden unless toggled */
-.controls:not(.show-advanced) .advanced-control {
+/* Advanced sections hidden unless toggled (full mode only; in product mode the
+   named-view system owns control-panel visibility, so this legacy mechanism is
+   scoped out to avoid double-hiding the Reports view's sections). */
+body:not(.product-mode) .controls:not(.show-advanced) .advanced-control {
   display: none;
 }
 
@@ -1489,4 +1491,85 @@ body.product-mode [data-surface="tooling"] {
 body.product-mode .controls > section:not([data-surface="tooling"]):last-of-type {
   border-bottom: 0;
   padding-bottom: 0;
+}
+
+/* ---------- Product mode: named views (Setup / Review / Reports) ---------- */
+/* P1b CLARIFY: product mode splits the product-core surfaces into three
+   single-purpose views so the primary task (Review) is obvious. A tiny vanilla
+   hash router sets exactly one of .show-setup / .show-review / .show-reports on
+   <body> (product mode only) and toggles aria-selected on the matching tab.
+   Each product-core section carries one of .view-setup / .view-review /
+   .view-reports. NO DOM MOVES: sections stay in place; only display switches.
+   Scoped under body.product-mode so full mode (router inert) keeps the
+   single-scroll workbench unchanged. A section already hidden via
+   [data-surface="tooling"] or inside #fullWorkbench stays hidden regardless. */
+body.product-mode:not(.show-setup) .view-setup,
+body.product-mode:not(.show-review) .view-review,
+body.product-mode:not(.show-reports) .view-reports {
+  display: none !important;
+}
+
+/* ---------- Segmented view nav (tablist) ---------- */
+/* Keyboard-accessible segmented control in the header. Hidden in full mode
+   (the legacy .topnav shows); revealed only in product mode, where .topnav is
+   hidden. Built from the indigo token system; the selected tab uses --accent. */
+.view-nav {
+  display: none;
+}
+
+body.product-mode .view-nav {
+  display: inline-flex;
+  gap: var(--s-1);
+  flex: 1;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: var(--s-1);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  box-shadow: var(--shadow-1);
+}
+
+body.product-mode .topnav {
+  display: none;
+}
+
+.view-nav [role="tab"] {
+  min-height: 32px;
+  padding: var(--s-2) var(--s-4);
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease, border-color 120ms ease;
+}
+
+.view-nav [role="tab"]:hover {
+  border-color: var(--accent-soft-line);
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+}
+
+.view-nav [role="tab"][aria-selected="true"] {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #ffffff;
+  box-shadow: var(--shadow-1);
+}
+
+.view-nav [role="tab"][aria-selected="true"]:hover {
+  background: var(--accent-strong);
+  border-color: var(--accent-strong);
+  color: #ffffff;
+}
+
+.view-nav [role="tab"]:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
 }

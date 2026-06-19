@@ -20,6 +20,11 @@
         <a href="#controlPanel">Workflow</a>
         <a href="#evidencePanel">Evidence</a>
       </nav>
+      <nav class="view-nav" aria-label="Workspace views" role="tablist">
+        <button id="tabSetup" type="button" role="tab" aria-selected="false" tabindex="-1">Setup</button>
+        <button id="tabReview" type="button" role="tab" aria-selected="true" tabindex="0">Review</button>
+        <button id="tabReports" type="button" role="tab" aria-selected="false" tabindex="-1">Reports</button>
+      </nav>
       <div class="status" id="status" role="status" aria-live="polite">Loading</div>
     </header>
 
@@ -51,7 +56,7 @@
 
     <main class="layout" id="workspace">
       <aside class="panel controls" id="controlPanel" aria-label="Workflow controls">
-        <section>
+        <section class="view-setup">
           <h2>Workspace</h2>
           <label>
             Dashboard workspace
@@ -540,7 +545,7 @@
         </section>
         </div>
 
-        <section>
+        <section class="view-setup">
           <h2>Pilot Area</h2>
           <label>
             Search
@@ -559,7 +564,7 @@
           <div class="preflight-box" id="pilotPreflight"></div>
         </section>
 
-        <section>
+        <section class="view-setup">
           <h2>Create Analysis</h2>
           <button id="planAnalysisWorkflow" type="button">Plan selected analysis</button>
           <button id="startAnalysisWorkflow" type="button">Start analysis job</button>
@@ -580,14 +585,14 @@
           <div id="portfolioReportsBody" class="workspace-body"></div>
         </section>
 
-        <section>
+        <section class="view-reports">
           <h2>Analysis Runs</h2>
           <button id="refreshAnalysisRuns" type="button">Refresh analysis runs</button>
           <div class="small-note runner-status" id="analysisRunsStatus">Analysis runs loading.</div>
           <div id="analysisRunsBody" class="workspace-body"></div>
         </section>
 
-        <section>
+        <section class="view-reports">
           <h2>Run History</h2>
           <button id="refreshJobs" type="button">Refresh jobs</button>
           <div class="small-note runner-status" id="jobStatus">No job selected.</div>
@@ -602,7 +607,7 @@
           <div class="small-note runner-status" id="buildStatus">No run started.</div>
         </section>
 
-        <section>
+        <section class="view-review">
           <h2>Candidate Filters</h2>
           <label>
             Generator type
@@ -625,19 +630,19 @@
           </label>
         </section>
 
-        <section>
+        <section class="view-review">
           <h2>Metrics</h2>
           <div class="metrics" id="metrics"></div>
         </section>
 
-        <section>
+        <section class="view-review">
           <h2>Interpretation</h2>
           <p class="note" id="reviewWording"></p>
           <p class="note">Missing OSM tags are data-quality gaps, not proof that infrastructure is absent.</p>
         </section>
       </aside>
 
-      <section class="map-area" id="mapPanel">
+      <section class="map-area view-review" id="mapPanel">
         <div class="map-toolbar">
           <div><span class="eyebrow">Kfar Saba pilot</span><h2>Safe Access Review Map</h2></div>
           <div class="legend">
@@ -650,7 +655,7 @@
         <svg id="map" role="img" aria-label="Kfar Saba review map"></svg>
       </section>
 
-      <section class="panel profile-panel">
+      <section class="panel profile-panel view-setup">
         <div class="panel-title">
           <h2>Dataset Profile</h2>
           <span id="profileStatus" class="badge">Waiting</span>
@@ -658,7 +663,7 @@
         <div id="sourceProfile" class="profile-grid"></div>
       </section>
 
-      <section class="panel table-panel" id="reviewQueuePanel">
+      <section class="panel table-panel view-review" id="reviewQueuePanel">
         <div class="table-header">
           <h2>Review Candidates</h2>
           <button id="exportCsv" type="button">Export visible CSV</button>
@@ -681,7 +686,7 @@
         </div>
       </section>
 
-      <section class="panel detail" id="candidatePanel">
+      <section class="panel detail view-review" id="candidatePanel">
         <h2>Selected Candidate</h2>
         <div id="candidateDetail" class="detail-body">Select a row or marker.</div>
       </section>
@@ -694,7 +699,7 @@
         <div id="templateReadiness" class="template-body"></div>
       </section>
 
-      <section class="panel profile-results-panel" id="evidencePanel" data-surface="tooling">
+      <section class="panel profile-results-panel view-reports" id="evidencePanel">
         <div class="panel-title">
           <h2>Universal Profile Results</h2>
           <span id="profileResultsStatus" class="badge">Waiting</span>
