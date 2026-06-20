@@ -149,6 +149,42 @@ def served_in_product_mode(path: str) -> bool:
     return any(path == prefix or path.startswith(prefix + "/") for prefix in PRODUCT_API_PREFIXES)
 
 
+# P4.1 first batch: data-driven GET dispatch for exact-path, single-statement arms.
+# Each handler mirrors its former if/elif body byte-for-byte. Signature is uniform
+# (self, segments, query) so the dispatcher can call every entry the same way.
+ROUTE_TABLE_GET = {
+    "/api/health": lambda self, segments, query: self.json_response({"ok": True, "app_version": APP_VERSION, "workspace_id": WORKSPACE_ID, "data_root_ok": OUTPUT_ROOT.exists(), "mode": "product" if PRODUCT_MODE else "full"}),
+    "/api/project-manifest": lambda self, segments, query: self.json_or_error_response(project_manifest()),
+    "/api/product-architecture": lambda self, segments, query: self.json_response(PRODUCT_ARCHITECTURE.blueprint()),
+    "/api/product-architecture/variants": lambda self, segments, query: self.json_response(PRODUCT_ARCHITECTURE.variants()),
+    "/api/product-architecture/roadmap": lambda self, segments, query: self.json_response(PRODUCT_ARCHITECTURE.roadmap()),
+    "/api/release-readiness": lambda self, segments, query: self.json_response(RELEASE_READINESS.overview()),
+    "/api/release-readiness/gates": lambda self, segments, query: self.json_response(RELEASE_READINESS.gates_response()),
+    "/api/release-readiness/snapshots": lambda self, segments, query: self.json_response(RELEASE_READINESS.list_snapshots(parse_int(first(query, "limit", "20"), 20))),
+    "/api/portfolio-demo": lambda self, segments, query: self.json_response(PORTFOLIO_DEMO.overview()),
+    "/api/portfolio-demo/steps": lambda self, segments, query: self.json_response(PORTFOLIO_DEMO.steps_response()),
+    "/api/portfolio-demo/snapshots": lambda self, segments, query: self.json_response(PORTFOLIO_DEMO.list_snapshots(parse_int(first(query, "limit", "20"), 20))),
+    "/api/portfolio-evidence-bundle": lambda self, segments, query: self.json_response(PORTFOLIO_EVIDENCE_BUNDLE.status()),
+    "/api/portfolio-evidence-bundle/bundles": lambda self, segments, query: self.json_response(PORTFOLIO_EVIDENCE_BUNDLE.list_bundles(parse_int(first(query, "limit", "20"), 20))),
+    "/api/bundle-review-checklist": lambda self, segments, query: self.json_response(BUNDLE_REVIEW_CHECKLIST.status()),
+    "/api/bundle-review-checklist/checklists": lambda self, segments, query: self.json_response(BUNDLE_REVIEW_CHECKLIST.list_checklists(parse_int(first(query, "limit", "20"), 20))),
+    "/api/portfolio-narrative-export": lambda self, segments, query: self.json_response(PORTFOLIO_NARRATIVE_EXPORT.status()),
+    "/api/portfolio-narrative-export/narratives": lambda self, segments, query: self.json_response(PORTFOLIO_NARRATIVE_EXPORT.list_narratives(parse_int(first(query, "limit", "20"), 20))),
+    "/api/portfolio-handoff-page": lambda self, segments, query: self.json_response(PORTFOLIO_HANDOFF_PAGE.status()),
+    "/api/portfolio-handoff-page/pages": lambda self, segments, query: self.json_response(PORTFOLIO_HANDOFF_PAGE.list_pages(parse_int(first(query, "limit", "20"), 20))),
+    "/api/portfolio-evidence-gallery": lambda self, segments, query: self.json_response(PORTFOLIO_EVIDENCE_GALLERY.status()),
+    "/api/portfolio-evidence-gallery/galleries": lambda self, segments, query: self.json_response(PORTFOLIO_EVIDENCE_GALLERY.list_galleries(parse_int(first(query, "limit", "20"), 20))),
+    "/api/multi-pilot-comparison": lambda self, segments, query: self.json_response(MULTI_PILOT_COMPARISON.status()),
+    "/api/multi-pilot-comparison/comparisons": lambda self, segments, query: self.json_response(MULTI_PILOT_COMPARISON.list_comparisons(parse_int(first(query, "limit", "20"), 20))),
+    "/api/comparison-map-exports": lambda self, segments, query: self.json_response(COMPARISON_MAP_EXPORTS.status()),
+    "/api/comparison-map-exports/exports": lambda self, segments, query: self.json_response(COMPARISON_MAP_EXPORTS.list_exports(parse_int(first(query, "limit", "20"), 20))),
+    "/api/postgis-backend": lambda self, segments, query: self.json_or_error_response(POSTGIS_BACKEND.status()),
+    "/api/postgis-backend/schema": lambda self, segments, query: self.json_or_error_response(POSTGIS_BACKEND.schema()),
+    "/api/postgis-backend/migration-plan": lambda self, segments, query: self.json_or_error_response(POSTGIS_BACKEND.migration_plan({"scope": first(query, "scope", "kfar_saba_pilot")})),
+    "/api/postgis-backend/plans": lambda self, segments, query: self.json_response(POSTGIS_BACKEND.list_plans(parse_int(first(query, "limit", "20"), 20))),
+}
+
+
 _DATA_ROOT_ENV = os.environ.get("GEOREVIEW_DATA_ROOT")
 MAPS_ROOT = Path(_DATA_ROOT_ENV).expanduser().resolve() if _DATA_ROOT_ENV else infer_maps_root(PROJECT_DIR)
 OUTPUT_ROOT = MAPS_ROOT / "analysis_output"
@@ -1583,96 +1619,42 @@ class Handler(BaseHTTPRequestHandler):
             self.json_response({"error": "not_found", "path": path}, status=404)
             return
         try:
-            if path == "/api/health":
-                self.json_response({"ok": True, "app_version": APP_VERSION, "workspace_id": WORKSPACE_ID, "data_root_ok": OUTPUT_ROOT.exists(), "mode": "product" if PRODUCT_MODE else "full"})
-            elif path == "/api/project-manifest":
-                self.json_or_error_response(project_manifest())
-            elif path == "/api/product-architecture":
-                self.json_response(PRODUCT_ARCHITECTURE.blueprint())
-            elif path == "/api/product-architecture/variants":
-                self.json_response(PRODUCT_ARCHITECTURE.variants())
-            elif path == "/api/product-architecture/roadmap":
-                self.json_response(PRODUCT_ARCHITECTURE.roadmap())
-            elif path == "/api/release-readiness":
-                self.json_response(RELEASE_READINESS.overview())
-            elif path == "/api/release-readiness/gates":
-                self.json_response(RELEASE_READINESS.gates_response())
-            elif path == "/api/release-readiness/snapshots":
-                self.json_response(RELEASE_READINESS.list_snapshots(parse_int(first(query, "limit", "20"), 20)))
-            elif len(segments) == 4 and segments[:3] == ["api", "release-readiness", "snapshots"]:
+            handler = ROUTE_TABLE_GET.get(path)
+            if handler is not None:
+                handler(self, segments, query)
+                return
+            if len(segments) == 4 and segments[:3] == ["api", "release-readiness", "snapshots"]:
                 self.json_or_error_response(RELEASE_READINESS.snapshot_detail(segments[3]))
-            elif path == "/api/portfolio-demo":
-                self.json_response(PORTFOLIO_DEMO.overview())
-            elif path == "/api/portfolio-demo/steps":
-                self.json_response(PORTFOLIO_DEMO.steps_response())
-            elif path == "/api/portfolio-demo/snapshots":
-                self.json_response(PORTFOLIO_DEMO.list_snapshots(parse_int(first(query, "limit", "20"), 20)))
             elif len(segments) == 4 and segments[:3] == ["api", "portfolio-demo", "snapshots"]:
                 self.json_or_error_response(PORTFOLIO_DEMO.snapshot_detail(segments[3]))
-            elif path == "/api/portfolio-evidence-bundle":
-                self.json_response(PORTFOLIO_EVIDENCE_BUNDLE.status())
-            elif path == "/api/portfolio-evidence-bundle/bundles":
-                self.json_response(PORTFOLIO_EVIDENCE_BUNDLE.list_bundles(parse_int(first(query, "limit", "20"), 20)))
             elif len(segments) == 5 and segments[:3] == ["api", "portfolio-evidence-bundle", "bundles"] and segments[4] == "download":
                 self.portfolio_evidence_bundle_response(segments[3])
             elif len(segments) == 4 and segments[:3] == ["api", "portfolio-evidence-bundle", "bundles"]:
                 self.json_or_error_response(PORTFOLIO_EVIDENCE_BUNDLE.detail(segments[3]))
-            elif path == "/api/bundle-review-checklist":
-                self.json_response(BUNDLE_REVIEW_CHECKLIST.status())
-            elif path == "/api/bundle-review-checklist/checklists":
-                self.json_response(BUNDLE_REVIEW_CHECKLIST.list_checklists(parse_int(first(query, "limit", "20"), 20)))
             elif len(segments) == 5 and segments[:3] == ["api", "bundle-review-checklist", "checklists"] and segments[4] == "download":
                 self.bundle_review_checklist_response(segments[3])
             elif len(segments) == 4 and segments[:3] == ["api", "bundle-review-checklist", "checklists"]:
                 self.json_or_error_response(BUNDLE_REVIEW_CHECKLIST.detail(segments[3]))
-            elif path == "/api/portfolio-narrative-export":
-                self.json_response(PORTFOLIO_NARRATIVE_EXPORT.status())
-            elif path == "/api/portfolio-narrative-export/narratives":
-                self.json_response(PORTFOLIO_NARRATIVE_EXPORT.list_narratives(parse_int(first(query, "limit", "20"), 20)))
             elif len(segments) == 5 and segments[:3] == ["api", "portfolio-narrative-export", "narratives"] and segments[4] == "download":
                 self.portfolio_narrative_response(segments[3])
             elif len(segments) == 4 and segments[:3] == ["api", "portfolio-narrative-export", "narratives"]:
                 self.json_or_error_response(PORTFOLIO_NARRATIVE_EXPORT.detail(segments[3]))
-            elif path == "/api/portfolio-handoff-page":
-                self.json_response(PORTFOLIO_HANDOFF_PAGE.status())
-            elif path == "/api/portfolio-handoff-page/pages":
-                self.json_response(PORTFOLIO_HANDOFF_PAGE.list_pages(parse_int(first(query, "limit", "20"), 20)))
             elif len(segments) == 5 and segments[:3] == ["api", "portfolio-handoff-page", "pages"] and segments[4] == "download":
                 self.portfolio_handoff_page_response(segments[3])
             elif len(segments) == 4 and segments[:3] == ["api", "portfolio-handoff-page", "pages"]:
                 self.json_or_error_response(PORTFOLIO_HANDOFF_PAGE.detail(segments[3]))
-            elif path == "/api/portfolio-evidence-gallery":
-                self.json_response(PORTFOLIO_EVIDENCE_GALLERY.status())
-            elif path == "/api/portfolio-evidence-gallery/galleries":
-                self.json_response(PORTFOLIO_EVIDENCE_GALLERY.list_galleries(parse_int(first(query, "limit", "20"), 20)))
             elif len(segments) == 5 and segments[:3] == ["api", "portfolio-evidence-gallery", "galleries"] and segments[4] == "download":
                 self.portfolio_evidence_gallery_response(segments[3])
             elif len(segments) == 4 and segments[:3] == ["api", "portfolio-evidence-gallery", "galleries"]:
                 self.json_or_error_response(PORTFOLIO_EVIDENCE_GALLERY.detail(segments[3]))
-            elif path == "/api/multi-pilot-comparison":
-                self.json_response(MULTI_PILOT_COMPARISON.status())
-            elif path == "/api/multi-pilot-comparison/comparisons":
-                self.json_response(MULTI_PILOT_COMPARISON.list_comparisons(parse_int(first(query, "limit", "20"), 20)))
             elif len(segments) == 5 and segments[:3] == ["api", "multi-pilot-comparison", "comparisons"] and segments[4] == "download":
                 self.multi_pilot_comparison_response(segments[3])
             elif len(segments) == 4 and segments[:3] == ["api", "multi-pilot-comparison", "comparisons"]:
                 self.json_or_error_response(MULTI_PILOT_COMPARISON.detail(segments[3]))
-            elif path == "/api/comparison-map-exports":
-                self.json_response(COMPARISON_MAP_EXPORTS.status())
-            elif path == "/api/comparison-map-exports/exports":
-                self.json_response(COMPARISON_MAP_EXPORTS.list_exports(parse_int(first(query, "limit", "20"), 20)))
             elif len(segments) == 5 and segments[:3] == ["api", "comparison-map-exports", "exports"] and segments[4] == "download":
                 self.comparison_map_export_response(segments[3])
             elif len(segments) == 4 and segments[:3] == ["api", "comparison-map-exports", "exports"]:
                 self.json_or_error_response(COMPARISON_MAP_EXPORTS.detail(segments[3]))
-            elif path == "/api/postgis-backend":
-                self.json_or_error_response(POSTGIS_BACKEND.status())
-            elif path == "/api/postgis-backend/schema":
-                self.json_or_error_response(POSTGIS_BACKEND.schema())
-            elif path == "/api/postgis-backend/migration-plan":
-                self.json_or_error_response(POSTGIS_BACKEND.migration_plan({"scope": first(query, "scope", "kfar_saba_pilot")}))
-            elif path == "/api/postgis-backend/plans":
-                self.json_response(POSTGIS_BACKEND.list_plans(parse_int(first(query, "limit", "20"), 20)))
             elif len(segments) == 3 and segments[:2] == ["api", "postgis-backend"]:
                 self.json_or_error_response(POSTGIS_BACKEND.detail(segments[2]))
             elif path == "/api/profile-mapper":
