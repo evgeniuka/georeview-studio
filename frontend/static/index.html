@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>GeoReview Studio v083</title>
     <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="/vendor/leaflet/leaflet.css" />
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
@@ -653,6 +654,7 @@
           </div>
         </div>
         <svg id="map" role="img" aria-label="Kfar Saba review map"></svg>
+        <div id="mapCanvas" aria-hidden="true"></div>
       </section>
 
       <section class="panel profile-panel view-setup">
@@ -741,6 +743,7 @@
       </section>
     </main>
 
+    <script src="/vendor/leaflet/leaflet.js"></script>
     <script src="/app.js"></script>
   </body>
 </html>

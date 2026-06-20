@@ -443,6 +443,8 @@ const els = {
   tabSetup: document.getElementById("tabSetup"),
   tabReview: document.getElementById("tabReview"),
   tabReports: document.getElementById("tabReports"),
+  mapPanel: document.getElementById("mapPanel"),
+  mapCanvas: document.getElementById("mapCanvas"),
 };
 
 async function getJson(url) {
@@ -5030,7 +5032,145 @@ function setupMapInteractions() {
   }
 }
 
+// ---- P2: real Leaflet street basemap (product mode only) ----
+// In product mode the map becomes a real OSM/CARTO street basemap on #mapCanvas.
+// The SVG #map stays as the full-mode renderer AND the offline fallback (when
+// tiles are unreachable). Full mode never initialises Leaflet, so the suites'
+// full-mode screenshot gate stays entirely off this path.
+let leafletMap = null;
+let leafletContextLayer = null;
+let leafletCandidateLayer = null;
+let leafletFitted = false;
+let leafletContextDone = false;
+let leafletTileFailed = false;
+
+function leafletAvailable() {
+  return (
+    Boolean(window.L) &&
+    Boolean(els.mapCanvas) &&
+    document.body.classList.contains("product-mode") &&
+    !leafletTileFailed
+  );
+}
+
+const CATEGORY_SHAPE = {
+  road: { color: "#ea580c", shape: "triangle" },
+  crossing: { color: "#059669", shape: "square" },
+  generator: { color: "#2563eb", shape: "diamond" },
+  candidate: { color: "#e11d48", shape: "circle" },
+};
+
+function markerSvg(shape, color, size, stroke) {
+  const c = (size / 2).toFixed(1);
+  const sw = stroke ? `stroke="${stroke}" stroke-width="1.5"` : "";
+  let body;
+  if (shape === "square") {
+    body = `<rect x="1.5" y="1.5" width="${size - 3}" height="${size - 3}" fill="${color}" ${sw}/>`;
+  } else if (shape === "triangle") {
+    body = `<polygon points="${c},1.5 ${size - 1.5},${size - 1.5} 1.5,${size - 1.5}" fill="${color}" ${sw}/>`;
+  } else if (shape === "diamond") {
+    body = `<polygon points="${c},1.5 ${size - 1.5},${c} ${c},${size - 1.5} 1.5,${c}" fill="${color}" ${sw}/>`;
+  } else {
+    body = `<circle cx="${c}" cy="${c}" r="${(size / 2 - 1.5).toFixed(1)}" fill="${color}" ${sw}/>`;
+  }
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg">${body}</svg>`;
+}
+
+function categoryIcon(category, size, stroke) {
+  const meta = CATEGORY_SHAPE[category];
+  return window.L.divIcon({
+    html: markerSvg(meta.shape, meta.color, size, stroke),
+    className: "gmark",
+    iconSize: [size, size],
+    iconAnchor: [size / 2, size / 2],
+  });
+}
+
+function ensureLeafletMap() {
+  if (leafletMap || !window.L || !els.mapCanvas) return leafletMap;
+  leafletMap = window.L.map(els.mapCanvas, { zoomControl: true, attributionControl: true });
+  const tiles = window.L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+    subdomains: "abcd",
+    maxZoom: 19,
+    attribution:
+      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+  });
+  let tileErrors = 0;
+  tiles.on("tileerror", () => {
+    tileErrors += 1;
+    if (tileErrors >= 4 && !leafletTileFailed) {
+      leafletTileFailed = true;
+      if (els.mapPanel) els.mapPanel.classList.remove("leaflet-on");
+      renderMapSvg();
+    }
+  });
+  tiles.addTo(leafletMap);
+  leafletContextLayer = window.L.layerGroup().addTo(leafletMap);
+  leafletCandidateLayer = window.L.layerGroup().addTo(leafletMap);
+  return leafletMap;
+}
+
+function addContextMarkers(points, category, size) {
+  for (const p of points) {
+    if (!Number.isFinite(p.lon) || !Number.isFinite(p.lat)) continue;
+    window.L.marker([p.lat, p.lon], { icon: categoryIcon(category, size, null), interactive: false, keyboard: false }).addTo(
+      leafletContextLayer,
+    );
+  }
+}
+
+function renderMapLeaflet() {
+  // Make #mapCanvas visible BEFORE initialising Leaflet so the map is created on
+  // a sized container (otherwise fitBounds computes a world-level zoom on a 0px box).
+  if (els.mapPanel) els.mapPanel.classList.add("leaflet-on");
+  if (!ensureLeafletMap() || !state.features) return;
+  leafletMap.invalidateSize();
+  if (!leafletContextDone) {
+    addContextMarkers(state.features.major_roads, "road", 12);
+    addContextMarkers(state.features.crossings, "crossing", 11);
+    addContextMarkers(state.features.generators, "generator", 11);
+    leafletContextDone = true;
+  }
+  const topIds = new Set(state.candidates.slice(0, 30).map((row) => row.generator_id));
+  const selectedId = state.selected && state.selected.generator_id;
+  leafletCandidateLayer.clearLayers();
+  const fitPoints = [];
+  for (const p of state.features.candidates) {
+    if (!topIds.has(p.generator_id) || !Number.isFinite(p.lon) || !Number.isFinite(p.lat)) continue;
+    const score = p.route_review_priority_score || p.risk_score || 0;
+    const size = Math.max(16, Math.min(28, score / 3.5));
+    const marker = window.L.marker([p.lat, p.lon], {
+      icon: categoryIcon("candidate", size, p.generator_id === selectedId ? "#0f172a" : "#ffffff"),
+      title: `${String(p.name || p.generator_id)} — review priority ${String(score)}`,
+      riseOnHover: true,
+    }).addTo(leafletCandidateLayer);
+    marker.on("click", () => selectCandidate(p.generator_id));
+    fitPoints.push([p.lat, p.lon]);
+  }
+  if (!leafletFitted && fitPoints.length) {
+    // Coarse data-driven view first so tiles load at the right place even before
+    // the (just-revealed) canvas has been laid out...
+    const avgLat = fitPoints.reduce((sum, pt) => sum + pt[0], 0) / fitPoints.length;
+    const avgLon = fitPoints.reduce((sum, pt) => sum + pt[1], 0) / fitPoints.length;
+    leafletMap.setView([avgLat, avgLon], 14);
+    // ...then a precise fit once the browser has measured the real container size.
+    requestAnimationFrame(() => {
+      if (!leafletMap || leafletFitted || leafletMap.getSize().y <= 50) return;
+      leafletMap.fitBounds(window.L.latLngBounds(fitPoints).pad(0.15));
+      leafletFitted = true;
+    });
+  }
+}
+
 function renderMap() {
+  if (leafletAvailable()) {
+    renderMapLeaflet();
+  } else {
+    renderMapSvg();
+  }
+}
+
+function renderMapSvg() {
   if (!els.map || !state.features) return;
   const allPoints = [
     ...state.features.generators,
@@ -5238,6 +5378,10 @@ function setView(name) {
     const active = candidate === view;
     tab.setAttribute("aria-selected", active ? "true" : "false");
     tab.tabIndex = active ? 0 : -1;
+  }
+  // Re-sync Leaflet when the Review view (re)appears so it lays out at full size.
+  if (leafletMap) {
+    leafletMap.invalidateSize();
   }
 }
 

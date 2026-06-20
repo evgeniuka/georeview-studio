@@ -1573,3 +1573,44 @@ body.product-mode .topnav {
   outline: none;
   box-shadow: var(--focus-ring);
 }
+
+/* ---------- P2: Leaflet street basemap (product mode) ---------- */
+/* #mapCanvas hosts the real OSM/CARTO tiled map; the SVG #map stays as the
+   full-mode renderer AND the offline fallback. They occupy the same slot; the
+   .leaflet-on class on .map-area (set by app.js only when Leaflet is live)
+   swaps which one shows. Default (full mode / before init / offline) = SVG. */
+#mapCanvas {
+  width: 100%;
+  height: calc(100% - 46px);
+  min-height: 450px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  overflow: hidden;
+  z-index: 0;
+}
+
+.map-area:not(.leaflet-on) #mapCanvas {
+  display: none;
+}
+
+.map-area.leaflet-on #map {
+  display: none;
+}
+
+/* Leaflet ships its own zoom control, so hide the SVG-era custom zoom buttons
+   while the Leaflet map is live. */
+.map-area.leaflet-on .map-zoom-controls {
+  display: none;
+}
+
+/* Shape-coded markers (divIcon) carry an inline SVG; strip Leaflet's default
+   icon chrome so only the shape shows. */
+.gmark {
+  background: transparent;
+  border: 0;
+}
+
+.gmark svg {
+  display: block;
+  filter: drop-shadow(0 1px 1px rgba(15, 23, 42, 0.28));
+}
