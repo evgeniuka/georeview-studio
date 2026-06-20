@@ -432,6 +432,134 @@ ROUTE_TABLE_POST = {
 }
 
 
+# P4.2 segment route-table: ordered (path-template -> handler) list for the
+# segment-pattern GET arms. Template slots are literal path segments; None is a
+# wildcard (id). do_GET scans in order, first match wins -- identical to the former
+# if/elif chain. Bodies mirror the former arms verbatim.
+ROUTE_TABLE_GET_SEGMENTS = [
+    (('api', 'release-readiness', 'snapshots', None), lambda self, segments, query: self.json_or_error_response(RELEASE_READINESS.snapshot_detail(segments[3]))),
+    (('api', 'portfolio-demo', 'snapshots', None), lambda self, segments, query: self.json_or_error_response(PORTFOLIO_DEMO.snapshot_detail(segments[3]))),
+    (('api', 'portfolio-evidence-bundle', 'bundles', None, 'download'), lambda self, segments, query: self.portfolio_evidence_bundle_response(segments[3])),
+    (('api', 'portfolio-evidence-bundle', 'bundles', None), lambda self, segments, query: self.json_or_error_response(PORTFOLIO_EVIDENCE_BUNDLE.detail(segments[3]))),
+    (('api', 'bundle-review-checklist', 'checklists', None, 'download'), lambda self, segments, query: self.bundle_review_checklist_response(segments[3])),
+    (('api', 'bundle-review-checklist', 'checklists', None), lambda self, segments, query: self.json_or_error_response(BUNDLE_REVIEW_CHECKLIST.detail(segments[3]))),
+    (('api', 'portfolio-narrative-export', 'narratives', None, 'download'), lambda self, segments, query: self.portfolio_narrative_response(segments[3])),
+    (('api', 'portfolio-narrative-export', 'narratives', None), lambda self, segments, query: self.json_or_error_response(PORTFOLIO_NARRATIVE_EXPORT.detail(segments[3]))),
+    (('api', 'portfolio-handoff-page', 'pages', None, 'download'), lambda self, segments, query: self.portfolio_handoff_page_response(segments[3])),
+    (('api', 'portfolio-handoff-page', 'pages', None), lambda self, segments, query: self.json_or_error_response(PORTFOLIO_HANDOFF_PAGE.detail(segments[3]))),
+    (('api', 'portfolio-evidence-gallery', 'galleries', None, 'download'), lambda self, segments, query: self.portfolio_evidence_gallery_response(segments[3])),
+    (('api', 'portfolio-evidence-gallery', 'galleries', None), lambda self, segments, query: self.json_or_error_response(PORTFOLIO_EVIDENCE_GALLERY.detail(segments[3]))),
+    (('api', 'multi-pilot-comparison', 'comparisons', None, 'download'), lambda self, segments, query: self.multi_pilot_comparison_response(segments[3])),
+    (('api', 'multi-pilot-comparison', 'comparisons', None), lambda self, segments, query: self.json_or_error_response(MULTI_PILOT_COMPARISON.detail(segments[3]))),
+    (('api', 'comparison-map-exports', 'exports', None, 'download'), lambda self, segments, query: self.comparison_map_export_response(segments[3])),
+    (('api', 'comparison-map-exports', 'exports', None), lambda self, segments, query: self.json_or_error_response(COMPARISON_MAP_EXPORTS.detail(segments[3]))),
+    (('api', 'postgis-backend', None), lambda self, segments, query: self.json_or_error_response(POSTGIS_BACKEND.detail(segments[2]))),
+    (('api', 'profile-mapper', 'contracts', None), lambda self, segments, query: self.json_or_error_response(PROFILE_MAPPER.contract(segments[3]))),
+    (('api', 'profile-mapper', 'plans', None), lambda self, segments, query: self.json_or_error_response(PROFILE_MAPPER.detail(segments[3]))),
+    (('api', 'dataset-packages', 'packages', None), lambda self, segments, query: self.json_or_error_response(DATASET_PACKAGES.detail(segments[3]))),
+    (('api', 'dataset-packages', 'packages', None, 'download'), lambda self, segments, query: self.dataset_package_response(segments[3])),
+    (('api', 'execution-queue', 'jobs', None), lambda self, segments, query: self.json_or_error_response(EXECUTION_QUEUE.detail(segments[3]))),
+    (('api', 'profile-promotion', 'candidates', None), lambda self, segments, query: self.json_or_error_response(PROFILE_PROMOTION.candidate(segments[3]))),
+    (('api', 'profile-promotion', 'contract-diffs', None), lambda self, segments, query: self.json_or_error_response(PROFILE_PROMOTION.contract_diff_detail(segments[3]))),
+    (('api', 'profile-promotion', 'regression-previews', None), lambda self, segments, query: self.json_or_error_response(PROFILE_PROMOTION.contract_regression_preview_detail(segments[3]))),
+    (('api', 'profile-promotion', 'config-apply-proposals', None), lambda self, segments, query: self.json_or_error_response(PROFILE_PROMOTION.config_apply_proposal_detail(segments[3]))),
+    (('api', 'profile-promotion', 'application-plans', None), lambda self, segments, query: self.json_or_error_response(PROFILE_PROMOTION.application_plan_detail(segments[3]))),
+    (('api', 'profile-promotion', 'proposals', None, 'decision'), lambda self, segments, query: self.json_or_error_response(PROFILE_PROMOTION.latest_decision(segments[3]))),
+    (('api', 'profile-promotion', 'proposals', None), lambda self, segments, query: self.json_or_error_response(PROFILE_PROMOTION.detail(segments[3]))),
+    (('api', 'template-authoring', 'drafts', None), lambda self, segments, query: self.json_or_error_response(TEMPLATE_AUTHORING.detail(segments[3]))),
+    (('api', 'contract-execution', 'dry-runs', None), lambda self, segments, query: self.json_or_error_response(CONTRACT_EXECUTION.detail(segments[3]))),
+    (('api', 'catalog', 'sources', None), lambda self, segments, query: self.json_or_error_response(CATALOG.profile(segments[3]))),
+    (('api', 'source-import-guardrails', 'requests', None, 'download'), lambda self, segments, query: self.source_import_guardrails_response(segments[3])),
+    (('api', 'source-import-guardrails', 'requests', None), lambda self, segments, query: self.json_or_error_response(SOURCE_IMPORT_GUARDRAILS.detail(segments[3]))),
+    (('api', 'source-handoff', 'handoffs', None, 'download'), lambda self, segments, query: self.source_handoff_response(segments[3])),
+    (('api', 'source-handoff', 'handoffs', None), lambda self, segments, query: self.json_or_error_response(SOURCE_HANDOFF.detail(segments[3]))),
+    (('api', 'source-handoff-execution', 'executions', None, 'download'), lambda self, segments, query: self.source_handoff_execution_response(segments[3])),
+    (('api', 'source-handoff-execution', 'executions', None), lambda self, segments, query: self.json_or_error_response(SOURCE_HANDOFF_EXECUTION.detail(segments[3]))),
+    (('api', 'execution-evidence-package', 'packages', None, 'download'), lambda self, segments, query: self.execution_evidence_package_response(segments[3])),
+    (('api', 'execution-evidence-package', 'packages', None), lambda self, segments, query: self.json_or_error_response(EXECUTION_EVIDENCE_PACKAGE.detail(segments[3]))),
+    (('api', 'execution-result-diff', 'diffs', None, 'download'), lambda self, segments, query: self.execution_result_diff_response(segments[3])),
+    (('api', 'execution-result-diff', 'diffs', None), lambda self, segments, query: self.json_or_error_response(EXECUTION_RESULT_DIFF.detail(segments[3]))),
+    (('api', 'execution-diff-gallery', 'galleries', None, 'download'), lambda self, segments, query: self.execution_diff_gallery_response(segments[3])),
+    (('api', 'execution-diff-gallery', 'galleries', None), lambda self, segments, query: self.json_or_error_response(EXECUTION_DIFF_GALLERY.detail(segments[3]))),
+    (('api', 'execution-diff-detail', 'drilldowns', None, 'download'), lambda self, segments, query: self.execution_diff_detail_response(segments[3])),
+    (('api', 'execution-diff-detail', 'drilldowns', None), lambda self, segments, query: self.json_or_error_response(EXECUTION_DIFF_DETAIL.detail(segments[3]))),
+    (('api', 'reproducibility-audit-packet', 'packets', None, 'download'), lambda self, segments, query: self.reproducibility_audit_packet_response(segments[3])),
+    (('api', 'reproducibility-audit-packet', 'packets', None), lambda self, segments, query: self.json_or_error_response(REPRODUCIBILITY_AUDIT_PACKET.detail(segments[3]))),
+    (('api', 'reviewer-audit-index', 'indexes', None, 'download'), lambda self, segments, query: self.reviewer_audit_index_response(segments[3])),
+    (('api', 'reviewer-audit-index', 'indexes', None), lambda self, segments, query: self.json_or_error_response(REVIEWER_AUDIT_INDEX.detail(segments[3]))),
+    (('api', 'portfolio-export-launcher', 'launchers', None, 'download'), lambda self, segments, query: self.portfolio_export_launcher_response(segments[3])),
+    (('api', 'portfolio-export-launcher', 'launchers', None), lambda self, segments, query: self.json_or_error_response(PORTFOLIO_EXPORT_LAUNCHER.detail(segments[3]))),
+    (('api', 'portable-release-package', 'packages', None, 'download'), lambda self, segments, query: self.portable_release_package_response(segments[3])),
+    (('api', 'portable-release-package', 'packages', None), lambda self, segments, query: self.json_or_error_response(PORTABLE_RELEASE_PACKAGE.detail(segments[3]))),
+    (('api', 'demo-script-pack', 'packs', None, 'download'), lambda self, segments, query: self.demo_script_pack_response(segments[3])),
+    (('api', 'demo-script-pack', 'packs', None), lambda self, segments, query: self.json_or_error_response(DEMO_SCRIPT_PACK.detail(segments[3]))),
+    (('api', 'visual-qa-snapshot-ledger', 'ledgers', None, 'download'), lambda self, segments, query: self.visual_qa_ledger_response(segments[3])),
+    (('api', 'visual-qa-snapshot-ledger', 'ledgers', None), lambda self, segments, query: self.json_or_error_response(VISUAL_QA_LEDGER.detail(segments[3]))),
+    (('api', 'visual-baseline-comparison', 'comparisons', None, 'download'), lambda self, segments, query: self.visual_baseline_comparison_response(segments[3])),
+    (('api', 'visual-baseline-comparison', 'comparisons', None), lambda self, segments, query: self.json_or_error_response(VISUAL_BASELINE_COMPARISON.detail(segments[3]))),
+    (('api', 'demo-artifact-completeness', 'checks', None, 'download'), lambda self, segments, query: self.demo_artifact_completeness_response(segments[3])),
+    (('api', 'demo-artifact-completeness', 'checks', None), lambda self, segments, query: self.json_or_error_response(DEMO_ARTIFACT_COMPLETENESS.detail(segments[3]))),
+    (('api', 'visual-evidence-capture', 'captures', None, 'download'), lambda self, segments, query: self.visual_evidence_capture_response(segments[3])),
+    (('api', 'visual-evidence-capture', 'captures', None), lambda self, segments, query: self.json_or_error_response(VISUAL_EVIDENCE_CAPTURE.detail(segments[3]))),
+    (('api', 'visual-evidence-review-diff', 'diffs', None, 'download'), lambda self, segments, query: self.visual_evidence_review_diff_response(segments[3])),
+    (('api', 'visual-evidence-review-diff', 'diffs', None), lambda self, segments, query: self.json_or_error_response(VISUAL_EVIDENCE_REVIEW_DIFF.detail(segments[3]))),
+    (('api', 'visual-evidence-review-annotations', 'annotations', None, 'download'), lambda self, segments, query: self.visual_evidence_review_annotations_response(segments[3])),
+    (('api', 'visual-evidence-review-annotations', 'annotations', None), lambda self, segments, query: self.json_or_error_response(VISUAL_EVIDENCE_REVIEW_ANNOTATIONS.detail(segments[3]))),
+    (('api', 'visual-evidence-signoff-packet', 'packets', None, 'download'), lambda self, segments, query: self.visual_evidence_signoff_packet_response(segments[3])),
+    (('api', 'visual-evidence-signoff-packet', 'packets', None), lambda self, segments, query: self.json_or_error_response(VISUAL_EVIDENCE_SIGNOFF_PACKET.detail(segments[3]))),
+    (('api', 'final-reviewer-launch-checklist', 'checklists', None, 'download'), lambda self, segments, query: self.final_reviewer_launch_checklist_response(segments[3])),
+    (('api', 'final-reviewer-launch-checklist', 'checklists', None), lambda self, segments, query: self.json_or_error_response(FINAL_REVIEWER_LAUNCH_CHECKLIST.detail(segments[3]))),
+    (('api', 'recruiter-demo-brief', 'briefs', None, 'download'), lambda self, segments, query: self.recruiter_demo_brief_response(segments[3])),
+    (('api', 'recruiter-demo-brief', 'briefs', None), lambda self, segments, query: self.json_or_error_response(RECRUITER_DEMO_BRIEF.detail(segments[3]))),
+    (('api', 'public-portfolio-package', 'packages', None, 'download'), lambda self, segments, query: self.public_portfolio_package_response(segments[3])),
+    (('api', 'public-portfolio-package', 'packages', None), lambda self, segments, query: self.json_or_error_response(PUBLIC_PORTFOLIO_PACKAGE.detail(segments[3]))),
+    (('api', 'demo-review-playbook', 'playbooks', None, 'download'), lambda self, segments, query: self.demo_review_playbook_response(segments[3])),
+    (('api', 'demo-review-playbook', 'playbooks', None), lambda self, segments, query: self.json_or_error_response(DEMO_REVIEW_PLAYBOOK.detail(segments[3]))),
+    (('api', 'github-publication-bundle', 'bundles', None, 'download'), lambda self, segments, query: self.github_publication_bundle_response(segments[3])),
+    (('api', 'github-publication-bundle', 'bundles', None), lambda self, segments, query: self.json_or_error_response(GITHUB_PUBLICATION_BUNDLE.detail(segments[3]))),
+    (('api', 'repository-publication-qa', 'reviews', None, 'download'), lambda self, segments, query: self.repository_publication_qa_response(segments[3])),
+    (('api', 'repository-publication-qa', 'reviews', None), lambda self, segments, query: self.json_or_error_response(REPOSITORY_PUBLICATION_QA.detail(segments[3]))),
+    (('api', 'repository-export-handoff', 'handoffs', None, 'download'), lambda self, segments, query: self.repository_export_handoff_response(segments[3])),
+    (('api', 'repository-export-handoff', 'handoffs', None), lambda self, segments, query: self.json_or_error_response(REPOSITORY_EXPORT_HANDOFF.detail(segments[3]))),
+    (('api', 'repository-dry-run-review', 'reviews', None, 'download'), lambda self, segments, query: self.repository_dry_run_review_response(segments[3])),
+    (('api', 'repository-dry-run-review', 'reviews', None), lambda self, segments, query: self.json_or_error_response(REPOSITORY_DRY_RUN_REVIEW.detail(segments[3]))),
+    (('api', 'repository-final-package-review', 'reviews', None, 'download'), lambda self, segments, query: self.repository_final_package_review_response(segments[3])),
+    (('api', 'repository-final-package-review', 'reviews', None), lambda self, segments, query: self.json_or_error_response(REPOSITORY_FINAL_PACKAGE_REVIEW.detail(segments[3]))),
+    (('api', 'public-readme-cleanup-review', 'reviews', None, 'download'), lambda self, segments, query: self.public_readme_cleanup_review_response(segments[3])),
+    (('api', 'public-readme-cleanup-review', 'reviews', None), lambda self, segments, query: self.json_or_error_response(PUBLIC_README_CLEANUP_REVIEW.detail(segments[3]))),
+    (('api', 'public-repository-polish-package', 'packages', None, 'download'), lambda self, segments, query: self.public_repository_polish_package_response(segments[3])),
+    (('api', 'public-repository-polish-package', 'packages', None), lambda self, segments, query: self.json_or_error_response(PUBLIC_REPOSITORY_POLISH_PACKAGE.detail(segments[3]))),
+    (('api', 'repository-export-checklist', 'checklists', None, 'download'), lambda self, segments, query: self.repository_export_checklist_response(segments[3])),
+    (('api', 'repository-export-checklist', 'checklists', None), lambda self, segments, query: self.json_or_error_response(REPOSITORY_EXPORT_CHECKLIST.detail(segments[3]))),
+    (('api', 'source-onboarding', 'sources', None), lambda self, segments, query: self.json_or_error_response(ONBOARDING.source_detail(segments[3]))),
+    (('api', 'profile-dashboard', None, 'summary'), lambda self, segments, query: self.json_or_error_response(PROFILE_DASHBOARD.summary(segments[2]))),
+    (('api', 'scoring-rules', None), lambda self, segments, query: self.json_or_error_response(SCORING_RULES.profile(segments[2]))),
+    (('api', 'scoring-rules', None, 'audit'), lambda self, segments, query: self.json_or_error_response(SCORING_RULES.audit(
+                    segments[2],
+                    limit=parse_int(first(query, "limit", "50"), 50),
+                    min_score=parse_int(first(query, "min_score", "0"), 0),
+                    only_mismatches=boolish(first(query, "only_mismatches", "false")),
+                ))),
+    (('api', 'profile-dashboard', None, 'results'), lambda self, segments, query: self.json_or_error_response(profile_dashboard_results_from_query(segments[2], query))),
+    (('api', 'analysis-profiles', None), lambda self, segments, query: self.json_or_error_response(profile_detail_from_query(segments[2], query))),
+    (('api', 'analysis-profiles', None, 'readiness'), lambda self, segments, query: self.json_or_error_response(profile_readiness_from_query(segments[2], query))),
+    (('api', 'profile-workspaces', None, 'summary'), lambda self, segments, query: self.json_or_error_response(profile_workspace_summary(segments[2]))),
+    (('api', 'profile-workspaces', None, 'results'), lambda self, segments, query: self.json_or_error_response(profile_workspace_results(segments[2], parse_int(first(query, "limit", "50"), 50)))),
+    (('api', 'profile-workspaces', None, 'download', None), lambda self, segments, query: self.profile_output_response(segments[2], segments[4])),
+    (('api', 'analysis-runs', None), lambda self, segments, query: self.json_or_error_response(ANALYSIS_RUNS.detail(segments[2]))),
+    (('api', 'analysis-runs', None, 'outputs'), lambda self, segments, query: self.json_or_error_response(ANALYSIS_RUNS.outputs(segments[2]))),
+    (('api', 'analysis-runs', None, 'outputs', None), lambda self, segments, query: self.analysis_output_response(segments[2], segments[4])),
+    (('api', 'export-bundles', None), lambda self, segments, query: self.json_or_error_response(PROFILE_EXPORT_BUNDLES.detail(segments[2]))),
+    (('api', 'export-bundles', None, 'download'), lambda self, segments, query: self.export_bundle_response(segments[2])),
+    (('api', 'portfolio-reports', None), lambda self, segments, query: self.json_or_error_response(PORTFOLIO_REPORTS.detail(segments[2]))),
+    (('api', 'portfolio-reports', None, 'download'), lambda self, segments, query: self.portfolio_report_response(segments[2])),
+    (('api', 'workspace-registry', None), lambda self, segments, query: self.json_or_error_response(RUNNER.workspace_detail(segments[2]))),
+    (('api', 'pilot-areas', None), lambda self, segments, query: self.json_or_error_response(PILOTS.detail(segments[2]))),
+    (('api', 'jobs', None), lambda self, segments, query: self.json_or_error_response(JOBS.detail(segments[2]))),
+]
+
+
+
 class ApiBadRequest(Exception):
     pass
 
@@ -1857,242 +1985,16 @@ class Handler(BaseHTTPRequestHandler):
             if handler is not None:
                 handler(self, segments, query)
                 return
-            if len(segments) == 4 and segments[:3] == ["api", "release-readiness", "snapshots"]:
-                self.json_or_error_response(RELEASE_READINESS.snapshot_detail(segments[3]))
-            elif len(segments) == 4 and segments[:3] == ["api", "portfolio-demo", "snapshots"]:
-                self.json_or_error_response(PORTFOLIO_DEMO.snapshot_detail(segments[3]))
-            elif len(segments) == 5 and segments[:3] == ["api", "portfolio-evidence-bundle", "bundles"] and segments[4] == "download":
-                self.portfolio_evidence_bundle_response(segments[3])
-            elif len(segments) == 4 and segments[:3] == ["api", "portfolio-evidence-bundle", "bundles"]:
-                self.json_or_error_response(PORTFOLIO_EVIDENCE_BUNDLE.detail(segments[3]))
-            elif len(segments) == 5 and segments[:3] == ["api", "bundle-review-checklist", "checklists"] and segments[4] == "download":
-                self.bundle_review_checklist_response(segments[3])
-            elif len(segments) == 4 and segments[:3] == ["api", "bundle-review-checklist", "checklists"]:
-                self.json_or_error_response(BUNDLE_REVIEW_CHECKLIST.detail(segments[3]))
-            elif len(segments) == 5 and segments[:3] == ["api", "portfolio-narrative-export", "narratives"] and segments[4] == "download":
-                self.portfolio_narrative_response(segments[3])
-            elif len(segments) == 4 and segments[:3] == ["api", "portfolio-narrative-export", "narratives"]:
-                self.json_or_error_response(PORTFOLIO_NARRATIVE_EXPORT.detail(segments[3]))
-            elif len(segments) == 5 and segments[:3] == ["api", "portfolio-handoff-page", "pages"] and segments[4] == "download":
-                self.portfolio_handoff_page_response(segments[3])
-            elif len(segments) == 4 and segments[:3] == ["api", "portfolio-handoff-page", "pages"]:
-                self.json_or_error_response(PORTFOLIO_HANDOFF_PAGE.detail(segments[3]))
-            elif len(segments) == 5 and segments[:3] == ["api", "portfolio-evidence-gallery", "galleries"] and segments[4] == "download":
-                self.portfolio_evidence_gallery_response(segments[3])
-            elif len(segments) == 4 and segments[:3] == ["api", "portfolio-evidence-gallery", "galleries"]:
-                self.json_or_error_response(PORTFOLIO_EVIDENCE_GALLERY.detail(segments[3]))
-            elif len(segments) == 5 and segments[:3] == ["api", "multi-pilot-comparison", "comparisons"] and segments[4] == "download":
-                self.multi_pilot_comparison_response(segments[3])
-            elif len(segments) == 4 and segments[:3] == ["api", "multi-pilot-comparison", "comparisons"]:
-                self.json_or_error_response(MULTI_PILOT_COMPARISON.detail(segments[3]))
-            elif len(segments) == 5 and segments[:3] == ["api", "comparison-map-exports", "exports"] and segments[4] == "download":
-                self.comparison_map_export_response(segments[3])
-            elif len(segments) == 4 and segments[:3] == ["api", "comparison-map-exports", "exports"]:
-                self.json_or_error_response(COMPARISON_MAP_EXPORTS.detail(segments[3]))
-            elif len(segments) == 3 and segments[:2] == ["api", "postgis-backend"]:
-                self.json_or_error_response(POSTGIS_BACKEND.detail(segments[2]))
-            elif len(segments) == 4 and segments[:3] == ["api", "profile-mapper", "contracts"]:
-                self.json_or_error_response(PROFILE_MAPPER.contract(segments[3]))
-            elif len(segments) == 4 and segments[:3] == ["api", "profile-mapper", "plans"]:
-                self.json_or_error_response(PROFILE_MAPPER.detail(segments[3]))
-            elif len(segments) == 4 and segments[:3] == ["api", "dataset-packages", "packages"]:
-                self.json_or_error_response(DATASET_PACKAGES.detail(segments[3]))
-            elif len(segments) == 5 and segments[:3] == ["api", "dataset-packages", "packages"] and segments[4] == "download":
-                self.dataset_package_response(segments[3])
-            elif len(segments) == 4 and segments[:3] == ["api", "execution-queue", "jobs"]:
-                self.json_or_error_response(EXECUTION_QUEUE.detail(segments[3]))
-            elif len(segments) == 4 and segments[:3] == ["api", "profile-promotion", "candidates"]:
-                self.json_or_error_response(PROFILE_PROMOTION.candidate(segments[3]))
-            elif len(segments) == 4 and segments[:3] == ["api", "profile-promotion", "contract-diffs"]:
-                self.json_or_error_response(PROFILE_PROMOTION.contract_diff_detail(segments[3]))
-            elif len(segments) == 4 and segments[:3] == ["api", "profile-promotion", "regression-previews"]:
-                self.json_or_error_response(PROFILE_PROMOTION.contract_regression_preview_detail(segments[3]))
-            elif len(segments) == 4 and segments[:3] == ["api", "profile-promotion", "config-apply-proposals"]:
-                self.json_or_error_response(PROFILE_PROMOTION.config_apply_proposal_detail(segments[3]))
-            elif len(segments) == 4 and segments[:3] == ["api", "profile-promotion", "application-plans"]:
-                self.json_or_error_response(PROFILE_PROMOTION.application_plan_detail(segments[3]))
-            elif len(segments) == 5 and segments[:3] == ["api", "profile-promotion", "proposals"] and segments[4] == "decision":
-                self.json_or_error_response(PROFILE_PROMOTION.latest_decision(segments[3]))
-            elif len(segments) == 4 and segments[:3] == ["api", "profile-promotion", "proposals"]:
-                self.json_or_error_response(PROFILE_PROMOTION.detail(segments[3]))
-            elif len(segments) == 4 and segments[:3] == ["api", "template-authoring", "drafts"]:
-                self.json_or_error_response(TEMPLATE_AUTHORING.detail(segments[3]))
-            elif len(segments) == 4 and segments[:3] == ["api", "contract-execution", "dry-runs"]:
-                self.json_or_error_response(CONTRACT_EXECUTION.detail(segments[3]))
-            elif len(segments) == 4 and segments[:3] == ["api", "catalog", "sources"]:
-                self.json_or_error_response(CATALOG.profile(segments[3]))
-            elif len(segments) == 5 and segments[:3] == ["api", "source-import-guardrails", "requests"] and segments[4] == "download":
-                self.source_import_guardrails_response(segments[3])
-            elif len(segments) == 4 and segments[:3] == ["api", "source-import-guardrails", "requests"]:
-                self.json_or_error_response(SOURCE_IMPORT_GUARDRAILS.detail(segments[3]))
-            elif len(segments) == 5 and segments[:3] == ["api", "source-handoff", "handoffs"] and segments[4] == "download":
-                self.source_handoff_response(segments[3])
-            elif len(segments) == 4 and segments[:3] == ["api", "source-handoff", "handoffs"]:
-                self.json_or_error_response(SOURCE_HANDOFF.detail(segments[3]))
-            elif len(segments) == 5 and segments[:3] == ["api", "source-handoff-execution", "executions"] and segments[4] == "download":
-                self.source_handoff_execution_response(segments[3])
-            elif len(segments) == 4 and segments[:3] == ["api", "source-handoff-execution", "executions"]:
-                self.json_or_error_response(SOURCE_HANDOFF_EXECUTION.detail(segments[3]))
-            elif len(segments) == 5 and segments[:3] == ["api", "execution-evidence-package", "packages"] and segments[4] == "download":
-                self.execution_evidence_package_response(segments[3])
-            elif len(segments) == 4 and segments[:3] == ["api", "execution-evidence-package", "packages"]:
-                self.json_or_error_response(EXECUTION_EVIDENCE_PACKAGE.detail(segments[3]))
-            elif len(segments) == 5 and segments[:3] == ["api", "execution-result-diff", "diffs"] and segments[4] == "download":
-                self.execution_result_diff_response(segments[3])
-            elif len(segments) == 4 and segments[:3] == ["api", "execution-result-diff", "diffs"]:
-                self.json_or_error_response(EXECUTION_RESULT_DIFF.detail(segments[3]))
-            elif len(segments) == 5 and segments[:3] == ["api", "execution-diff-gallery", "galleries"] and segments[4] == "download":
-                self.execution_diff_gallery_response(segments[3])
-            elif len(segments) == 4 and segments[:3] == ["api", "execution-diff-gallery", "galleries"]:
-                self.json_or_error_response(EXECUTION_DIFF_GALLERY.detail(segments[3]))
-            elif len(segments) == 5 and segments[:3] == ["api", "execution-diff-detail", "drilldowns"] and segments[4] == "download":
-                self.execution_diff_detail_response(segments[3])
-            elif len(segments) == 4 and segments[:3] == ["api", "execution-diff-detail", "drilldowns"]:
-                self.json_or_error_response(EXECUTION_DIFF_DETAIL.detail(segments[3]))
-            elif len(segments) == 5 and segments[:3] == ["api", "reproducibility-audit-packet", "packets"] and segments[4] == "download":
-                self.reproducibility_audit_packet_response(segments[3])
-            elif len(segments) == 4 and segments[:3] == ["api", "reproducibility-audit-packet", "packets"]:
-                self.json_or_error_response(REPRODUCIBILITY_AUDIT_PACKET.detail(segments[3]))
-            elif len(segments) == 5 and segments[:3] == ["api", "reviewer-audit-index", "indexes"] and segments[4] == "download":
-                self.reviewer_audit_index_response(segments[3])
-            elif len(segments) == 4 and segments[:3] == ["api", "reviewer-audit-index", "indexes"]:
-                self.json_or_error_response(REVIEWER_AUDIT_INDEX.detail(segments[3]))
-            elif len(segments) == 5 and segments[:3] == ["api", "portfolio-export-launcher", "launchers"] and segments[4] == "download":
-                self.portfolio_export_launcher_response(segments[3])
-            elif len(segments) == 4 and segments[:3] == ["api", "portfolio-export-launcher", "launchers"]:
-                self.json_or_error_response(PORTFOLIO_EXPORT_LAUNCHER.detail(segments[3]))
-            elif len(segments) == 5 and segments[:3] == ["api", "portable-release-package", "packages"] and segments[4] == "download":
-                self.portable_release_package_response(segments[3])
-            elif len(segments) == 4 and segments[:3] == ["api", "portable-release-package", "packages"]:
-                self.json_or_error_response(PORTABLE_RELEASE_PACKAGE.detail(segments[3]))
-            elif len(segments) == 5 and segments[:3] == ["api", "demo-script-pack", "packs"] and segments[4] == "download":
-                self.demo_script_pack_response(segments[3])
-            elif len(segments) == 4 and segments[:3] == ["api", "demo-script-pack", "packs"]:
-                self.json_or_error_response(DEMO_SCRIPT_PACK.detail(segments[3]))
-            elif len(segments) == 5 and segments[:3] == ["api", "visual-qa-snapshot-ledger", "ledgers"] and segments[4] == "download":
-                self.visual_qa_ledger_response(segments[3])
-            elif len(segments) == 4 and segments[:3] == ["api", "visual-qa-snapshot-ledger", "ledgers"]:
-                self.json_or_error_response(VISUAL_QA_LEDGER.detail(segments[3]))
-            elif len(segments) == 5 and segments[:3] == ["api", "visual-baseline-comparison", "comparisons"] and segments[4] == "download":
-                self.visual_baseline_comparison_response(segments[3])
-            elif len(segments) == 4 and segments[:3] == ["api", "visual-baseline-comparison", "comparisons"]:
-                self.json_or_error_response(VISUAL_BASELINE_COMPARISON.detail(segments[3]))
-            elif len(segments) == 5 and segments[:3] == ["api", "demo-artifact-completeness", "checks"] and segments[4] == "download":
-                self.demo_artifact_completeness_response(segments[3])
-            elif len(segments) == 4 and segments[:3] == ["api", "demo-artifact-completeness", "checks"]:
-                self.json_or_error_response(DEMO_ARTIFACT_COMPLETENESS.detail(segments[3]))
-            elif len(segments) == 5 and segments[:3] == ["api", "visual-evidence-capture", "captures"] and segments[4] == "download":
-                self.visual_evidence_capture_response(segments[3])
-            elif len(segments) == 4 and segments[:3] == ["api", "visual-evidence-capture", "captures"]:
-                self.json_or_error_response(VISUAL_EVIDENCE_CAPTURE.detail(segments[3]))
-            elif len(segments) == 5 and segments[:3] == ["api", "visual-evidence-review-diff", "diffs"] and segments[4] == "download":
-                self.visual_evidence_review_diff_response(segments[3])
-            elif len(segments) == 4 and segments[:3] == ["api", "visual-evidence-review-diff", "diffs"]:
-                self.json_or_error_response(VISUAL_EVIDENCE_REVIEW_DIFF.detail(segments[3]))
-            elif len(segments) == 5 and segments[:3] == ["api", "visual-evidence-review-annotations", "annotations"] and segments[4] == "download":
-                self.visual_evidence_review_annotations_response(segments[3])
-            elif len(segments) == 4 and segments[:3] == ["api", "visual-evidence-review-annotations", "annotations"]:
-                self.json_or_error_response(VISUAL_EVIDENCE_REVIEW_ANNOTATIONS.detail(segments[3]))
-            elif len(segments) == 5 and segments[:3] == ["api", "visual-evidence-signoff-packet", "packets"] and segments[4] == "download":
-                self.visual_evidence_signoff_packet_response(segments[3])
-            elif len(segments) == 4 and segments[:3] == ["api", "visual-evidence-signoff-packet", "packets"]:
-                self.json_or_error_response(VISUAL_EVIDENCE_SIGNOFF_PACKET.detail(segments[3]))
-            elif len(segments) == 5 and segments[:3] == ["api", "final-reviewer-launch-checklist", "checklists"] and segments[4] == "download":
-                self.final_reviewer_launch_checklist_response(segments[3])
-            elif len(segments) == 4 and segments[:3] == ["api", "final-reviewer-launch-checklist", "checklists"]:
-                self.json_or_error_response(FINAL_REVIEWER_LAUNCH_CHECKLIST.detail(segments[3]))
-            elif len(segments) == 5 and segments[:3] == ["api", "recruiter-demo-brief", "briefs"] and segments[4] == "download":
-                self.recruiter_demo_brief_response(segments[3])
-            elif len(segments) == 4 and segments[:3] == ["api", "recruiter-demo-brief", "briefs"]:
-                self.json_or_error_response(RECRUITER_DEMO_BRIEF.detail(segments[3]))
-            elif len(segments) == 5 and segments[:3] == ["api", "public-portfolio-package", "packages"] and segments[4] == "download":
-                self.public_portfolio_package_response(segments[3])
-            elif len(segments) == 4 and segments[:3] == ["api", "public-portfolio-package", "packages"]:
-                self.json_or_error_response(PUBLIC_PORTFOLIO_PACKAGE.detail(segments[3]))
-            elif len(segments) == 5 and segments[:3] == ["api", "demo-review-playbook", "playbooks"] and segments[4] == "download":
-                self.demo_review_playbook_response(segments[3])
-            elif len(segments) == 4 and segments[:3] == ["api", "demo-review-playbook", "playbooks"]:
-                self.json_or_error_response(DEMO_REVIEW_PLAYBOOK.detail(segments[3]))
-            elif len(segments) == 5 and segments[:3] == ["api", "github-publication-bundle", "bundles"] and segments[4] == "download":
-                self.github_publication_bundle_response(segments[3])
-            elif len(segments) == 4 and segments[:3] == ["api", "github-publication-bundle", "bundles"]:
-                self.json_or_error_response(GITHUB_PUBLICATION_BUNDLE.detail(segments[3]))
-            elif len(segments) == 5 and segments[:3] == ["api", "repository-publication-qa", "reviews"] and segments[4] == "download":
-                self.repository_publication_qa_response(segments[3])
-            elif len(segments) == 4 and segments[:3] == ["api", "repository-publication-qa", "reviews"]:
-                self.json_or_error_response(REPOSITORY_PUBLICATION_QA.detail(segments[3]))
-            elif len(segments) == 5 and segments[:3] == ["api", "repository-export-handoff", "handoffs"] and segments[4] == "download":
-                self.repository_export_handoff_response(segments[3])
-            elif len(segments) == 4 and segments[:3] == ["api", "repository-export-handoff", "handoffs"]:
-                self.json_or_error_response(REPOSITORY_EXPORT_HANDOFF.detail(segments[3]))
-            elif len(segments) == 5 and segments[:3] == ["api", "repository-dry-run-review", "reviews"] and segments[4] == "download":
-                self.repository_dry_run_review_response(segments[3])
-            elif len(segments) == 4 and segments[:3] == ["api", "repository-dry-run-review", "reviews"]:
-                self.json_or_error_response(REPOSITORY_DRY_RUN_REVIEW.detail(segments[3]))
-            elif len(segments) == 5 and segments[:3] == ["api", "repository-final-package-review", "reviews"] and segments[4] == "download":
-                self.repository_final_package_review_response(segments[3])
-            elif len(segments) == 4 and segments[:3] == ["api", "repository-final-package-review", "reviews"]:
-                self.json_or_error_response(REPOSITORY_FINAL_PACKAGE_REVIEW.detail(segments[3]))
-            elif len(segments) == 5 and segments[:3] == ["api", "public-readme-cleanup-review", "reviews"] and segments[4] == "download":
-                self.public_readme_cleanup_review_response(segments[3])
-            elif len(segments) == 4 and segments[:3] == ["api", "public-readme-cleanup-review", "reviews"]:
-                self.json_or_error_response(PUBLIC_README_CLEANUP_REVIEW.detail(segments[3]))
-            elif len(segments) == 5 and segments[:3] == ["api", "public-repository-polish-package", "packages"] and segments[4] == "download":
-                self.public_repository_polish_package_response(segments[3])
-            elif len(segments) == 4 and segments[:3] == ["api", "public-repository-polish-package", "packages"]:
-                self.json_or_error_response(PUBLIC_REPOSITORY_POLISH_PACKAGE.detail(segments[3]))
-            elif len(segments) == 5 and segments[:3] == ["api", "repository-export-checklist", "checklists"] and segments[4] == "download":
-                self.repository_export_checklist_response(segments[3])
-            elif len(segments) == 4 and segments[:3] == ["api", "repository-export-checklist", "checklists"]:
-                self.json_or_error_response(REPOSITORY_EXPORT_CHECKLIST.detail(segments[3]))
-            elif len(segments) == 4 and segments[:3] == ["api", "source-onboarding", "sources"]:
-                self.json_or_error_response(ONBOARDING.source_detail(segments[3]))
-            elif len(segments) == 4 and segments[:2] == ["api", "profile-dashboard"] and segments[3] == "summary":
-                self.json_or_error_response(PROFILE_DASHBOARD.summary(segments[2]))
-            elif len(segments) == 3 and segments[:2] == ["api", "scoring-rules"]:
-                self.json_or_error_response(SCORING_RULES.profile(segments[2]))
-            elif len(segments) == 4 and segments[:2] == ["api", "scoring-rules"] and segments[3] == "audit":
-                self.json_or_error_response(SCORING_RULES.audit(
-                    segments[2],
-                    limit=parse_int(first(query, "limit", "50"), 50),
-                    min_score=parse_int(first(query, "min_score", "0"), 0),
-                    only_mismatches=boolish(first(query, "only_mismatches", "false")),
-                ))
-            elif len(segments) == 4 and segments[:2] == ["api", "profile-dashboard"] and segments[3] == "results":
-                self.json_or_error_response(profile_dashboard_results_from_query(segments[2], query))
-            elif len(segments) == 3 and segments[:2] == ["api", "analysis-profiles"]:
-                self.json_or_error_response(profile_detail_from_query(segments[2], query))
-            elif len(segments) == 4 and segments[:2] == ["api", "analysis-profiles"] and segments[3] == "readiness":
-                self.json_or_error_response(profile_readiness_from_query(segments[2], query))
-            elif len(segments) == 4 and segments[:2] == ["api", "profile-workspaces"] and segments[3] == "summary":
-                self.json_or_error_response(profile_workspace_summary(segments[2]))
-            elif len(segments) == 4 and segments[:2] == ["api", "profile-workspaces"] and segments[3] == "results":
-                self.json_or_error_response(profile_workspace_results(segments[2], parse_int(first(query, "limit", "50"), 50)))
-            elif len(segments) == 5 and segments[:2] == ["api", "profile-workspaces"] and segments[3] == "download":
-                self.profile_output_response(segments[2], segments[4])
-            elif len(segments) == 3 and segments[:2] == ["api", "analysis-runs"]:
-                self.json_or_error_response(ANALYSIS_RUNS.detail(segments[2]))
-            elif len(segments) == 4 and segments[:2] == ["api", "analysis-runs"] and segments[3] == "outputs":
-                self.json_or_error_response(ANALYSIS_RUNS.outputs(segments[2]))
-            elif len(segments) == 5 and segments[:2] == ["api", "analysis-runs"] and segments[3] == "outputs":
-                self.analysis_output_response(segments[2], segments[4])
-            elif len(segments) == 3 and segments[:2] == ["api", "export-bundles"]:
-                self.json_or_error_response(PROFILE_EXPORT_BUNDLES.detail(segments[2]))
-            elif len(segments) == 4 and segments[:2] == ["api", "export-bundles"] and segments[3] == "download":
-                self.export_bundle_response(segments[2])
-            elif len(segments) == 3 and segments[:2] == ["api", "portfolio-reports"]:
-                self.json_or_error_response(PORTFOLIO_REPORTS.detail(segments[2]))
-            elif len(segments) == 4 and segments[:2] == ["api", "portfolio-reports"] and segments[3] == "download":
-                self.portfolio_report_response(segments[2])
-            elif len(segments) == 4 and segments[:2] == ["api", "templates"] and segments[3] == "check":
+            for template, seg_handler in ROUTE_TABLE_GET_SEGMENTS:
+                if len(segments) == len(template) and all(
+                    expected is None or expected == actual
+                    for expected, actual in zip(template, segments)
+                ):
+                    seg_handler(self, segments, query)
+                    return
+            if len(segments) == 4 and segments[:2] == ["api", "templates"] and segments[3] == "check":
                 dataset_id = first(query, "dataset_id", "")
                 self.json_or_error_response(CATALOG.safe_access_check(dataset_id))
-            elif len(segments) == 3 and segments[:2] == ["api", "workspace-registry"]:
-                self.json_or_error_response(RUNNER.workspace_detail(segments[2]))
-            elif len(segments) == 3 and segments[:2] == ["api", "pilot-areas"]:
-                self.json_or_error_response(PILOTS.detail(segments[2]))
-            elif len(segments) == 3 and segments[:2] == ["api", "jobs"]:
-                self.json_or_error_response(JOBS.detail(segments[2]))
             elif len(segments) == 4 and segments[:2] == ["api", "dashboard-workspaces"]:
                 workspace_id = segments[2]
                 action = segments[3]
