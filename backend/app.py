@@ -36,47 +36,9 @@ from profile_export_bundle import ProfileExportBundleBuilder
 from preflight import SafeAccessPreflight
 from profile_dashboard import ProfileDashboardStore
 from local_intake import LocalIntakeWizard
-from product_architecture import ProductArchitecture
-from portfolio_demo import PortfolioDemoWalkthrough
-from portfolio_evidence_bundle import PortfolioEvidenceBundleBuilder
-from bundle_review_checklist import BundleReviewChecklist
-from portfolio_narrative_export import PortfolioNarrativeExporter
-from portfolio_handoff_page import PortfolioHandoffPageBuilder
-from portfolio_evidence_gallery import PortfolioEvidenceGalleryBuilder
-from multi_pilot_comparison import MultiPilotComparisonBuilder
-from comparison_map_exports import ComparisonMapExportBuilder
 from source_import_guardrails import SourceImportGuardrails
 from source_handoff import SourceHandoffPlanner
 from source_handoff_execution import SourceHandoffExecutionController
-from execution_evidence_package import ExecutionEvidencePackageBuilder
-from execution_result_diff import ExecutionResultDiffBuilder
-from execution_diff_gallery import ExecutionDiffGalleryBuilder
-from execution_diff_detail import ExecutionDiffDetailDrilldownBuilder
-from reproducibility_audit_packet import ReproducibilityAuditPacketBuilder
-from reviewer_audit_index import ReviewerAuditIndexBuilder
-from portfolio_export_launcher import PortfolioExportLauncherBuilder
-from portable_release_package import PortableReleasePackageBuilder
-from demo_script_pack import DemoScriptPackBuilder
-from visual_qa_snapshot_ledger import VisualQASnapshotLedgerBuilder
-from visual_baseline_comparison import VisualBaselineComparisonManifestBuilder
-from demo_artifact_completeness import DemoArtifactCompletenessValidator
-from visual_evidence_capture import VisualEvidenceCaptureBuilder
-from visual_evidence_review_diff import VisualEvidenceReviewDiffBuilder
-from visual_evidence_review_annotations import VisualEvidenceReviewAnnotationsBuilder
-from visual_evidence_signoff_packet import VisualEvidenceSignoffPacketBuilder
-from final_reviewer_launch_checklist import FinalReviewerLaunchChecklistBuilder
-from recruiter_demo_brief import RecruiterDemoBriefBuilder
-from public_portfolio_interview_package import PublicPortfolioInterviewPackageBuilder
-from demo_review_playbook import DemoReviewPlaybookBuilder
-from github_publication_bundle import GitHubPublicationBundleBuilder
-from repository_publication_qa import RepositoryPublicationQABuilder
-from repository_export_handoff import RepositoryExportHandoffBuilder
-from repository_dry_run_review import RepositoryDryRunReviewBuilder
-from repository_final_package_review import RepositoryFinalPackageReviewBuilder
-from public_readme_cleanup_review import PublicReadmeCleanupReviewBuilder
-from public_repository_polish_package import PublicRepositoryPolishPackageBuilder
-from repository_export_checklist import RepositoryExportChecklistBuilder
-from release_readiness import ReleaseReadinessDashboard
 from run_job_manager import RunJobManager
 from review_decisions import ReviewDecisionStore
 from scoring_rules import ScoringRulesStore
@@ -171,29 +133,6 @@ ROUTE_TABLE_GET = {
 
     "/api/health": lambda self, segments, query: self.json_response({"ok": True, "app_version": APP_VERSION, "workspace_id": WORKSPACE_ID, "data_root_ok": OUTPUT_ROOT.exists(), "mode": "product" if PRODUCT_MODE else "full"}),
     "/api/project-manifest": lambda self, segments, query: self.json_or_error_response(project_manifest()),
-    "/api/product-architecture": lambda self, segments, query: self.json_response(PRODUCT_ARCHITECTURE.blueprint()),
-    "/api/product-architecture/variants": lambda self, segments, query: self.json_response(PRODUCT_ARCHITECTURE.variants()),
-    "/api/product-architecture/roadmap": lambda self, segments, query: self.json_response(PRODUCT_ARCHITECTURE.roadmap()),
-    "/api/release-readiness": lambda self, segments, query: self.json_response(RELEASE_READINESS.overview()),
-    "/api/release-readiness/gates": lambda self, segments, query: self.json_response(RELEASE_READINESS.gates_response()),
-    "/api/release-readiness/snapshots": lambda self, segments, query: self.json_response(RELEASE_READINESS.list_snapshots(parse_int(first(query, "limit", "20"), 20))),
-    "/api/portfolio-demo": lambda self, segments, query: self.json_response(PORTFOLIO_DEMO.overview()),
-    "/api/portfolio-demo/steps": lambda self, segments, query: self.json_response(PORTFOLIO_DEMO.steps_response()),
-    "/api/portfolio-demo/snapshots": lambda self, segments, query: self.json_response(PORTFOLIO_DEMO.list_snapshots(parse_int(first(query, "limit", "20"), 20))),
-    "/api/portfolio-evidence-bundle": lambda self, segments, query: self.json_response(PORTFOLIO_EVIDENCE_BUNDLE.status()),
-    "/api/portfolio-evidence-bundle/bundles": lambda self, segments, query: self.json_response(PORTFOLIO_EVIDENCE_BUNDLE.list_bundles(parse_int(first(query, "limit", "20"), 20))),
-    "/api/bundle-review-checklist": lambda self, segments, query: self.json_response(BUNDLE_REVIEW_CHECKLIST.status()),
-    "/api/bundle-review-checklist/checklists": lambda self, segments, query: self.json_response(BUNDLE_REVIEW_CHECKLIST.list_checklists(parse_int(first(query, "limit", "20"), 20))),
-    "/api/portfolio-narrative-export": lambda self, segments, query: self.json_response(PORTFOLIO_NARRATIVE_EXPORT.status()),
-    "/api/portfolio-narrative-export/narratives": lambda self, segments, query: self.json_response(PORTFOLIO_NARRATIVE_EXPORT.list_narratives(parse_int(first(query, "limit", "20"), 20))),
-    "/api/portfolio-handoff-page": lambda self, segments, query: self.json_response(PORTFOLIO_HANDOFF_PAGE.status()),
-    "/api/portfolio-handoff-page/pages": lambda self, segments, query: self.json_response(PORTFOLIO_HANDOFF_PAGE.list_pages(parse_int(first(query, "limit", "20"), 20))),
-    "/api/portfolio-evidence-gallery": lambda self, segments, query: self.json_response(PORTFOLIO_EVIDENCE_GALLERY.status()),
-    "/api/portfolio-evidence-gallery/galleries": lambda self, segments, query: self.json_response(PORTFOLIO_EVIDENCE_GALLERY.list_galleries(parse_int(first(query, "limit", "20"), 20))),
-    "/api/multi-pilot-comparison": lambda self, segments, query: self.json_response(MULTI_PILOT_COMPARISON.status()),
-    "/api/multi-pilot-comparison/comparisons": lambda self, segments, query: self.json_response(MULTI_PILOT_COMPARISON.list_comparisons(parse_int(first(query, "limit", "20"), 20))),
-    "/api/comparison-map-exports": lambda self, segments, query: self.json_response(COMPARISON_MAP_EXPORTS.status()),
-    "/api/comparison-map-exports/exports": lambda self, segments, query: self.json_response(COMPARISON_MAP_EXPORTS.list_exports(parse_int(first(query, "limit", "20"), 20))),
     "/api/postgis-backend": lambda self, segments, query: self.json_or_error_response(POSTGIS_BACKEND.status()),
     "/api/postgis-backend/schema": lambda self, segments, query: self.json_or_error_response(POSTGIS_BACKEND.schema()),
     "/api/postgis-backend/migration-plan": lambda self, segments, query: self.json_or_error_response(POSTGIS_BACKEND.migration_plan({"scope": first(query, "scope", "kfar_saba_pilot")})),
@@ -268,76 +207,6 @@ ROUTE_TABLE_GET = {
     "/api/source-handoff-execution": lambda self, segments, query: self.json_response(SOURCE_HANDOFF_EXECUTION.status()),
     "/api/source-handoff-execution/candidates": lambda self, segments, query: self.json_response(SOURCE_HANDOFF_EXECUTION.candidates(parse_int(first(query, "limit", "20"), 20))),
     "/api/source-handoff-execution/executions": lambda self, segments, query: self.json_response(SOURCE_HANDOFF_EXECUTION.list_executions(parse_int(first(query, "limit", "20"), 20))),
-    "/api/execution-evidence-package": lambda self, segments, query: self.json_response(EXECUTION_EVIDENCE_PACKAGE.status()),
-    "/api/execution-evidence-package/candidates": lambda self, segments, query: self.json_response(EXECUTION_EVIDENCE_PACKAGE.candidates(parse_int(first(query, "limit", "20"), 20))),
-    "/api/execution-evidence-package/packages": lambda self, segments, query: self.json_response(EXECUTION_EVIDENCE_PACKAGE.list_packages(parse_int(first(query, "limit", "20"), 20))),
-    "/api/execution-result-diff": lambda self, segments, query: self.json_response(EXECUTION_RESULT_DIFF.status()),
-    "/api/execution-result-diff/candidates": lambda self, segments, query: self.json_response(EXECUTION_RESULT_DIFF.candidates(parse_int(first(query, "limit", "20"), 20))),
-    "/api/execution-result-diff/diffs": lambda self, segments, query: self.json_response(EXECUTION_RESULT_DIFF.list_diffs(parse_int(first(query, "limit", "20"), 20))),
-    "/api/execution-diff-gallery": lambda self, segments, query: self.json_response(EXECUTION_DIFF_GALLERY.status()),
-    "/api/execution-diff-gallery/items": lambda self, segments, query: self.json_response(EXECUTION_DIFF_GALLERY.items(
-                    limit=parse_int(first(query, "limit", "20"), 20),
-                    classification=first(query, "classification", ""),
-                    readiness=first(query, "readiness", ""),
-                    scope=first(query, "scope", ""),
-                )),
-    "/api/execution-diff-gallery/galleries": lambda self, segments, query: self.json_response(EXECUTION_DIFF_GALLERY.list_galleries(parse_int(first(query, "limit", "20"), 20))),
-    "/api/execution-diff-detail": lambda self, segments, query: self.json_response(EXECUTION_DIFF_DETAIL.status()),
-    "/api/execution-diff-detail/baselines": lambda self, segments, query: self.json_response(EXECUTION_DIFF_DETAIL.baselines(parse_int(first(query, "limit", "20"), 20))),
-    "/api/execution-diff-detail/inspect": lambda self, segments, query: self.json_or_error_response(EXECUTION_DIFF_DETAIL.inspect_diff(
-                    first(query, "diff_id", ""),
-                    first(query, "baseline_diff_id", ""),
-                )),
-    "/api/execution-diff-detail/drilldowns": lambda self, segments, query: self.json_response(EXECUTION_DIFF_DETAIL.list_drilldowns(parse_int(first(query, "limit", "20"), 20))),
-    "/api/reproducibility-audit-packet": lambda self, segments, query: self.json_response(REPRODUCIBILITY_AUDIT_PACKET.status()),
-    "/api/reproducibility-audit-packet/candidates": lambda self, segments, query: self.json_response(REPRODUCIBILITY_AUDIT_PACKET.candidates(parse_int(first(query, "limit", "20"), 20))),
-    "/api/reproducibility-audit-packet/packets": lambda self, segments, query: self.json_response(REPRODUCIBILITY_AUDIT_PACKET.list_packets(parse_int(first(query, "limit", "20"), 20))),
-    "/api/reviewer-audit-index": lambda self, segments, query: self.json_response(REVIEWER_AUDIT_INDEX.status()),
-    "/api/reviewer-audit-index/indexes": lambda self, segments, query: self.json_response(REVIEWER_AUDIT_INDEX.list_indexes(parse_int(first(query, "limit", "20"), 20))),
-    "/api/portfolio-export-launcher": lambda self, segments, query: self.json_response(PORTFOLIO_EXPORT_LAUNCHER.status()),
-    "/api/portfolio-export-launcher/launchers": lambda self, segments, query: self.json_response(PORTFOLIO_EXPORT_LAUNCHER.list_launchers(parse_int(first(query, "limit", "20"), 20))),
-    "/api/portable-release-package": lambda self, segments, query: self.json_response(PORTABLE_RELEASE_PACKAGE.status()),
-    "/api/portable-release-package/packages": lambda self, segments, query: self.json_response(PORTABLE_RELEASE_PACKAGE.list_packages(parse_int(first(query, "limit", "20"), 20))),
-    "/api/demo-script-pack": lambda self, segments, query: self.json_response(DEMO_SCRIPT_PACK.status()),
-    "/api/demo-script-pack/packs": lambda self, segments, query: self.json_response(DEMO_SCRIPT_PACK.list_packs(parse_int(first(query, "limit", "20"), 20))),
-    "/api/visual-qa-snapshot-ledger": lambda self, segments, query: self.json_response(VISUAL_QA_LEDGER.status()),
-    "/api/visual-qa-snapshot-ledger/ledgers": lambda self, segments, query: self.json_response(VISUAL_QA_LEDGER.list_ledgers(parse_int(first(query, "limit", "20"), 20))),
-    "/api/visual-baseline-comparison": lambda self, segments, query: self.json_response(VISUAL_BASELINE_COMPARISON.status()),
-    "/api/visual-baseline-comparison/comparisons": lambda self, segments, query: self.json_response(VISUAL_BASELINE_COMPARISON.list_comparisons(parse_int(first(query, "limit", "20"), 20))),
-    "/api/demo-artifact-completeness": lambda self, segments, query: self.json_response(DEMO_ARTIFACT_COMPLETENESS.status()),
-    "/api/demo-artifact-completeness/checks": lambda self, segments, query: self.json_response(DEMO_ARTIFACT_COMPLETENESS.list_checks(parse_int(first(query, "limit", "20"), 20))),
-    "/api/visual-evidence-capture": lambda self, segments, query: self.json_response(VISUAL_EVIDENCE_CAPTURE.status()),
-    "/api/visual-evidence-capture/captures": lambda self, segments, query: self.json_response(VISUAL_EVIDENCE_CAPTURE.list_captures(parse_int(first(query, "limit", "20"), 20))),
-    "/api/visual-evidence-review-diff": lambda self, segments, query: self.json_response(VISUAL_EVIDENCE_REVIEW_DIFF.status()),
-    "/api/visual-evidence-review-diff/diffs": lambda self, segments, query: self.json_response(VISUAL_EVIDENCE_REVIEW_DIFF.list_diffs(parse_int(first(query, "limit", "20"), 20))),
-    "/api/visual-evidence-review-annotations": lambda self, segments, query: self.json_response(VISUAL_EVIDENCE_REVIEW_ANNOTATIONS.status()),
-    "/api/visual-evidence-review-annotations/annotations": lambda self, segments, query: self.json_response(VISUAL_EVIDENCE_REVIEW_ANNOTATIONS.list_annotations(parse_int(first(query, "limit", "20"), 20))),
-    "/api/visual-evidence-signoff-packet": lambda self, segments, query: self.json_response(VISUAL_EVIDENCE_SIGNOFF_PACKET.status()),
-    "/api/visual-evidence-signoff-packet/packets": lambda self, segments, query: self.json_response(VISUAL_EVIDENCE_SIGNOFF_PACKET.list_packets(parse_int(first(query, "limit", "20"), 20))),
-    "/api/final-reviewer-launch-checklist": lambda self, segments, query: self.json_response(FINAL_REVIEWER_LAUNCH_CHECKLIST.status()),
-    "/api/final-reviewer-launch-checklist/checklists": lambda self, segments, query: self.json_response(FINAL_REVIEWER_LAUNCH_CHECKLIST.list_checklists(parse_int(first(query, "limit", "20"), 20))),
-    "/api/recruiter-demo-brief": lambda self, segments, query: self.json_response(RECRUITER_DEMO_BRIEF.status()),
-    "/api/recruiter-demo-brief/briefs": lambda self, segments, query: self.json_response(RECRUITER_DEMO_BRIEF.list_briefs(parse_int(first(query, "limit", "20"), 20))),
-    "/api/public-portfolio-package": lambda self, segments, query: self.json_response(PUBLIC_PORTFOLIO_PACKAGE.status()),
-    "/api/public-portfolio-package/packages": lambda self, segments, query: self.json_response(PUBLIC_PORTFOLIO_PACKAGE.list_packages(parse_int(first(query, "limit", "20"), 20))),
-    "/api/demo-review-playbook": lambda self, segments, query: self.json_response(DEMO_REVIEW_PLAYBOOK.status()),
-    "/api/demo-review-playbook/playbooks": lambda self, segments, query: self.json_response(DEMO_REVIEW_PLAYBOOK.list_playbooks(parse_int(first(query, "limit", "20"), 20))),
-    "/api/github-publication-bundle": lambda self, segments, query: self.json_response(GITHUB_PUBLICATION_BUNDLE.status()),
-    "/api/github-publication-bundle/bundles": lambda self, segments, query: self.json_response(GITHUB_PUBLICATION_BUNDLE.list_bundles(parse_int(first(query, "limit", "20"), 20))),
-    "/api/repository-publication-qa": lambda self, segments, query: self.json_response(REPOSITORY_PUBLICATION_QA.status()),
-    "/api/repository-publication-qa/reviews": lambda self, segments, query: self.json_response(REPOSITORY_PUBLICATION_QA.list_reviews(parse_int(first(query, "limit", "20"), 20))),
-    "/api/repository-export-handoff": lambda self, segments, query: self.json_response(REPOSITORY_EXPORT_HANDOFF.status()),
-    "/api/repository-export-handoff/handoffs": lambda self, segments, query: self.json_response(REPOSITORY_EXPORT_HANDOFF.list_handoffs(parse_int(first(query, "limit", "20"), 20))),
-    "/api/repository-dry-run-review": lambda self, segments, query: self.json_response(REPOSITORY_DRY_RUN_REVIEW.status()),
-    "/api/repository-dry-run-review/reviews": lambda self, segments, query: self.json_response(REPOSITORY_DRY_RUN_REVIEW.list_reviews(parse_int(first(query, "limit", "20"), 20))),
-    "/api/repository-final-package-review": lambda self, segments, query: self.json_response(REPOSITORY_FINAL_PACKAGE_REVIEW.status()),
-    "/api/repository-final-package-review/reviews": lambda self, segments, query: self.json_response(REPOSITORY_FINAL_PACKAGE_REVIEW.list_reviews(parse_int(first(query, "limit", "20"), 20))),
-    "/api/public-readme-cleanup-review": lambda self, segments, query: self.json_response(PUBLIC_README_CLEANUP_REVIEW.status()),
-    "/api/public-readme-cleanup-review/reviews": lambda self, segments, query: self.json_response(PUBLIC_README_CLEANUP_REVIEW.list_reviews(parse_int(first(query, "limit", "20"), 20))),
-    "/api/public-repository-polish-package": lambda self, segments, query: self.json_response(PUBLIC_REPOSITORY_POLISH_PACKAGE.status()),
-    "/api/public-repository-polish-package/packages": lambda self, segments, query: self.json_response(PUBLIC_REPOSITORY_POLISH_PACKAGE.list_packages(parse_int(first(query, "limit", "20"), 20))),
-    "/api/repository-export-checklist": lambda self, segments, query: self.json_response(REPOSITORY_EXPORT_CHECKLIST.status()),
-    "/api/repository-export-checklist/checklists": lambda self, segments, query: self.json_response(REPOSITORY_EXPORT_CHECKLIST.list_checklists(parse_int(first(query, "limit", "20"), 20))),
     "/api/analysis-workflow/plan": lambda self, segments, query: self.json_or_error_response(analysis_plan_from_query(query)),
     "/api/analysis-profiles": lambda self, segments, query: self.json_or_error_response(profiles_from_query(query)),
     "/api/profile-dashboard": lambda self, segments, query: self.json_response(PROFILE_DASHBOARD.overview()),
@@ -370,46 +239,8 @@ ROUTE_TABLE_POST = {
     "/api/source-import-guardrails/request": lambda self, body: self.json_or_error_response(SOURCE_IMPORT_GUARDRAILS.create_request(body)),
     "/api/source-handoff/create": lambda self, body: self.json_or_error_response(SOURCE_HANDOFF.create_handoff(body)),
     "/api/source-handoff-execution/execute": lambda self, body: self.json_or_error_response(SOURCE_HANDOFF_EXECUTION.execute_handoff(body, run_profile)),
-    "/api/execution-evidence-package/create": lambda self, body: self.json_or_error_response(EXECUTION_EVIDENCE_PACKAGE.create_package(body)),
-    "/api/execution-result-diff/create": lambda self, body: self.json_or_error_response(EXECUTION_RESULT_DIFF.create_diff(body)),
-    "/api/execution-diff-gallery/create": lambda self, body: self.json_or_error_response(EXECUTION_DIFF_GALLERY.create_gallery(body)),
-    "/api/execution-diff-detail/create": lambda self, body: self.json_or_error_response(EXECUTION_DIFF_DETAIL.create_drilldown(body)),
-    "/api/reproducibility-audit-packet/create": lambda self, body: self.json_or_error_response(REPRODUCIBILITY_AUDIT_PACKET.create_packet(body)),
-    "/api/reviewer-audit-index/create": lambda self, body: self.json_or_error_response(REVIEWER_AUDIT_INDEX.create_index(body)),
-    "/api/portfolio-export-launcher/create": lambda self, body: self.json_or_error_response(PORTFOLIO_EXPORT_LAUNCHER.create_launcher(body)),
-    "/api/portable-release-package/create": lambda self, body: self.json_or_error_response(PORTABLE_RELEASE_PACKAGE.create_package(body)),
-    "/api/demo-script-pack/create": lambda self, body: self.json_or_error_response(DEMO_SCRIPT_PACK.create_pack(body)),
-    "/api/visual-qa-snapshot-ledger/create": lambda self, body: self.json_or_error_response(VISUAL_QA_LEDGER.create_ledger(body)),
-    "/api/visual-baseline-comparison/create": lambda self, body: self.json_or_error_response(VISUAL_BASELINE_COMPARISON.create_comparison(body)),
-    "/api/demo-artifact-completeness/create": lambda self, body: self.json_or_error_response(DEMO_ARTIFACT_COMPLETENESS.create_check(body)),
-    "/api/visual-evidence-capture/create": lambda self, body: self.json_or_error_response(VISUAL_EVIDENCE_CAPTURE.create_capture(body)),
-    "/api/visual-evidence-review-diff/create": lambda self, body: self.json_or_error_response(VISUAL_EVIDENCE_REVIEW_DIFF.create_diff(body)),
-    "/api/visual-evidence-review-annotations/create": lambda self, body: self.json_or_error_response(VISUAL_EVIDENCE_REVIEW_ANNOTATIONS.create_annotations(body)),
-    "/api/visual-evidence-signoff-packet/create": lambda self, body: self.json_or_error_response(VISUAL_EVIDENCE_SIGNOFF_PACKET.create_packet(body)),
-    "/api/final-reviewer-launch-checklist/create": lambda self, body: self.json_or_error_response(FINAL_REVIEWER_LAUNCH_CHECKLIST.create_checklist(body)),
-    "/api/recruiter-demo-brief/create": lambda self, body: self.json_or_error_response(RECRUITER_DEMO_BRIEF.create_brief(body)),
-    "/api/public-portfolio-package/create": lambda self, body: self.json_or_error_response(PUBLIC_PORTFOLIO_PACKAGE.create_package(body)),
-    "/api/demo-review-playbook/create": lambda self, body: self.json_or_error_response(DEMO_REVIEW_PLAYBOOK.create_playbook(body)),
-    "/api/github-publication-bundle/create": lambda self, body: self.json_or_error_response(GITHUB_PUBLICATION_BUNDLE.create_bundle(body)),
-    "/api/repository-publication-qa/create": lambda self, body: self.json_or_error_response(REPOSITORY_PUBLICATION_QA.create_review(body)),
-    "/api/repository-export-handoff/create": lambda self, body: self.json_or_error_response(REPOSITORY_EXPORT_HANDOFF.create_handoff(body)),
-    "/api/repository-dry-run-review/create": lambda self, body: self.json_or_error_response(REPOSITORY_DRY_RUN_REVIEW.create_review(body)),
-    "/api/repository-final-package-review/create": lambda self, body: self.json_or_error_response(REPOSITORY_FINAL_PACKAGE_REVIEW.create_review(body)),
-    "/api/public-readme-cleanup-review/create": lambda self, body: self.json_or_error_response(PUBLIC_README_CLEANUP_REVIEW.create_review(body)),
-    "/api/public-repository-polish-package/create": lambda self, body: self.json_or_error_response(PUBLIC_REPOSITORY_POLISH_PACKAGE.create_package(body)),
-    "/api/repository-export-checklist/create": lambda self, body: self.json_or_error_response(REPOSITORY_EXPORT_CHECKLIST.create_checklist(body)),
     "/api/analysis-workflow/plan": lambda self, body: self.json_or_error_response(ANALYSIS.plan(body)),
     "/api/analysis-workflow/start": lambda self, body: self.json_or_error_response(start_analysis_workflow(body), default_status=202),
-    "/api/product-architecture/implementation-plan": lambda self, body: self.json_response(PRODUCT_ARCHITECTURE.implementation_plan(body)),
-    "/api/release-readiness/snapshot": lambda self, body: self.json_or_error_response(RELEASE_READINESS.create_snapshot(body)),
-    "/api/portfolio-demo/snapshot": lambda self, body: self.json_or_error_response(PORTFOLIO_DEMO.create_snapshot(body)),
-    "/api/portfolio-evidence-bundle/create": lambda self, body: self.json_or_error_response(PORTFOLIO_EVIDENCE_BUNDLE.create_bundle(body)),
-    "/api/bundle-review-checklist/create": lambda self, body: self.json_or_error_response(BUNDLE_REVIEW_CHECKLIST.create_checklist(body)),
-    "/api/portfolio-narrative-export/create": lambda self, body: self.json_or_error_response(PORTFOLIO_NARRATIVE_EXPORT.create_narrative(body)),
-    "/api/portfolio-handoff-page/create": lambda self, body: self.json_or_error_response(PORTFOLIO_HANDOFF_PAGE.create_page(body)),
-    "/api/portfolio-evidence-gallery/create": lambda self, body: self.json_or_error_response(PORTFOLIO_EVIDENCE_GALLERY.create_gallery(body)),
-    "/api/multi-pilot-comparison/create": lambda self, body: self.json_or_error_response(MULTI_PILOT_COMPARISON.create_comparison(body)),
-    "/api/comparison-map-exports/create": lambda self, body: self.json_or_error_response(COMPARISON_MAP_EXPORTS.create_export(body)),
     "/api/postgis-backend/migration-plan": lambda self, body: self.json_or_error_response(POSTGIS_BACKEND.migration_plan(body, write_files=True)),
     "/api/profile-mapper/plan": lambda self, body: self.json_or_error_response(PROFILE_MAPPER.mapper_plan(body, write_files=True)),
     "/api/contract-execution/dry-run": lambda self, body: self.json_or_error_response(CONTRACT_EXECUTION.dry_run(body, write_files=True)),
@@ -437,22 +268,13 @@ ROUTE_TABLE_POST = {
 # wildcard (id). do_GET scans in order, first match wins -- identical to the former
 # if/elif chain. Bodies mirror the former arms verbatim.
 ROUTE_TABLE_GET_SEGMENTS = [
-    (('api', 'release-readiness', 'snapshots', None), lambda self, segments, query: self.json_or_error_response(RELEASE_READINESS.snapshot_detail(segments[3]))),
-    (('api', 'portfolio-demo', 'snapshots', None), lambda self, segments, query: self.json_or_error_response(PORTFOLIO_DEMO.snapshot_detail(segments[3]))),
     (('api', 'portfolio-evidence-bundle', 'bundles', None, 'download'), lambda self, segments, query: self.portfolio_evidence_bundle_response(segments[3])),
-    (('api', 'portfolio-evidence-bundle', 'bundles', None), lambda self, segments, query: self.json_or_error_response(PORTFOLIO_EVIDENCE_BUNDLE.detail(segments[3]))),
     (('api', 'bundle-review-checklist', 'checklists', None, 'download'), lambda self, segments, query: self.bundle_review_checklist_response(segments[3])),
-    (('api', 'bundle-review-checklist', 'checklists', None), lambda self, segments, query: self.json_or_error_response(BUNDLE_REVIEW_CHECKLIST.detail(segments[3]))),
     (('api', 'portfolio-narrative-export', 'narratives', None, 'download'), lambda self, segments, query: self.portfolio_narrative_response(segments[3])),
-    (('api', 'portfolio-narrative-export', 'narratives', None), lambda self, segments, query: self.json_or_error_response(PORTFOLIO_NARRATIVE_EXPORT.detail(segments[3]))),
     (('api', 'portfolio-handoff-page', 'pages', None, 'download'), lambda self, segments, query: self.portfolio_handoff_page_response(segments[3])),
-    (('api', 'portfolio-handoff-page', 'pages', None), lambda self, segments, query: self.json_or_error_response(PORTFOLIO_HANDOFF_PAGE.detail(segments[3]))),
     (('api', 'portfolio-evidence-gallery', 'galleries', None, 'download'), lambda self, segments, query: self.portfolio_evidence_gallery_response(segments[3])),
-    (('api', 'portfolio-evidence-gallery', 'galleries', None), lambda self, segments, query: self.json_or_error_response(PORTFOLIO_EVIDENCE_GALLERY.detail(segments[3]))),
     (('api', 'multi-pilot-comparison', 'comparisons', None, 'download'), lambda self, segments, query: self.multi_pilot_comparison_response(segments[3])),
-    (('api', 'multi-pilot-comparison', 'comparisons', None), lambda self, segments, query: self.json_or_error_response(MULTI_PILOT_COMPARISON.detail(segments[3]))),
     (('api', 'comparison-map-exports', 'exports', None, 'download'), lambda self, segments, query: self.comparison_map_export_response(segments[3])),
-    (('api', 'comparison-map-exports', 'exports', None), lambda self, segments, query: self.json_or_error_response(COMPARISON_MAP_EXPORTS.detail(segments[3]))),
     (('api', 'postgis-backend', None), lambda self, segments, query: self.json_or_error_response(POSTGIS_BACKEND.detail(segments[2]))),
     (('api', 'profile-mapper', 'contracts', None), lambda self, segments, query: self.json_or_error_response(PROFILE_MAPPER.contract(segments[3]))),
     (('api', 'profile-mapper', 'plans', None), lambda self, segments, query: self.json_or_error_response(PROFILE_MAPPER.detail(segments[3]))),
@@ -476,61 +298,33 @@ ROUTE_TABLE_GET_SEGMENTS = [
     (('api', 'source-handoff-execution', 'executions', None, 'download'), lambda self, segments, query: self.source_handoff_execution_response(segments[3])),
     (('api', 'source-handoff-execution', 'executions', None), lambda self, segments, query: self.json_or_error_response(SOURCE_HANDOFF_EXECUTION.detail(segments[3]))),
     (('api', 'execution-evidence-package', 'packages', None, 'download'), lambda self, segments, query: self.execution_evidence_package_response(segments[3])),
-    (('api', 'execution-evidence-package', 'packages', None), lambda self, segments, query: self.json_or_error_response(EXECUTION_EVIDENCE_PACKAGE.detail(segments[3]))),
     (('api', 'execution-result-diff', 'diffs', None, 'download'), lambda self, segments, query: self.execution_result_diff_response(segments[3])),
-    (('api', 'execution-result-diff', 'diffs', None), lambda self, segments, query: self.json_or_error_response(EXECUTION_RESULT_DIFF.detail(segments[3]))),
     (('api', 'execution-diff-gallery', 'galleries', None, 'download'), lambda self, segments, query: self.execution_diff_gallery_response(segments[3])),
-    (('api', 'execution-diff-gallery', 'galleries', None), lambda self, segments, query: self.json_or_error_response(EXECUTION_DIFF_GALLERY.detail(segments[3]))),
     (('api', 'execution-diff-detail', 'drilldowns', None, 'download'), lambda self, segments, query: self.execution_diff_detail_response(segments[3])),
-    (('api', 'execution-diff-detail', 'drilldowns', None), lambda self, segments, query: self.json_or_error_response(EXECUTION_DIFF_DETAIL.detail(segments[3]))),
     (('api', 'reproducibility-audit-packet', 'packets', None, 'download'), lambda self, segments, query: self.reproducibility_audit_packet_response(segments[3])),
-    (('api', 'reproducibility-audit-packet', 'packets', None), lambda self, segments, query: self.json_or_error_response(REPRODUCIBILITY_AUDIT_PACKET.detail(segments[3]))),
     (('api', 'reviewer-audit-index', 'indexes', None, 'download'), lambda self, segments, query: self.reviewer_audit_index_response(segments[3])),
-    (('api', 'reviewer-audit-index', 'indexes', None), lambda self, segments, query: self.json_or_error_response(REVIEWER_AUDIT_INDEX.detail(segments[3]))),
     (('api', 'portfolio-export-launcher', 'launchers', None, 'download'), lambda self, segments, query: self.portfolio_export_launcher_response(segments[3])),
-    (('api', 'portfolio-export-launcher', 'launchers', None), lambda self, segments, query: self.json_or_error_response(PORTFOLIO_EXPORT_LAUNCHER.detail(segments[3]))),
     (('api', 'portable-release-package', 'packages', None, 'download'), lambda self, segments, query: self.portable_release_package_response(segments[3])),
-    (('api', 'portable-release-package', 'packages', None), lambda self, segments, query: self.json_or_error_response(PORTABLE_RELEASE_PACKAGE.detail(segments[3]))),
     (('api', 'demo-script-pack', 'packs', None, 'download'), lambda self, segments, query: self.demo_script_pack_response(segments[3])),
-    (('api', 'demo-script-pack', 'packs', None), lambda self, segments, query: self.json_or_error_response(DEMO_SCRIPT_PACK.detail(segments[3]))),
     (('api', 'visual-qa-snapshot-ledger', 'ledgers', None, 'download'), lambda self, segments, query: self.visual_qa_ledger_response(segments[3])),
-    (('api', 'visual-qa-snapshot-ledger', 'ledgers', None), lambda self, segments, query: self.json_or_error_response(VISUAL_QA_LEDGER.detail(segments[3]))),
     (('api', 'visual-baseline-comparison', 'comparisons', None, 'download'), lambda self, segments, query: self.visual_baseline_comparison_response(segments[3])),
-    (('api', 'visual-baseline-comparison', 'comparisons', None), lambda self, segments, query: self.json_or_error_response(VISUAL_BASELINE_COMPARISON.detail(segments[3]))),
     (('api', 'demo-artifact-completeness', 'checks', None, 'download'), lambda self, segments, query: self.demo_artifact_completeness_response(segments[3])),
-    (('api', 'demo-artifact-completeness', 'checks', None), lambda self, segments, query: self.json_or_error_response(DEMO_ARTIFACT_COMPLETENESS.detail(segments[3]))),
     (('api', 'visual-evidence-capture', 'captures', None, 'download'), lambda self, segments, query: self.visual_evidence_capture_response(segments[3])),
-    (('api', 'visual-evidence-capture', 'captures', None), lambda self, segments, query: self.json_or_error_response(VISUAL_EVIDENCE_CAPTURE.detail(segments[3]))),
     (('api', 'visual-evidence-review-diff', 'diffs', None, 'download'), lambda self, segments, query: self.visual_evidence_review_diff_response(segments[3])),
-    (('api', 'visual-evidence-review-diff', 'diffs', None), lambda self, segments, query: self.json_or_error_response(VISUAL_EVIDENCE_REVIEW_DIFF.detail(segments[3]))),
     (('api', 'visual-evidence-review-annotations', 'annotations', None, 'download'), lambda self, segments, query: self.visual_evidence_review_annotations_response(segments[3])),
-    (('api', 'visual-evidence-review-annotations', 'annotations', None), lambda self, segments, query: self.json_or_error_response(VISUAL_EVIDENCE_REVIEW_ANNOTATIONS.detail(segments[3]))),
     (('api', 'visual-evidence-signoff-packet', 'packets', None, 'download'), lambda self, segments, query: self.visual_evidence_signoff_packet_response(segments[3])),
-    (('api', 'visual-evidence-signoff-packet', 'packets', None), lambda self, segments, query: self.json_or_error_response(VISUAL_EVIDENCE_SIGNOFF_PACKET.detail(segments[3]))),
     (('api', 'final-reviewer-launch-checklist', 'checklists', None, 'download'), lambda self, segments, query: self.final_reviewer_launch_checklist_response(segments[3])),
-    (('api', 'final-reviewer-launch-checklist', 'checklists', None), lambda self, segments, query: self.json_or_error_response(FINAL_REVIEWER_LAUNCH_CHECKLIST.detail(segments[3]))),
     (('api', 'recruiter-demo-brief', 'briefs', None, 'download'), lambda self, segments, query: self.recruiter_demo_brief_response(segments[3])),
-    (('api', 'recruiter-demo-brief', 'briefs', None), lambda self, segments, query: self.json_or_error_response(RECRUITER_DEMO_BRIEF.detail(segments[3]))),
     (('api', 'public-portfolio-package', 'packages', None, 'download'), lambda self, segments, query: self.public_portfolio_package_response(segments[3])),
-    (('api', 'public-portfolio-package', 'packages', None), lambda self, segments, query: self.json_or_error_response(PUBLIC_PORTFOLIO_PACKAGE.detail(segments[3]))),
     (('api', 'demo-review-playbook', 'playbooks', None, 'download'), lambda self, segments, query: self.demo_review_playbook_response(segments[3])),
-    (('api', 'demo-review-playbook', 'playbooks', None), lambda self, segments, query: self.json_or_error_response(DEMO_REVIEW_PLAYBOOK.detail(segments[3]))),
     (('api', 'github-publication-bundle', 'bundles', None, 'download'), lambda self, segments, query: self.github_publication_bundle_response(segments[3])),
-    (('api', 'github-publication-bundle', 'bundles', None), lambda self, segments, query: self.json_or_error_response(GITHUB_PUBLICATION_BUNDLE.detail(segments[3]))),
     (('api', 'repository-publication-qa', 'reviews', None, 'download'), lambda self, segments, query: self.repository_publication_qa_response(segments[3])),
-    (('api', 'repository-publication-qa', 'reviews', None), lambda self, segments, query: self.json_or_error_response(REPOSITORY_PUBLICATION_QA.detail(segments[3]))),
     (('api', 'repository-export-handoff', 'handoffs', None, 'download'), lambda self, segments, query: self.repository_export_handoff_response(segments[3])),
-    (('api', 'repository-export-handoff', 'handoffs', None), lambda self, segments, query: self.json_or_error_response(REPOSITORY_EXPORT_HANDOFF.detail(segments[3]))),
     (('api', 'repository-dry-run-review', 'reviews', None, 'download'), lambda self, segments, query: self.repository_dry_run_review_response(segments[3])),
-    (('api', 'repository-dry-run-review', 'reviews', None), lambda self, segments, query: self.json_or_error_response(REPOSITORY_DRY_RUN_REVIEW.detail(segments[3]))),
     (('api', 'repository-final-package-review', 'reviews', None, 'download'), lambda self, segments, query: self.repository_final_package_review_response(segments[3])),
-    (('api', 'repository-final-package-review', 'reviews', None), lambda self, segments, query: self.json_or_error_response(REPOSITORY_FINAL_PACKAGE_REVIEW.detail(segments[3]))),
     (('api', 'public-readme-cleanup-review', 'reviews', None, 'download'), lambda self, segments, query: self.public_readme_cleanup_review_response(segments[3])),
-    (('api', 'public-readme-cleanup-review', 'reviews', None), lambda self, segments, query: self.json_or_error_response(PUBLIC_README_CLEANUP_REVIEW.detail(segments[3]))),
     (('api', 'public-repository-polish-package', 'packages', None, 'download'), lambda self, segments, query: self.public_repository_polish_package_response(segments[3])),
-    (('api', 'public-repository-polish-package', 'packages', None), lambda self, segments, query: self.json_or_error_response(PUBLIC_REPOSITORY_POLISH_PACKAGE.detail(segments[3]))),
     (('api', 'repository-export-checklist', 'checklists', None, 'download'), lambda self, segments, query: self.repository_export_checklist_response(segments[3])),
-    (('api', 'repository-export-checklist', 'checklists', None), lambda self, segments, query: self.json_or_error_response(REPOSITORY_EXPORT_CHECKLIST.detail(segments[3]))),
     (('api', 'source-onboarding', 'sources', None), lambda self, segments, query: self.json_or_error_response(ONBOARDING.source_detail(segments[3]))),
     (('api', 'profile-dashboard', None, 'summary'), lambda self, segments, query: self.json_or_error_response(PROFILE_DASHBOARD.summary(segments[2]))),
     (('api', 'scoring-rules', None), lambda self, segments, query: self.json_or_error_response(SCORING_RULES.profile(segments[2]))),
@@ -1256,7 +1050,6 @@ ANALYSIS = AnalysisWorkflow(ONBOARDING, PILOTS, PREFLIGHT, DEFAULT_SOURCE_DATASE
 ANALYSIS_RUNS = AnalysisRuns(RUNS_DIR, WORKSPACES_DIR)
 PORTFOLIO_REPORTS = PortfolioReportBuilder(PORTFOLIO_REPORTS_DIR, ANALYSIS_RUNS, WORKSPACES_DIR)
 PROFILES = AnalysisProfileRegistry(ONBOARDING, PILOTS, PREFLIGHT, DEFAULT_SOURCE_DATASET_ID)
-PRODUCT_ARCHITECTURE = ProductArchitecture(PROFILES, ONBOARDING, project_manifest)
 PROFILE_DASHBOARD = ProfileDashboardStore(WORKSPACES_DIR, REVIEW_WORDING)
 LOCAL_INTAKE = LocalIntakeWizard(MAPS_ROOT, OUTPUT_ROOT, ONBOARDING, DEFAULT_SOURCE_DATASET_ID)
 SOURCE_IMPORT_GUARDRAILS = SourceImportGuardrails(PROJECT_DIR, OUTPUT_ROOT, MAPS_ROOT, ONBOARDING, LOCAL_INTAKE, DEFAULT_SOURCE_DATASET_ID, REVIEW_WORDING)
@@ -1269,348 +1062,18 @@ TEMPLATE_AUTHORING = TemplateAuthoringWizard(PROFILE_MAPPER_CONFIG_PATH, OUTPUT_
 EXECUTION_QUEUE = ControlledExecutionQueue(CONTRACT_EXECUTION, OUTPUT_ROOT)
 SOURCE_HANDOFF = SourceHandoffPlanner(OUTPUT_ROOT, SOURCE_IMPORT_GUARDRAILS, PROFILE_MAPPER, CONTRACT_EXECUTION, EXECUTION_QUEUE, REVIEW_WORDING)
 SOURCE_HANDOFF_EXECUTION = SourceHandoffExecutionController(OUTPUT_ROOT, WORKSPACES_DIR, SOURCE_HANDOFF, EXECUTION_QUEUE, REVIEW_WORDING)
-EXECUTION_EVIDENCE_PACKAGE = ExecutionEvidencePackageBuilder(PROJECT_DIR, OUTPUT_ROOT, WORKSPACES_DIR, APP_VERSION, project_manifest, REVIEW_WORDING, SOURCE_HANDOFF_EXECUTION, expected_api_endpoints=362)
-EXECUTION_RESULT_DIFF = ExecutionResultDiffBuilder(PROJECT_DIR, OUTPUT_ROOT, APP_VERSION, project_manifest, REVIEW_WORDING, EXECUTION_EVIDENCE_PACKAGE, expected_api_endpoints=362)
-EXECUTION_DIFF_GALLERY = ExecutionDiffGalleryBuilder(PROJECT_DIR, OUTPUT_ROOT, APP_VERSION, project_manifest, REVIEW_WORDING, EXECUTION_RESULT_DIFF, expected_api_endpoints=362)
-EXECUTION_DIFF_DETAIL = ExecutionDiffDetailDrilldownBuilder(PROJECT_DIR, OUTPUT_ROOT, APP_VERSION, project_manifest, REVIEW_WORDING, EXECUTION_RESULT_DIFF, EXECUTION_DIFF_GALLERY, expected_api_endpoints=362)
-REPRODUCIBILITY_AUDIT_PACKET = ReproducibilityAuditPacketBuilder(PROJECT_DIR, OUTPUT_ROOT, APP_VERSION, project_manifest, REVIEW_WORDING, EXECUTION_RESULT_DIFF, EXECUTION_DIFF_GALLERY, EXECUTION_DIFF_DETAIL, expected_api_endpoints=362)
-REVIEWER_AUDIT_INDEX = ReviewerAuditIndexBuilder(PROJECT_DIR, OUTPUT_ROOT, APP_VERSION, project_manifest, REVIEW_WORDING, REPRODUCIBILITY_AUDIT_PACKET, expected_api_endpoints=362)
-PORTFOLIO_EXPORT_LAUNCHER = PortfolioExportLauncherBuilder(PROJECT_DIR, OUTPUT_ROOT, APP_VERSION, project_manifest, REVIEW_WORDING, REVIEWER_AUDIT_INDEX, REPRODUCIBILITY_AUDIT_PACKET, expected_api_endpoints=362)
-PORTABLE_RELEASE_PACKAGE = PortableReleasePackageBuilder(PROJECT_DIR, OUTPUT_ROOT, APP_VERSION, project_manifest, REVIEW_WORDING, PORTFOLIO_EXPORT_LAUNCHER, REVIEWER_AUDIT_INDEX, REPRODUCIBILITY_AUDIT_PACKET, expected_api_endpoints=362)
-DEMO_SCRIPT_PACK = DemoScriptPackBuilder(PROJECT_DIR, OUTPUT_ROOT, APP_VERSION, project_manifest, REVIEW_WORDING, PORTABLE_RELEASE_PACKAGE, expected_api_endpoints=362)
-VISUAL_QA_LEDGER = VisualQASnapshotLedgerBuilder(PROJECT_DIR, OUTPUT_ROOT, APP_VERSION, project_manifest, REVIEW_WORDING, DEMO_SCRIPT_PACK, expected_api_endpoints=362)
-VISUAL_BASELINE_COMPARISON = VisualBaselineComparisonManifestBuilder(PROJECT_DIR, OUTPUT_ROOT, APP_VERSION, project_manifest, REVIEW_WORDING, VISUAL_QA_LEDGER, expected_api_endpoints=362)
 AUTHORED_PROFILE_RUNNER = AuthoredProfileRunner(OUTPUT_ROOT, WORKSPACES_DIR, TEMPLATE_AUTHORING, REVIEW_WORDING)
 PROFILE_PROMOTION = ProfilePromotionWizard(OUTPUT_ROOT, WORKSPACES_DIR, TEMPLATE_AUTHORING, PROFILE_MAPPER_CONFIG_PATH, REVIEW_WORDING)
 DATASET_PACKAGES = DatasetPackageBuilder(OUTPUT_ROOT, ONBOARDING, LOCAL_INTAKE, TEMPLATE_AUTHORING, EXECUTION_QUEUE)
-RELEASE_READINESS = ReleaseReadinessDashboard(
-    PROJECT_DIR,
-    OUTPUT_ROOT,
-    APP_VERSION,
-    project_manifest,
-    REVIEW_WORDING,
-    {
-        "product_architecture": PRODUCT_ARCHITECTURE,
-        "profile_dashboard": PROFILE_DASHBOARD,
-        "scoring_rules": SCORING_RULES,
-        "postgis_backend": POSTGIS_BACKEND,
-        "profile_mapper": PROFILE_MAPPER,
-        "contract_execution": CONTRACT_EXECUTION,
-        "template_authoring": TEMPLATE_AUTHORING,
-        "execution_queue": EXECUTION_QUEUE,
-        "dataset_packages": DATASET_PACKAGES,
-        "authored_profile_runner": AUTHORED_PROFILE_RUNNER,
-        "profile_promotion": PROFILE_PROMOTION,
-        "onboarding": ONBOARDING,
-        "source_import_guardrails": SOURCE_IMPORT_GUARDRAILS,
-        "source_handoff": SOURCE_HANDOFF,
-        "source_handoff_execution": SOURCE_HANDOFF_EXECUTION,
-        "execution_evidence_package": EXECUTION_EVIDENCE_PACKAGE,
-        "execution_result_diff": EXECUTION_RESULT_DIFF,
-        "execution_diff_gallery": EXECUTION_DIFF_GALLERY,
-        "execution_diff_detail": EXECUTION_DIFF_DETAIL,
-        "reproducibility_audit_packet": REPRODUCIBILITY_AUDIT_PACKET,
-        "reviewer_audit_index": REVIEWER_AUDIT_INDEX,
-        "portfolio_export_launcher": PORTFOLIO_EXPORT_LAUNCHER,
-        "portable_release_package": PORTABLE_RELEASE_PACKAGE,
-        "demo_script_pack": DEMO_SCRIPT_PACK,
-        "visual_qa_ledger": VISUAL_QA_LEDGER,
-        "visual_baseline_comparison": VISUAL_BASELINE_COMPARISON,
-    },
-)
-PORTFOLIO_DEMO = PortfolioDemoWalkthrough(
-    PROJECT_DIR,
-    OUTPUT_ROOT,
-    APP_VERSION,
-    project_manifest,
-    REVIEW_WORDING,
-    {
-        "product_architecture": PRODUCT_ARCHITECTURE,
-        "release_readiness": RELEASE_READINESS,
-        "onboarding": ONBOARDING,
-        "profile_dashboard": PROFILE_DASHBOARD,
-        "scoring_rules": SCORING_RULES,
-        "portfolio_reports": PORTFOLIO_REPORTS,
-        "profile_export_bundles": PROFILE_EXPORT_BUNDLES,
-        "profile_promotion": PROFILE_PROMOTION,
-    },
-)
-PORTFOLIO_EVIDENCE_BUNDLE = PortfolioEvidenceBundleBuilder(
-    PROJECT_DIR,
-    OUTPUT_ROOT,
-    APP_VERSION,
-    project_manifest,
-    REVIEW_WORDING,
-    {
-        "release_readiness": RELEASE_READINESS,
-        "portfolio_demo": PORTFOLIO_DEMO,
-        "portfolio_reports": PORTFOLIO_REPORTS,
-        "profile_export_bundles": PROFILE_EXPORT_BUNDLES,
-    },
-)
-BUNDLE_REVIEW_CHECKLIST = BundleReviewChecklist(
-    PROJECT_DIR,
-    OUTPUT_ROOT,
-    APP_VERSION,
-    project_manifest,
-    REVIEW_WORDING,
-    {"portfolio_evidence_bundle": PORTFOLIO_EVIDENCE_BUNDLE},
-    expected_api_endpoints=362,
-)
-PORTFOLIO_NARRATIVE_EXPORT = PortfolioNarrativeExporter(
-    PROJECT_DIR,
-    OUTPUT_ROOT,
-    APP_VERSION,
-    project_manifest,
-    REVIEW_WORDING,
-    {
-        "bundle_review_checklist": BUNDLE_REVIEW_CHECKLIST,
-        "portfolio_evidence_bundle": PORTFOLIO_EVIDENCE_BUNDLE,
-    },
-    expected_api_endpoints=362,
-)
-PORTFOLIO_HANDOFF_PAGE = PortfolioHandoffPageBuilder(
-    PROJECT_DIR,
-    OUTPUT_ROOT,
-    APP_VERSION,
-    project_manifest,
-    REVIEW_WORDING,
-    {"portfolio_narrative_export": PORTFOLIO_NARRATIVE_EXPORT},
-    expected_api_endpoints=362,
-)
-PORTFOLIO_EVIDENCE_GALLERY = PortfolioEvidenceGalleryBuilder(
-    PROJECT_DIR,
-    OUTPUT_ROOT,
-    APP_VERSION,
-    project_manifest,
-    REVIEW_WORDING,
-    {
-        "portfolio_handoff_page": PORTFOLIO_HANDOFF_PAGE,
-        "portfolio_narrative_export": PORTFOLIO_NARRATIVE_EXPORT,
-        "portfolio_evidence_bundle": PORTFOLIO_EVIDENCE_BUNDLE,
-        "bundle_review_checklist": BUNDLE_REVIEW_CHECKLIST,
-        "portfolio_reports": PORTFOLIO_REPORTS,
-        "release_readiness": RELEASE_READINESS,
-        "profile_dashboard": PROFILE_DASHBOARD,
-        "product_architecture": PRODUCT_ARCHITECTURE,
-    },
-    expected_api_endpoints=362,
-)
-MULTI_PILOT_COMPARISON = MultiPilotComparisonBuilder(
-    PROJECT_DIR,
-    OUTPUT_ROOT,
-    APP_VERSION,
-    project_manifest,
-    REVIEW_WORDING,
-    {
-        "dashboards": DASHBOARDS,
-        "pilots": PILOTS,
-        "portfolio_evidence_gallery": PORTFOLIO_EVIDENCE_GALLERY,
-    },
-    expected_api_endpoints=362,
-)
-RELEASE_READINESS.dependencies["multi_pilot_comparison"] = MULTI_PILOT_COMPARISON
 
-COMPARISON_MAP_EXPORTS = ComparisonMapExportBuilder(
-    PROJECT_DIR,
-    OUTPUT_ROOT,
-    APP_VERSION,
-    project_manifest,
-    REVIEW_WORDING,
-    {"multi_pilot_comparison": MULTI_PILOT_COMPARISON},
-    expected_api_endpoints=362,
-)
-RELEASE_READINESS.dependencies["comparison_map_exports"] = COMPARISON_MAP_EXPORTS
 
-DEMO_ARTIFACT_COMPLETENESS = DemoArtifactCompletenessValidator(
-    PROJECT_DIR,
-    OUTPUT_ROOT,
-    APP_VERSION,
-    project_manifest,
-    REVIEW_WORDING,
-    {
-        "portfolio_evidence_bundle": PORTFOLIO_EVIDENCE_BUNDLE,
-        "bundle_review_checklist": BUNDLE_REVIEW_CHECKLIST,
-        "portfolio_narrative_export": PORTFOLIO_NARRATIVE_EXPORT,
-        "portfolio_handoff_page": PORTFOLIO_HANDOFF_PAGE,
-        "portfolio_evidence_gallery": PORTFOLIO_EVIDENCE_GALLERY,
-        "portable_release_package": PORTABLE_RELEASE_PACKAGE,
-        "demo_script_pack": DEMO_SCRIPT_PACK,
-        "visual_qa_ledger": VISUAL_QA_LEDGER,
-        "visual_baseline_comparison": VISUAL_BASELINE_COMPARISON,
-    },
-    expected_api_endpoints=362,
-)
-RELEASE_READINESS.dependencies["demo_artifact_completeness"] = DEMO_ARTIFACT_COMPLETENESS
 
-VISUAL_EVIDENCE_CAPTURE = VisualEvidenceCaptureBuilder(
-    PROJECT_DIR,
-    OUTPUT_ROOT,
-    APP_VERSION,
-    project_manifest,
-    REVIEW_WORDING,
-    VISUAL_QA_LEDGER,
-    DEMO_ARTIFACT_COMPLETENESS,
-    expected_api_endpoints=362,
-)
-RELEASE_READINESS.dependencies["visual_evidence_capture"] = VISUAL_EVIDENCE_CAPTURE
 
-VISUAL_EVIDENCE_REVIEW_DIFF = VisualEvidenceReviewDiffBuilder(
-    PROJECT_DIR,
-    OUTPUT_ROOT,
-    APP_VERSION,
-    project_manifest,
-    REVIEW_WORDING,
-    VISUAL_EVIDENCE_CAPTURE,
-    expected_api_endpoints=362,
-)
-RELEASE_READINESS.dependencies["visual_evidence_review_diff"] = VISUAL_EVIDENCE_REVIEW_DIFF
 
-VISUAL_EVIDENCE_REVIEW_ANNOTATIONS = VisualEvidenceReviewAnnotationsBuilder(
-    PROJECT_DIR,
-    OUTPUT_ROOT,
-    APP_VERSION,
-    project_manifest,
-    REVIEW_WORDING,
-    VISUAL_EVIDENCE_REVIEW_DIFF,
-    expected_api_endpoints=362,
-)
-RELEASE_READINESS.dependencies["visual_evidence_review_annotations"] = VISUAL_EVIDENCE_REVIEW_ANNOTATIONS
 
-VISUAL_EVIDENCE_SIGNOFF_PACKET = VisualEvidenceSignoffPacketBuilder(
-    PROJECT_DIR,
-    OUTPUT_ROOT,
-    APP_VERSION,
-    project_manifest,
-    REVIEW_WORDING,
-    VISUAL_EVIDENCE_REVIEW_ANNOTATIONS,
-    expected_api_endpoints=362,
-)
-RELEASE_READINESS.dependencies["visual_evidence_signoff_packet"] = VISUAL_EVIDENCE_SIGNOFF_PACKET
 
-FINAL_REVIEWER_LAUNCH_CHECKLIST = FinalReviewerLaunchChecklistBuilder(
-    PROJECT_DIR,
-    OUTPUT_ROOT,
-    APP_VERSION,
-    project_manifest,
-    REVIEW_WORDING,
-    VISUAL_EVIDENCE_SIGNOFF_PACKET,
-    expected_api_endpoints=362,
-)
-RELEASE_READINESS.dependencies["final_reviewer_launch_checklist"] = FINAL_REVIEWER_LAUNCH_CHECKLIST
 
-RECRUITER_DEMO_BRIEF = RecruiterDemoBriefBuilder(
-    PROJECT_DIR,
-    OUTPUT_ROOT,
-    APP_VERSION,
-    project_manifest,
-    REVIEW_WORDING,
-    FINAL_REVIEWER_LAUNCH_CHECKLIST,
-    expected_api_endpoints=362,
-)
-RELEASE_READINESS.dependencies["recruiter_demo_brief"] = RECRUITER_DEMO_BRIEF
 
-PUBLIC_PORTFOLIO_PACKAGE = PublicPortfolioInterviewPackageBuilder(
-    PROJECT_DIR,
-    OUTPUT_ROOT,
-    APP_VERSION,
-    project_manifest,
-    REVIEW_WORDING,
-    RECRUITER_DEMO_BRIEF,
-    expected_api_endpoints=362,
-)
-RELEASE_READINESS.dependencies["public_portfolio_package"] = PUBLIC_PORTFOLIO_PACKAGE
-DEMO_REVIEW_PLAYBOOK = DemoReviewPlaybookBuilder(
-    PROJECT_DIR,
-    OUTPUT_ROOT,
-    APP_VERSION,
-    project_manifest,
-    REVIEW_WORDING,
-    PUBLIC_PORTFOLIO_PACKAGE,
-    expected_api_endpoints=362,
-)
-RELEASE_READINESS.dependencies["demo_review_playbook"] = DEMO_REVIEW_PLAYBOOK
-GITHUB_PUBLICATION_BUNDLE = GitHubPublicationBundleBuilder(
-    PROJECT_DIR,
-    OUTPUT_ROOT,
-    APP_VERSION,
-    project_manifest,
-    REVIEW_WORDING,
-    DEMO_REVIEW_PLAYBOOK,
-    expected_api_endpoints=362,
-)
-RELEASE_READINESS.dependencies["github_publication_bundle"] = GITHUB_PUBLICATION_BUNDLE
-REPOSITORY_PUBLICATION_QA = RepositoryPublicationQABuilder(
-    PROJECT_DIR,
-    OUTPUT_ROOT,
-    APP_VERSION,
-    project_manifest,
-    REVIEW_WORDING,
-    GITHUB_PUBLICATION_BUNDLE,
-    expected_api_endpoints=362,
-)
-RELEASE_READINESS.dependencies["repository_publication_qa"] = REPOSITORY_PUBLICATION_QA
-REPOSITORY_EXPORT_HANDOFF = RepositoryExportHandoffBuilder(
-    PROJECT_DIR,
-    OUTPUT_ROOT,
-    APP_VERSION,
-    project_manifest,
-    REVIEW_WORDING,
-    REPOSITORY_PUBLICATION_QA,
-    expected_api_endpoints=362,
-)
-RELEASE_READINESS.dependencies["repository_export_handoff"] = REPOSITORY_EXPORT_HANDOFF
-REPOSITORY_DRY_RUN_REVIEW = RepositoryDryRunReviewBuilder(
-    PROJECT_DIR,
-    OUTPUT_ROOT,
-    APP_VERSION,
-    project_manifest,
-    REVIEW_WORDING,
-    REPOSITORY_EXPORT_HANDOFF,
-    expected_api_endpoints=362,
-)
-RELEASE_READINESS.dependencies["repository_dry_run_review"] = REPOSITORY_DRY_RUN_REVIEW
-REPOSITORY_FINAL_PACKAGE_REVIEW = RepositoryFinalPackageReviewBuilder(
-    PROJECT_DIR,
-    OUTPUT_ROOT,
-    APP_VERSION,
-    project_manifest,
-    REVIEW_WORDING,
-    REPOSITORY_DRY_RUN_REVIEW,
-    expected_api_endpoints=362,
-)
-RELEASE_READINESS.dependencies["repository_final_package_review"] = REPOSITORY_FINAL_PACKAGE_REVIEW
-PUBLIC_README_CLEANUP_REVIEW = PublicReadmeCleanupReviewBuilder(
-    PROJECT_DIR,
-    OUTPUT_ROOT,
-    APP_VERSION,
-    project_manifest,
-    REVIEW_WORDING,
-    REPOSITORY_FINAL_PACKAGE_REVIEW,
-    expected_api_endpoints=362,
-)
-RELEASE_READINESS.dependencies["public_readme_cleanup_review"] = PUBLIC_README_CLEANUP_REVIEW
-PUBLIC_REPOSITORY_POLISH_PACKAGE = PublicRepositoryPolishPackageBuilder(
-    PROJECT_DIR,
-    OUTPUT_ROOT,
-    APP_VERSION,
-    project_manifest,
-    REVIEW_WORDING,
-    PUBLIC_README_CLEANUP_REVIEW,
-    expected_api_endpoints=362,
-)
-RELEASE_READINESS.dependencies["public_repository_polish_package"] = PUBLIC_REPOSITORY_POLISH_PACKAGE
-REPOSITORY_EXPORT_CHECKLIST = RepositoryExportChecklistBuilder(
-    PROJECT_DIR,
-    OUTPUT_ROOT,
-    APP_VERSION,
-    project_manifest,
-    REVIEW_WORDING,
-    PUBLIC_REPOSITORY_POLISH_PACKAGE,
-    VISUAL_EVIDENCE_CAPTURE,
-    expected_api_endpoints=362,
-)
-RELEASE_READINESS.dependencies["repository_export_checklist"] = REPOSITORY_EXPORT_CHECKLIST
 
 
 def preflight_from_query(query: dict[str, list[str]]) -> dict:
@@ -2178,95 +1641,11 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(content)
 
-    def portfolio_evidence_bundle_response(self, bundle_id: str) -> None:
-        result = PORTFOLIO_EVIDENCE_BUNDLE.output_file(bundle_id, "portfolio_evidence_bundle_report")
-        if "error" in result:
-            self.json_or_error_response(result)
-            return
-        path = result["path"]
-        content = path.read_bytes()
-        self.send_response(200)
-        self.send_header("Content-Type", "text/markdown; charset=utf-8")
-        self.send_header("Content-Length", str(len(content)))
-        self.send_header("Content-Disposition", f'attachment; filename="{path.name}"')
-        self.send_header("Cache-Control", "no-store")
-        self.end_headers()
-        self.wfile.write(content)
 
-    def bundle_review_checklist_response(self, checklist_id: str) -> None:
-        result = BUNDLE_REVIEW_CHECKLIST.output_file(checklist_id, "bundle_review_checklist_report")
-        if "error" in result:
-            self.json_or_error_response(result)
-            return
-        path = result["path"]
-        content = path.read_bytes()
-        self.send_response(200)
-        self.send_header("Content-Type", "text/markdown; charset=utf-8")
-        self.send_header("Content-Length", str(len(content)))
-        self.send_header("Content-Disposition", f'attachment; filename="{path.name}"')
-        self.send_header("Cache-Control", "no-store")
-        self.end_headers()
-        self.wfile.write(content)
 
-    def portfolio_narrative_response(self, narrative_id: str) -> None:
-        result = PORTFOLIO_NARRATIVE_EXPORT.output_file(narrative_id, "portfolio_narrative_report")
-        if "error" in result:
-            self.json_or_error_response(result)
-            return
-        path = result["path"]
-        content = path.read_bytes()
-        self.send_response(200)
-        self.send_header("Content-Type", "text/markdown; charset=utf-8")
-        self.send_header("Content-Length", str(len(content)))
-        self.send_header("Content-Disposition", f'attachment; filename="{path.name}"')
-        self.send_header("Cache-Control", "no-store")
-        self.end_headers()
-        self.wfile.write(content)
 
-    def portfolio_handoff_page_response(self, page_id: str) -> None:
-        result = PORTFOLIO_HANDOFF_PAGE.output_file(page_id, "portfolio_handoff_page")
-        if "error" in result:
-            self.json_or_error_response(result)
-            return
-        path = result["path"]
-        content = path.read_bytes()
-        self.send_response(200)
-        self.send_header("Content-Type", "text/html; charset=utf-8")
-        self.send_header("Content-Length", str(len(content)))
-        self.send_header("Content-Disposition", f'attachment; filename="{path.name}"')
-        self.send_header("Cache-Control", "no-store")
-        self.end_headers()
-        self.wfile.write(content)
 
-    def portfolio_evidence_gallery_response(self, gallery_id: str) -> None:
-        result = PORTFOLIO_EVIDENCE_GALLERY.output_file(gallery_id, "portfolio_evidence_gallery")
-        if "error" in result:
-            self.json_or_error_response(result)
-            return
-        path = result["path"]
-        content = path.read_bytes()
-        self.send_response(200)
-        self.send_header("Content-Type", "text/html; charset=utf-8")
-        self.send_header("Content-Length", str(len(content)))
-        self.send_header("Content-Disposition", f'attachment; filename="{path.name}"')
-        self.send_header("Cache-Control", "no-store")
-        self.end_headers()
-        self.wfile.write(content)
 
-    def multi_pilot_comparison_response(self, comparison_id: str) -> None:
-        result = MULTI_PILOT_COMPARISON.output_file(comparison_id, "multi_pilot_comparison")
-        if "error" in result:
-            self.json_or_error_response(result)
-            return
-        path = result["path"]
-        content = path.read_bytes()
-        self.send_response(200)
-        self.send_header("Content-Type", "text/html; charset=utf-8")
-        self.send_header("Content-Length", str(len(content)))
-        self.send_header("Content-Disposition", f'attachment; filename="{path.name}"')
-        self.send_header("Cache-Control", "no-store")
-        self.end_headers()
-        self.wfile.write(content)
 
     def source_import_guardrails_response(self, request_id: str) -> None:
         result = SOURCE_IMPORT_GUARDRAILS.output_file(request_id, "source_import_review")
@@ -2313,441 +1692,35 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(content)
 
-    def execution_evidence_package_response(self, package_id: str) -> None:
-        result = EXECUTION_EVIDENCE_PACKAGE.output_file(package_id, "execution_evidence_package")
-        if "error" in result:
-            self.json_or_error_response(result)
-            return
-        path = result["path"]
-        content = path.read_bytes()
-        self.send_response(200)
-        self.send_header("Content-Type", "text/markdown; charset=utf-8")
-        self.send_header("Content-Length", str(len(content)))
-        self.send_header("Content-Disposition", f'attachment; filename="{path.name}"')
-        self.send_header("Cache-Control", "no-store")
-        self.end_headers()
-        self.wfile.write(content)
-
-    def execution_result_diff_response(self, diff_id: str) -> None:
-        result = EXECUTION_RESULT_DIFF.output_file(diff_id, "execution_result_diff")
-        if "error" in result:
-            self.json_or_error_response(result)
-            return
-        path = result["path"]
-        content = path.read_bytes()
-        self.send_response(200)
-        self.send_header("Content-Type", "text/markdown; charset=utf-8")
-        self.send_header("Content-Length", str(len(content)))
-        self.send_header("Content-Disposition", f'attachment; filename="{path.name}"')
-        self.send_header("Cache-Control", "no-store")
-        self.end_headers()
-        self.wfile.write(content)
-
-    def execution_diff_gallery_response(self, gallery_id: str) -> None:
-        result = EXECUTION_DIFF_GALLERY.output_file(gallery_id, "execution_diff_gallery")
-        if "error" in result:
-            self.json_or_error_response(result)
-            return
-        path = result["path"]
-        content = path.read_bytes()
-        self.send_response(200)
-        self.send_header("Content-Type", "text/markdown; charset=utf-8")
-        self.send_header("Content-Length", str(len(content)))
-        self.send_header("Content-Disposition", f'attachment; filename="{path.name}"')
-        self.send_header("Cache-Control", "no-store")
-        self.end_headers()
-        self.wfile.write(content)
-
-    def execution_diff_detail_response(self, detail_id: str) -> None:
-        result = EXECUTION_DIFF_DETAIL.output_file(detail_id, "execution_diff_detail")
-        if "error" in result:
-            self.json_or_error_response(result)
-            return
-        path = result["path"]
-        content = path.read_bytes()
-        self.send_response(200)
-        self.send_header("Content-Type", "text/markdown; charset=utf-8")
-        self.send_header("Content-Length", str(len(content)))
-        self.send_header("Content-Disposition", f'attachment; filename="{path.name}"')
-        self.send_header("Cache-Control", "no-store")
-        self.end_headers()
-        self.wfile.write(content)
-
-    def reviewer_audit_index_response(self, index_id: str) -> None:
-        result = REVIEWER_AUDIT_INDEX.output_file(index_id, "reviewer_audit_index")
-        if "error" in result:
-            self.json_or_error_response(result)
-            return
-        path = result["path"]
-        content = path.read_bytes()
-        self.send_response(200)
-        self.send_header("Content-Type", "text/markdown; charset=utf-8")
-        self.send_header("Content-Length", str(len(content)))
-        self.send_header("Content-Disposition", f'attachment; filename="{path.name}"')
-        self.send_header("Cache-Control", "no-store")
-        self.end_headers()
-        self.wfile.write(content)
-
-    def portfolio_export_launcher_response(self, launcher_id: str) -> None:
-        result = PORTFOLIO_EXPORT_LAUNCHER.output_file(launcher_id, "portfolio_export_launcher")
-        if "error" in result:
-            self.json_or_error_response(result)
-            return
-        path = result["path"]
-        content = path.read_bytes()
-        self.send_response(200)
-        self.send_header("Content-Type", "text/markdown; charset=utf-8")
-        self.send_header("Content-Length", str(len(content)))
-        self.send_header("Content-Disposition", f'attachment; filename="{path.name}"')
-        self.send_header("Cache-Control", "no-store")
-        self.end_headers()
-        self.wfile.write(content)
-
-    def portable_release_package_response(self, package_id: str) -> None:
-        result = PORTABLE_RELEASE_PACKAGE.output_file(package_id, "zip")
-        if "error" in result:
-            self.json_or_error_response(result)
-            return
-        path = result["path"]
-        content = path.read_bytes()
-        self.send_response(200)
-        self.send_header("Content-Type", "application/zip")
-        self.send_header("Content-Length", str(len(content)))
-        self.send_header("Content-Disposition", f'attachment; filename="{path.name}"')
-        self.send_header("Cache-Control", "no-store")
-        self.end_headers()
-        self.wfile.write(content)
-
-    def demo_script_pack_response(self, pack_id: str) -> None:
-        result = DEMO_SCRIPT_PACK.output_file(pack_id, "demo_script")
-        if "error" in result:
-            self.json_or_error_response(result)
-            return
-        path = result["path"]
-        content = path.read_bytes()
-        self.send_response(200)
-        self.send_header("Content-Type", "text/markdown; charset=utf-8")
-        self.send_header("Content-Length", str(len(content)))
-        self.send_header("Content-Disposition", f'attachment; filename="{path.name}"')
-        self.send_header("Cache-Control", "no-store")
-        self.end_headers()
-        self.wfile.write(content)
-
-    def visual_qa_ledger_response(self, ledger_id: str) -> None:
-        result = VISUAL_QA_LEDGER.output_file(ledger_id, "markdown")
-        if "error" in result:
-            self.json_or_error_response(result)
-            return
-        path = result["path"]
-        content = path.read_bytes()
-        self.send_response(200)
-        self.send_header("Content-Type", "text/markdown; charset=utf-8")
-        self.send_header("Content-Length", str(len(content)))
-        self.send_header("Content-Disposition", f'attachment; filename="{path.name}"')
-        self.send_header("Cache-Control", "no-store")
-        self.end_headers()
-        self.wfile.write(content)
-
-    def visual_baseline_comparison_response(self, comparison_id: str) -> None:
-        result = VISUAL_BASELINE_COMPARISON.output_file(comparison_id, "markdown")
-        if "error" in result:
-            self.json_or_error_response(result)
-            return
-        path = result["path"]
-        content = path.read_bytes()
-        self.send_response(200)
-        self.send_header("Content-Type", "text/markdown; charset=utf-8")
-        self.send_header("Content-Length", str(len(content)))
-        self.send_header("Content-Disposition", f'attachment; filename="{path.name}"')
-        self.send_header("Cache-Control", "no-store")
-        self.end_headers()
-        self.wfile.write(content)
-
-    def visual_evidence_capture_response(self, capture_id: str) -> None:
-        result = VISUAL_EVIDENCE_CAPTURE.output_file(capture_id, "contact_sheet")
-        if "error" in result:
-            self.json_or_error_response(result)
-            return
-        path = result["path"]
-        content = path.read_bytes()
-        self.send_response(200)
-        self.send_header("Content-Type", "text/html; charset=utf-8")
-        self.send_header("Content-Length", str(len(content)))
-        self.send_header("Content-Disposition", f'attachment; filename="{path.name}"')
-        self.send_header("Cache-Control", "no-store")
-        self.end_headers()
-        self.wfile.write(content)
-
-    def visual_evidence_review_diff_response(self, diff_id: str) -> None:
-        result = VISUAL_EVIDENCE_REVIEW_DIFF.output_file(diff_id, "html")
-        if "error" in result:
-            self.json_or_error_response(result)
-            return
-        path = result["path"]
-        content = path.read_bytes()
-        self.send_response(200)
-        self.send_header("Content-Type", "text/html; charset=utf-8")
-        self.send_header("Content-Length", str(len(content)))
-        self.send_header("Content-Disposition", f'attachment; filename="{path.name}"')
-        self.send_header("Cache-Control", "no-store")
-        self.end_headers()
-        self.wfile.write(content)
-
-    def visual_evidence_review_annotations_response(self, annotation_id: str) -> None:
-        result = VISUAL_EVIDENCE_REVIEW_ANNOTATIONS.output_file(annotation_id, "html")
-        if "error" in result:
-            self.json_or_error_response(result)
-            return
-        path = result["path"]
-        content = path.read_bytes()
-        self.send_response(200)
-        self.send_header("Content-Type", "text/html; charset=utf-8")
-        self.send_header("Content-Length", str(len(content)))
-        self.send_header("Content-Disposition", f'attachment; filename="{path.name}"')
-        self.send_header("Cache-Control", "no-store")
-        self.end_headers()
-        self.wfile.write(content)
-
-    def visual_evidence_signoff_packet_response(self, packet_id: str) -> None:
-        result = VISUAL_EVIDENCE_SIGNOFF_PACKET.output_file(packet_id, "html")
-        if "error" in result:
-            self.json_or_error_response(result)
-            return
-        path = result["path"]
-        content = path.read_bytes()
-        self.send_response(200)
-        self.send_header("Content-Type", "text/html; charset=utf-8")
-        self.send_header("Content-Length", str(len(content)))
-        self.send_header("Content-Disposition", f'attachment; filename="{path.name}"')
-        self.send_header("Cache-Control", "no-store")
-        self.end_headers()
-        self.wfile.write(content)
-
-    def final_reviewer_launch_checklist_response(self, checklist_id: str) -> None:
-        result = FINAL_REVIEWER_LAUNCH_CHECKLIST.output_file(checklist_id, "html")
-        if "error" in result:
-            self.json_or_error_response(result)
-            return
-        path = result["path"]
-        content = path.read_bytes()
-        self.send_response(200)
-        self.send_header("Content-Type", "text/html; charset=utf-8")
-        self.send_header("Content-Length", str(len(content)))
-        self.send_header("Content-Disposition", f'attachment; filename="{path.name}"')
-        self.send_header("Cache-Control", "no-store")
-        self.end_headers()
-        self.wfile.write(content)
-
-    def recruiter_demo_brief_response(self, brief_id: str) -> None:
-        result = RECRUITER_DEMO_BRIEF.output_file(brief_id, "html")
-        if "error" in result:
-            self.json_or_error_response(result)
-            return
-        path = result["path"]
-        content = path.read_bytes()
-        self.send_response(200)
-        self.send_header("Content-Type", "text/html; charset=utf-8")
-        self.send_header("Content-Length", str(len(content)))
-        self.send_header("Content-Disposition", f'attachment; filename="{path.name}"')
-        self.send_header("Cache-Control", "no-store")
-        self.end_headers()
-        self.wfile.write(content)
-
-    def public_portfolio_package_response(self, package_id: str) -> None:
-        result = PUBLIC_PORTFOLIO_PACKAGE.output_file(package_id, "html")
-        if "error" in result:
-            self.json_or_error_response(result)
-            return
-        path = result["path"]
-        content = path.read_bytes()
-        self.send_response(200)
-        self.send_header("Content-Type", "text/html; charset=utf-8")
-        self.send_header("Content-Length", str(len(content)))
-        self.send_header("Content-Disposition", f'attachment; filename="{path.name}"')
-        self.send_header("Cache-Control", "no-store")
-        self.end_headers()
-        self.wfile.write(content)
-
-    def demo_review_playbook_response(self, playbook_id: str) -> None:
-        result = DEMO_REVIEW_PLAYBOOK.output_file(playbook_id, "html")
-        if "error" in result:
-            self.json_or_error_response(result)
-            return
-        path = result["path"]
-        content = path.read_bytes()
-        self.send_response(200)
-        self.send_header("Content-Type", "text/html; charset=utf-8")
-        self.send_header("Content-Length", str(len(content)))
-        self.send_header("Content-Disposition", f'attachment; filename="{path.name}"')
-        self.send_header("Cache-Control", "no-store")
-        self.end_headers()
-        self.wfile.write(content)
-
-    def github_publication_bundle_response(self, bundle_id: str) -> None:
-        result = GITHUB_PUBLICATION_BUNDLE.output_file(bundle_id, "zip")
-        if "error" in result:
-            self.json_or_error_response(result)
-            return
-        path = result["path"]
-        content = path.read_bytes()
-        self.send_response(200)
-        self.send_header("Content-Type", "application/zip")
-        self.send_header("Content-Length", str(len(content)))
-        self.send_header("Content-Disposition", f'attachment; filename="{path.name}"')
-        self.send_header("Cache-Control", "no-store")
-        self.end_headers()
-        self.wfile.write(content)
 
 
-    def demo_artifact_completeness_response(self, check_id: str) -> None:
-        result = DEMO_ARTIFACT_COMPLETENESS.output_file(check_id, "markdown")
-        if "error" in result:
-            self.json_or_error_response(result)
-            return
-        path = result["path"]
-        content = path.read_bytes()
-        self.send_response(200)
-        self.send_header("Content-Type", "text/markdown; charset=utf-8")
-        self.send_header("Content-Length", str(len(content)))
-        self.send_header("Content-Disposition", f'attachment; filename="{path.name}"')
-        self.send_header("Cache-Control", "no-store")
-        self.end_headers()
-        self.wfile.write(content)
 
-    def repository_publication_qa_response(self, review_id: str) -> None:
-        result = REPOSITORY_PUBLICATION_QA.output_file(review_id, "zip")
-        if "error" in result:
-            self.json_or_error_response(result)
-            return
-        path = result["path"]
-        content = path.read_bytes()
-        self.send_response(200)
-        self.send_header("Content-Type", "application/zip")
-        self.send_header("Content-Length", str(len(content)))
-        self.send_header("Content-Disposition", f'attachment; filename="{path.name}"')
-        self.send_header("Cache-Control", "no-store")
-        self.end_headers()
-        self.wfile.write(content)
 
-    def repository_export_handoff_response(self, handoff_id: str) -> None:
-        result = REPOSITORY_EXPORT_HANDOFF.output_file(handoff_id, "zip")
-        if "error" in result:
-            self.json_or_error_response(result)
-            return
-        path = result["path"]
-        content = path.read_bytes()
-        self.send_response(200)
-        self.send_header("Content-Type", "application/zip")
-        self.send_header("Content-Length", str(len(content)))
-        self.send_header("Content-Disposition", f'attachment; filename="{path.name}"')
-        self.send_header("Cache-Control", "no-store")
-        self.end_headers()
-        self.wfile.write(content)
 
-    def repository_dry_run_review_response(self, review_id: str) -> None:
-        result = REPOSITORY_DRY_RUN_REVIEW.output_file(review_id, "zip")
-        if "error" in result:
-            self.json_or_error_response(result)
-            return
-        path = result["path"]
-        content = path.read_bytes()
-        self.send_response(200)
-        self.send_header("Content-Type", "application/zip")
-        self.send_header("Content-Length", str(len(content)))
-        self.send_header("Content-Disposition", f'attachment; filename="{path.name}"')
-        self.send_header("Cache-Control", "no-store")
-        self.end_headers()
-        self.wfile.write(content)
 
-    def repository_final_package_review_response(self, review_id: str) -> None:
-        result = REPOSITORY_FINAL_PACKAGE_REVIEW.output_file(review_id, "zip")
-        if "error" in result:
-            self.json_or_error_response(result)
-            return
-        path = result["path"]
-        content = path.read_bytes()
-        self.send_response(200)
-        self.send_header("Content-Type", "application/zip")
-        self.send_header("Content-Length", str(len(content)))
-        self.send_header("Content-Disposition", f'attachment; filename="{path.name}"')
-        self.send_header("Cache-Control", "no-store")
-        self.end_headers()
-        self.wfile.write(content)
 
-    def public_readme_cleanup_review_response(self, review_id: str) -> None:
-        result = PUBLIC_README_CLEANUP_REVIEW.output_file(review_id, "zip")
-        if "error" in result:
-            self.json_or_error_response(result)
-            return
-        path = result["path"]
-        content = path.read_bytes()
-        self.send_response(200)
-        self.send_header("Content-Type", "application/zip")
-        self.send_header("Content-Length", str(len(content)))
-        self.send_header("Content-Disposition", f'attachment; filename="{path.name}"')
-        self.send_header("Cache-Control", "no-store")
-        self.end_headers()
-        self.wfile.write(content)
 
-    def public_repository_polish_package_response(self, package_id: str) -> None:
-        result = PUBLIC_REPOSITORY_POLISH_PACKAGE.output_file(package_id, "zip")
-        if "error" in result:
-            self.json_or_error_response(result)
-            return
-        path = result["path"]
-        content = path.read_bytes()
-        self.send_response(200)
-        self.send_header("Content-Type", "application/zip")
-        self.send_header("Content-Length", str(len(content)))
-        self.send_header("Content-Disposition", f'attachment; filename="{path.name}"')
-        self.send_header("Cache-Control", "no-store")
-        self.end_headers()
-        self.wfile.write(content)
 
-    def repository_export_checklist_response(self, checklist_id: str) -> None:
-        result = REPOSITORY_EXPORT_CHECKLIST.output_file(checklist_id, "zip")
-        if "error" in result:
-            self.json_or_error_response(result)
-            return
-        path = result["path"]
-        content = path.read_bytes()
-        self.send_response(200)
-        self.send_header("Content-Type", "application/zip")
-        self.send_header("Content-Length", str(len(content)))
-        self.send_header("Content-Disposition", f'attachment; filename="{path.name}"')
-        self.send_header("Cache-Control", "no-store")
-        self.end_headers()
-        self.wfile.write(content)
 
-    def reproducibility_audit_packet_response(self, packet_id: str) -> None:
-        result = REPRODUCIBILITY_AUDIT_PACKET.output_file(packet_id, "packet_summary")
-        if "error" in result:
-            self.json_or_error_response(result)
-            return
-        path = result["path"]
-        content = path.read_bytes()
-        self.send_response(200)
-        self.send_header("Content-Type", "text/markdown; charset=utf-8")
-        self.send_header("Content-Length", str(len(content)))
-        self.send_header("Content-Disposition", f'attachment; filename="{path.name}"')
-        self.send_header("Cache-Control", "no-store")
-        self.end_headers()
-        self.wfile.write(content)
 
-    def comparison_map_export_response(self, export_id: str) -> None:
-        result = COMPARISON_MAP_EXPORTS.output_file(export_id, "comparison_map_export")
-        if "error" in result:
-            self.json_or_error_response(result)
-            return
-        path = result["path"]
-        content = path.read_bytes()
-        self.send_response(200)
-        self.send_header("Content-Type", "text/html; charset=utf-8")
-        self.send_header("Content-Length", str(len(content)))
-        self.send_header("Content-Disposition", f'attachment; filename="{path.name}"')
-        self.send_header("Cache-Control", "no-store")
-        self.end_headers()
-        self.wfile.write(content)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     def profile_output_response(self, workspace_id: str, output_id: str) -> None:
         result = profile_workspace_output_file(workspace_id, output_id)

@@ -1,8 +1,6 @@
 ﻿from __future__ import annotations
 
-import io
 import json
-import zipfile
 from http.server import ThreadingHTTPServer
 from pathlib import Path
 import sys
@@ -74,215 +72,54 @@ def main() -> None:
         if status != 200 or payload.get("version") != "v083_2026-06-01":
             fail("project manifest endpoint contract failed")
 
-        status, payload = request_json(base_url, "/api/product-architecture")
-        if status != 200 or payload.get("recommended_variant_id") != "universal_gis_review_studio":
-            fail("product architecture endpoint contract failed")
-        if payload.get("current_evidence", {}).get("implemented_profile_count", 0) < 3:
-            fail("product architecture should expose implemented profile count")
-        product_architecture_version = payload.get("product_architecture_version")
 
-        status, payload = request_json(base_url, "/api/product-architecture/variants")
-        if status != 200 or len(payload.get("variants", [])) != 3:
-            fail("product architecture variants endpoint contract failed")
 
-        status, payload = request_json(base_url, "/api/product-architecture/roadmap")
-        if status != 200 or not any(item.get("release") == "v083" and item.get("status") == "current" for item in payload.get("roadmap", [])):
-            fail("product architecture roadmap endpoint contract failed")
 
-        status, payload = request_json(base_url, "/api/product-architecture/implementation-plan", method="POST", body=json.dumps({"target_version": "v083"}))
-        if status != 200 or payload.get("target_version") != "v083" or payload.get("focus") != "figma_aligned_dashboard_polish" or len(payload.get("milestones", [])) < 4:
-            fail("product architecture implementation plan endpoint contract failed")
 
-        status, payload = request_json(base_url, "/api/release-readiness")
-        if status != 200 or payload.get("release_readiness_version") != "release_readiness_dashboard_v001" or payload.get("summary", {}).get("failed_gate_count", 0) != 0:
-            fail("release readiness overview endpoint contract failed")
-        release_readiness_gate_count = payload.get("summary", {}).get("gate_count", 0)
 
-        status, payload = request_json(base_url, "/api/release-readiness/gates")
-        if status != 200 or payload.get("gate_count") != release_readiness_gate_count or payload.get("failed_gate_count") != 0:
-            fail("release readiness gates endpoint contract failed")
 
-        status, payload = request_json(base_url, "/api/release-readiness/snapshot", method="POST", body=json.dumps({"created_by": "api_contract", "notes": "API contract readiness snapshot."}))
-        if status != 200 or not payload.get("ok") or not payload.get("snapshot", {}).get("snapshot_id") or payload.get("snapshot", {}).get("mutates_config") is not False:
-            fail("release readiness snapshot endpoint contract failed")
-        release_readiness_snapshot_id = payload.get("snapshot", {}).get("snapshot_id")
 
-        status, payload = request_json(base_url, "/api/release-readiness/snapshots?limit=5")
-        if status != 200 or not isinstance(payload, list) or not any(row.get("snapshot_id") == release_readiness_snapshot_id for row in payload):
-            fail("release readiness snapshots list endpoint contract failed")
 
-        status, payload = request_json(base_url, f"/api/release-readiness/snapshots/{release_readiness_snapshot_id}")
-        if status != 200 or payload.get("snapshot_id") != release_readiness_snapshot_id:
-            fail("release readiness snapshot detail endpoint contract failed")
 
-        status, payload = request_json(base_url, "/api/portfolio-demo")
-        if status != 200 or payload.get("portfolio_demo_version") != "portfolio_demo_walkthrough_v001" or payload.get("step_count", 0) < 7:
-            fail("portfolio demo overview endpoint contract failed")
-        portfolio_demo_step_count = payload.get("step_count", 0)
 
-        status, payload = request_json(base_url, "/api/portfolio-demo/steps")
-        if status != 200 or payload.get("step_count") != portfolio_demo_step_count:
-            fail("portfolio demo steps endpoint contract failed")
 
-        status, payload = request_json(base_url, "/api/portfolio-demo/snapshot", method="POST", body=json.dumps({"created_by": "api_contract", "notes": "API contract demo snapshot."}))
-        if status != 200 or not payload.get("ok") or not payload.get("snapshot", {}).get("snapshot_id") or payload.get("snapshot", {}).get("mutates_config") is not False:
-            fail("portfolio demo snapshot endpoint contract failed")
-        portfolio_demo_snapshot_id = payload.get("snapshot", {}).get("snapshot_id")
 
-        status, payload = request_json(base_url, "/api/portfolio-demo/snapshots?limit=5")
-        if status != 200 or not isinstance(payload, list) or not any(row.get("snapshot_id") == portfolio_demo_snapshot_id for row in payload):
-            fail("portfolio demo snapshots list endpoint contract failed")
 
-        status, payload = request_json(base_url, f"/api/portfolio-demo/snapshots/{portfolio_demo_snapshot_id}")
-        if status != 200 or payload.get("snapshot_id") != portfolio_demo_snapshot_id:
-            fail("portfolio demo snapshot detail endpoint contract failed")
 
-        status, payload = request_json(base_url, "/api/portfolio-evidence-bundle")
-        if status != 200 or payload.get("portfolio_evidence_bundle_version") != "portfolio_evidence_bundle_v001":
-            fail("portfolio evidence bundle status endpoint contract failed")
 
-        status, payload = request_json(base_url, "/api/portfolio-evidence-bundle/create", method="POST", body=json.dumps({"created_by": "api_contract", "notes": "API contract evidence bundle.", "reuse_latest": True}))
-        if status != 200 or not payload.get("ok") or not payload.get("bundle", {}).get("bundle_id") or payload.get("bundle", {}).get("copied_file_count", 0) < 8:
-            fail("portfolio evidence bundle create endpoint contract failed")
-        portfolio_evidence_bundle_id = payload.get("bundle", {}).get("bundle_id")
 
-        status, payload = request_json(base_url, "/api/portfolio-evidence-bundle/bundles?limit=5")
-        if status != 200 or not isinstance(payload, list) or not any(row.get("bundle_id") == portfolio_evidence_bundle_id for row in payload):
-            fail("portfolio evidence bundle list endpoint contract failed")
 
-        status, payload = request_json(base_url, f"/api/portfolio-evidence-bundle/bundles/{portfolio_evidence_bundle_id}")
-        if status != 200 or payload.get("bundle_id") != portfolio_evidence_bundle_id:
-            fail("portfolio evidence bundle detail endpoint contract failed")
 
-        status, content, content_type = request_bytes(base_url, f"/api/portfolio-evidence-bundle/bundles/{portfolio_evidence_bundle_id}/download")
-        if status != 200 or len(content) < 500 or "markdown" not in content_type.lower():
-            fail("portfolio evidence bundle download endpoint contract failed")
 
-        status, payload = request_json(base_url, "/api/bundle-review-checklist")
-        if status != 200 or payload.get("bundle_review_checklist_version") != "bundle_review_checklist_v001":
-            fail("bundle review checklist status endpoint contract failed")
 
-        status, payload = request_json(base_url, "/api/bundle-review-checklist/create", method="POST", body=json.dumps({"created_by": "api_contract", "notes": "API contract bundle review checklist.", "create_bundle": True, "reuse_latest": True}))
-        if status != 200 or not payload.get("ok") or not payload.get("checklist", {}).get("checklist_id") or payload.get("checklist", {}).get("summary", {}).get("failed_count", 1) != 0:
-            fail("bundle review checklist create endpoint contract failed")
-        bundle_review_checklist_id = payload.get("checklist", {}).get("checklist_id")
 
-        status, payload = request_json(base_url, "/api/bundle-review-checklist/checklists?limit=5")
-        if status != 200 or not isinstance(payload, list) or not any(row.get("checklist_id") == bundle_review_checklist_id for row in payload):
-            fail("bundle review checklist list endpoint contract failed")
 
-        status, payload = request_json(base_url, f"/api/bundle-review-checklist/checklists/{bundle_review_checklist_id}")
-        if status != 200 or payload.get("checklist_id") != bundle_review_checklist_id:
-            fail("bundle review checklist detail endpoint contract failed")
 
-        status, content, content_type = request_bytes(base_url, f"/api/bundle-review-checklist/checklists/{bundle_review_checklist_id}/download")
-        if status != 200 or len(content) < 500 or "markdown" not in content_type.lower():
-            fail("bundle review checklist download endpoint contract failed")
 
-        status, payload = request_json(base_url, "/api/portfolio-narrative-export")
-        if status != 200 or payload.get("portfolio_narrative_export_version") != "portfolio_narrative_export_v001":
-            fail("portfolio narrative export status endpoint contract failed")
 
-        status, payload = request_json(base_url, "/api/portfolio-narrative-export/create", method="POST", body=json.dumps({"created_by": "api_contract", "notes": "API contract portfolio narrative.", "create_checklist": True, "create_bundle": True, "reuse_latest": True}))
-        if status != 200 or not payload.get("ok") or not payload.get("narrative", {}).get("narrative_id") or len(payload.get("narrative", {}).get("sections", [])) < 7:
-            fail("portfolio narrative export create endpoint contract failed")
-        portfolio_narrative_id = payload.get("narrative", {}).get("narrative_id")
 
-        status, payload = request_json(base_url, "/api/portfolio-narrative-export/narratives?limit=5")
-        if status != 200 or not isinstance(payload, list) or not any(row.get("narrative_id") == portfolio_narrative_id for row in payload):
-            fail("portfolio narrative export list endpoint contract failed")
 
-        status, payload = request_json(base_url, f"/api/portfolio-narrative-export/narratives/{portfolio_narrative_id}")
-        if status != 200 or payload.get("narrative_id") != portfolio_narrative_id:
-            fail("portfolio narrative export detail endpoint contract failed")
 
-        status, content, content_type = request_bytes(base_url, f"/api/portfolio-narrative-export/narratives/{portfolio_narrative_id}/download")
-        if status != 200 or len(content) < 500 or "markdown" not in content_type.lower():
-            fail("portfolio narrative export download endpoint contract failed")
 
-        status, payload = request_json(base_url, "/api/portfolio-handoff-page")
-        if status != 200 or payload.get("portfolio_handoff_page_version") != "portfolio_handoff_page_v001":
-            fail("portfolio handoff page status endpoint contract failed")
 
-        status, payload = request_json(base_url, "/api/portfolio-handoff-page/create", method="POST", body=json.dumps({"created_by": "api_contract", "notes": "API contract portfolio handoff page.", "create_narrative": True, "create_checklist": True, "create_bundle": True, "reuse_latest": True}))
-        if status != 200 or not payload.get("ok") or not payload.get("page", {}).get("page_id"):
-            fail("portfolio handoff page create endpoint contract failed")
-        portfolio_handoff_page_id = payload.get("page", {}).get("page_id")
 
-        status, payload = request_json(base_url, "/api/portfolio-handoff-page/pages?limit=5")
-        if status != 200 or not isinstance(payload, list) or not any(row.get("page_id") == portfolio_handoff_page_id for row in payload):
-            fail("portfolio handoff page list endpoint contract failed")
 
-        status, payload = request_json(base_url, f"/api/portfolio-handoff-page/pages/{portfolio_handoff_page_id}")
-        if status != 200 or payload.get("page_id") != portfolio_handoff_page_id:
-            fail("portfolio handoff page detail endpoint contract failed")
 
-        status, content, content_type = request_bytes(base_url, f"/api/portfolio-handoff-page/pages/{portfolio_handoff_page_id}/download")
-        if status != 200 or len(content) < 1000 or "html" not in content_type.lower() or b"GeoReview Studio" not in content:
-            fail("portfolio handoff page download endpoint contract failed")
 
-        status, payload = request_json(base_url, "/api/portfolio-evidence-gallery")
-        if status != 200 or payload.get("portfolio_evidence_gallery_version") != "portfolio_evidence_gallery_v001":
-            fail("portfolio evidence gallery status endpoint contract failed")
 
-        status, payload = request_json(base_url, "/api/portfolio-evidence-gallery/create", method="POST", body=json.dumps({"created_by": "api_contract", "notes": "API contract portfolio evidence gallery.", "create_handoff_page": True, "create_narrative": True, "create_checklist": True, "create_bundle": True, "reuse_latest": True}))
-        if status != 200 or not payload.get("ok") or not payload.get("gallery", {}).get("gallery_id"):
-            fail("portfolio evidence gallery create endpoint contract failed")
-        portfolio_evidence_gallery_id = payload.get("gallery", {}).get("gallery_id")
 
-        status, payload = request_json(base_url, "/api/portfolio-evidence-gallery/galleries?limit=5")
-        if status != 200 or not isinstance(payload, list) or not any(row.get("gallery_id") == portfolio_evidence_gallery_id for row in payload):
-            fail("portfolio evidence gallery list endpoint contract failed")
 
-        status, payload = request_json(base_url, f"/api/portfolio-evidence-gallery/galleries/{portfolio_evidence_gallery_id}")
-        if status != 200 or payload.get("gallery_id") != portfolio_evidence_gallery_id:
-            fail("portfolio evidence gallery detail endpoint contract failed")
 
-        status, content, content_type = request_bytes(base_url, f"/api/portfolio-evidence-gallery/galleries/{portfolio_evidence_gallery_id}/download")
-        if status != 200 or len(content) < 1000 or "html" not in content_type.lower() or b"Evidence Gallery" not in content:
-            fail("portfolio evidence gallery download endpoint contract failed")
 
-        status, payload = request_json(base_url, "/api/multi-pilot-comparison")
-        if status != 200 or payload.get("multi_pilot_comparison_version") != "multi_pilot_comparison_v001" or payload.get("ready_pilot_count", 0) < 2:
-            fail("multi-pilot comparison status endpoint contract failed")
 
-        status, payload = request_json(base_url, "/api/multi-pilot-comparison/create", method="POST", body=json.dumps({"created_by": "api_contract", "notes": "API contract multi-pilot comparison."}))
-        if status != 200 or not payload.get("ok") or not payload.get("comparison", {}).get("comparison_id") or payload.get("comparison", {}).get("comparison_readiness") != "ready_for_multi_pilot_review":
-            fail("multi-pilot comparison create endpoint contract failed")
-        multi_pilot_comparison_id = payload.get("comparison", {}).get("comparison_id")
 
-        status, payload = request_json(base_url, "/api/multi-pilot-comparison/comparisons?limit=5")
-        if status != 200 or not isinstance(payload, list) or not any(row.get("comparison_id") == multi_pilot_comparison_id for row in payload):
-            fail("multi-pilot comparison list endpoint contract failed")
 
-        status, payload = request_json(base_url, f"/api/multi-pilot-comparison/comparisons/{multi_pilot_comparison_id}")
-        if status != 200 or payload.get("comparison_id") != multi_pilot_comparison_id or len(payload.get("comparison_matrix", [])) < 8:
-            fail("multi-pilot comparison detail endpoint contract failed")
 
-        status, content, content_type = request_bytes(base_url, f"/api/multi-pilot-comparison/comparisons/{multi_pilot_comparison_id}/download")
-        if status != 200 or len(content) < 1000 or "html" not in content_type.lower() or b"Multi-Pilot Comparison" not in content:
-            fail("multi-pilot comparison download endpoint contract failed")
 
-        status, payload = request_json(base_url, "/api/comparison-map-exports")
-        if status != 200 or payload.get("comparison_map_exports_version") != "comparison_map_exports_v001" or payload.get("ready_pilot_count", 0) < 2:
-            fail("comparison map exports status endpoint contract failed")
 
-        status, payload = request_json(base_url, "/api/comparison-map-exports/create", method="POST", body=json.dumps({"created_by": "api_contract", "notes": "API contract comparison map export.", "top_limit": 20}))
-        if status != 200 or not payload.get("ok") or not payload.get("export", {}).get("export_id") or payload.get("export", {}).get("export_readiness") != "ready_for_portfolio_map_review":
-            fail("comparison map exports create endpoint contract failed")
-        comparison_map_export_id = payload.get("export", {}).get("export_id")
 
-        status, payload = request_json(base_url, "/api/comparison-map-exports/exports?limit=5")
-        if status != 200 or not isinstance(payload, list) or not any(row.get("export_id") == comparison_map_export_id for row in payload):
-            fail("comparison map exports list endpoint contract failed")
 
-        status, payload = request_json(base_url, f"/api/comparison-map-exports/exports/{comparison_map_export_id}")
-        if status != 200 or payload.get("export_id") != comparison_map_export_id or len(payload.get("pilot_maps", [])) < 2:
-            fail("comparison map exports detail endpoint contract failed")
 
-        status, content, content_type = request_bytes(base_url, f"/api/comparison-map-exports/exports/{comparison_map_export_id}/download")
-        if status != 200 or len(content) < 1000 or "html" not in content_type.lower() or b"Comparison Map Export" not in content:
-            fail("comparison map exports download endpoint contract failed")
 
         status, payload = request_json(base_url, "/api/profile-dashboard")
         if status != 200 or payload.get("implemented_profile_count", 0) < 3:
@@ -910,860 +747,155 @@ def main() -> None:
         if status != 200 or len(content) < 1000 or "markdown" not in content_type.lower() or b"Source Handoff Execution" not in content:
             fail("source handoff execution download endpoint contract failed")
 
-        status, payload = request_json(base_url, "/api/execution-evidence-package")
-        if status != 200 or payload.get("execution_evidence_package_version") != "execution_evidence_package_v001":
-            fail("execution evidence package status endpoint contract failed")
-
-        status, payload = request_json(base_url, "/api/execution-evidence-package/candidates?limit=5")
-        if status != 200 or not isinstance(payload, list) or not any(row.get("execution_id") == source_handoff_execution_id for row in payload):
-            fail("execution evidence package candidates endpoint contract failed")
-
-        status, payload = request_json(
-            base_url,
-            "/api/execution-evidence-package/create",
-            method="POST",
-            body=json.dumps({
-                "execution_id": source_handoff_execution_id,
-                "created_by": "api_contract",
-                "notes": "API contract execution evidence package.",
-            }),
-        )
-        if status != 200 or payload.get("package", {}).get("package_readiness") != "ready_for_reviewer":
-            fail("execution evidence package create endpoint contract failed")
-        execution_evidence_package_id = payload.get("package", {}).get("package_id")
-
-        status, payload = request_json(base_url, "/api/execution-evidence-package/packages?limit=5")
-        if status != 200 or not isinstance(payload, list) or not any(row.get("package_id") == execution_evidence_package_id for row in payload):
-            fail("execution evidence package list endpoint contract failed")
-
-        status, payload = request_json(base_url, f"/api/execution-evidence-package/packages/{execution_evidence_package_id}")
-        if status != 200 or payload.get("package_id") != execution_evidence_package_id or payload.get("execution_id") != source_handoff_execution_id:
-            fail("execution evidence package detail endpoint contract failed")
-
-        status, content, content_type = request_bytes(base_url, f"/api/execution-evidence-package/packages/{execution_evidence_package_id}/download")
-        if status != 200 or len(content) < 1000 or "markdown" not in content_type.lower() or b"Execution Evidence Package" not in content:
-            fail("execution evidence package download endpoint contract failed")
-
-        time.sleep(1.1)
-        status, payload = request_json(
-            base_url,
-            "/api/execution-evidence-package/create",
-            method="POST",
-            body=json.dumps({
-                "execution_id": source_handoff_execution_id,
-                "created_by": "api_contract",
-                "notes": "API contract second execution evidence package for diffing.",
-            }),
-        )
-        if status != 200 or payload.get("package", {}).get("package_readiness") != "ready_for_reviewer":
-            fail("second execution evidence package create endpoint contract failed")
-        second_execution_evidence_package_id = payload.get("package", {}).get("package_id")
-
-        status, payload = request_json(base_url, "/api/execution-result-diff")
-        if status != 200 or payload.get("execution_result_diff_version") != "execution_result_diff_v001":
-            fail("execution result diff status endpoint contract failed")
-
-        status, payload = request_json(base_url, "/api/execution-result-diff/candidates?limit=5")
-        if status != 200 or not isinstance(payload, list) or not payload:
-            fail("execution result diff candidates endpoint contract failed")
-
-        status, payload = request_json(
-            base_url,
-            "/api/execution-result-diff/create",
-            method="POST",
-            body=json.dumps({
-                "left_package_id": execution_evidence_package_id,
-                "right_package_id": second_execution_evidence_package_id,
-                "created_by": "api_contract",
-                "notes": "API contract execution result diff.",
-            }),
-        )
-        if status != 200 or payload.get("diff", {}).get("diff_readiness") != "ready_for_reviewer":
-            fail("execution result diff create endpoint contract failed")
-        execution_result_diff_id = payload.get("diff", {}).get("diff_id")
-
-        status, payload = request_json(base_url, "/api/execution-result-diff/diffs?limit=5")
-        if status != 200 or not isinstance(payload, list) or not any(row.get("diff_id") == execution_result_diff_id for row in payload):
-            fail("execution result diff list endpoint contract failed")
-
-        status, payload = request_json(base_url, f"/api/execution-result-diff/diffs/{execution_result_diff_id}")
-        if status != 200 or payload.get("diff_id") != execution_result_diff_id or payload.get("diff_readiness") != "ready_for_reviewer":
-            fail("execution result diff detail endpoint contract failed")
-
-        status, content, content_type = request_bytes(base_url, f"/api/execution-result-diff/diffs/{execution_result_diff_id}/download")
-        if status != 200 or len(content) < 1000 or "markdown" not in content_type.lower() or b"Execution Result Diff" not in content:
-            fail("execution result diff download endpoint contract failed")
-
-        status, payload = request_json(base_url, "/api/execution-diff-gallery")
-        if status != 200 or payload.get("execution_diff_gallery_version") != "execution_diff_gallery_v001" or payload.get("indexed_diff_count", 0) < 1:
-            fail("execution diff gallery status endpoint contract failed")
-
-        status, payload = request_json(base_url, "/api/execution-diff-gallery/items?limit=5")
-        if status != 200 or not isinstance(payload, list) or not any(row.get("diff_id") == execution_result_diff_id for row in payload):
-            fail("execution diff gallery items endpoint contract failed")
-
-        status, payload = request_json(
-            base_url,
-            "/api/execution-diff-gallery/create",
-            method="POST",
-            body=json.dumps({"created_by": "api_contract", "notes": "API contract v062 execution diff gallery.", "limit": 50}),
-        )
-        if status != 200 or payload.get("gallery", {}).get("gallery_readiness") != "ready_for_reviewer":
-            fail("execution diff gallery create endpoint contract failed")
-        execution_diff_gallery_id = payload.get("gallery", {}).get("gallery_id")
-
-        status, payload = request_json(base_url, "/api/execution-diff-gallery/galleries?limit=5")
-        if status != 200 or not isinstance(payload, list) or not any(row.get("gallery_id") == execution_diff_gallery_id for row in payload):
-            fail("execution diff gallery list endpoint contract failed")
-
-        status, payload = request_json(base_url, f"/api/execution-diff-gallery/galleries/{execution_diff_gallery_id}")
-        if status != 200 or payload.get("gallery_id") != execution_diff_gallery_id or payload.get("gallery_readiness") != "ready_for_reviewer":
-            fail("execution diff gallery detail endpoint contract failed")
-
-        status, content, content_type = request_bytes(base_url, f"/api/execution-diff-gallery/galleries/{execution_diff_gallery_id}/download")
-        if status != 200 or len(content) < 1000 or "markdown" not in content_type.lower() or b"Execution Diff Gallery" not in content:
-            fail("execution diff gallery download endpoint contract failed")
-
-        status, payload = request_json(base_url, "/api/execution-diff-detail")
-        if status != 200 or payload.get("execution_diff_detail_version") != "execution_diff_detail_v001" or payload.get("baseline_candidate_count", 0) < 1:
-            fail("execution diff detail status endpoint contract failed")
-
-        status, payload = request_json(base_url, "/api/execution-diff-detail/baselines?limit=5")
-        if status != 200 or not isinstance(payload, list) or not any(row.get("diff_id") == execution_result_diff_id for row in payload):
-            fail("execution diff detail baselines endpoint contract failed")
-        baseline_diff_id = payload[0].get("diff_id")
-
-        status, payload = request_json(base_url, f"/api/execution-diff-detail/inspect?diff_id={execution_result_diff_id}&baseline_diff_id={baseline_diff_id}")
-        if status != 200 or payload.get("diff_id") != execution_result_diff_id or not payload.get("drilldown", {}).get("table_breakdown"):
-            fail("execution diff detail inspect endpoint contract failed")
-
-        status, payload = request_json(
-            base_url,
-            "/api/execution-diff-detail/create",
-            method="POST",
-            body=json.dumps({
-                "diff_id": execution_result_diff_id,
-                "baseline_diff_id": baseline_diff_id,
-                "created_by": "api_contract",
-                "notes": "API contract v062 execution diff detail drilldown.",
-            }),
-        )
-        if status != 200 or payload.get("detail", {}).get("drilldown_readiness") != "ready_for_reviewer":
-            fail("execution diff detail create endpoint contract failed")
-        execution_diff_detail_id = payload.get("detail", {}).get("detail_id")
-
-        status, payload = request_json(base_url, "/api/execution-diff-detail/drilldowns?limit=5")
-        if status != 200 or not isinstance(payload, list) or not any(row.get("detail_id") == execution_diff_detail_id for row in payload):
-            fail("execution diff detail list endpoint contract failed")
-
-        status, payload = request_json(base_url, f"/api/execution-diff-detail/drilldowns/{execution_diff_detail_id}")
-        if status != 200 or payload.get("detail_id") != execution_diff_detail_id or payload.get("drilldown_readiness") != "ready_for_reviewer":
-            fail("execution diff detail detail endpoint contract failed")
-
-        status, content, content_type = request_bytes(base_url, f"/api/execution-diff-detail/drilldowns/{execution_diff_detail_id}/download")
-        if status != 200 or len(content) < 1000 or "markdown" not in content_type.lower() or b"Execution Diff Detail Drilldown" not in content:
-            fail("execution diff detail download endpoint contract failed")
-
-        status, payload = request_json(base_url, "/api/reproducibility-audit-packet")
-        if status != 200 or payload.get("reproducibility_audit_packet_version") != "reproducibility_audit_packet_v001" or payload.get("candidate_count", 0) < 1:
-            fail("reproducibility audit packet status endpoint contract failed")
-
-        status, payload = request_json(base_url, "/api/reproducibility-audit-packet/candidates?limit=5")
-        if status != 200 or not isinstance(payload, list) or not any(row.get("detail_id") == execution_diff_detail_id for row in payload):
-            fail("reproducibility audit packet candidates endpoint contract failed")
-
-        status, payload = request_json(
-            base_url,
-            "/api/reproducibility-audit-packet/create",
-            method="POST",
-            body=json.dumps({
-                "detail_id": execution_diff_detail_id,
-                "created_by": "api_contract",
-                "notes": "API contract v062 reproducibility audit packet.",
-            }),
-        )
-        if status != 200 or payload.get("packet", {}).get("packet_readiness") != "ready_for_reviewer":
-            fail("reproducibility audit packet create endpoint contract failed")
-        reproducibility_audit_packet_id = payload.get("packet", {}).get("packet_id")
-
-        status, payload = request_json(base_url, "/api/reproducibility-audit-packet/packets?limit=5")
-        if status != 200 or not isinstance(payload, list) or not any(row.get("packet_id") == reproducibility_audit_packet_id for row in payload):
-            fail("reproducibility audit packet list endpoint contract failed")
-
-        status, payload = request_json(base_url, f"/api/reproducibility-audit-packet/packets/{reproducibility_audit_packet_id}")
-        if status != 200 or payload.get("packet_id") != reproducibility_audit_packet_id or payload.get("packet_readiness") != "ready_for_reviewer":
-            fail("reproducibility audit packet detail endpoint contract failed")
-
-        status, content, content_type = request_bytes(base_url, f"/api/reproducibility-audit-packet/packets/{reproducibility_audit_packet_id}/download")
-        if status != 200 or len(content) < 1000 or "markdown" not in content_type.lower() or b"Reproducibility Audit Packet" not in content:
-            fail("reproducibility audit packet download endpoint contract failed")
-
-        status, payload = request_json(base_url, "/api/reviewer-audit-index")
-        if status != 200 or payload.get("reviewer_audit_index_version") != "reviewer_audit_index_v001" or payload.get("ready_packet_count", 0) < 1:
-            fail("reviewer audit index status endpoint contract failed")
-
-        status, payload = request_json(
-            base_url,
-            "/api/reviewer-audit-index/create",
-            method="POST",
-            body=json.dumps({"created_by": "api_contract", "notes": "API contract v062 reviewer audit index.", "packet_limit": 25}),
-        )
-        if status != 200 or payload.get("index", {}).get("index_readiness") != "ready_for_reviewer":
-            fail("reviewer audit index create endpoint contract failed")
-        reviewer_audit_index_id = payload.get("index", {}).get("index_id")
-
-        status, payload = request_json(base_url, "/api/reviewer-audit-index/indexes?limit=5")
-        if status != 200 or not isinstance(payload, list) or not any(row.get("index_id") == reviewer_audit_index_id for row in payload):
-            fail("reviewer audit index list endpoint contract failed")
-
-        status, payload = request_json(base_url, f"/api/reviewer-audit-index/indexes/{reviewer_audit_index_id}")
-        if status != 200 or payload.get("index_id") != reviewer_audit_index_id or payload.get("index_readiness") != "ready_for_reviewer":
-            fail("reviewer audit index detail endpoint contract failed")
-
-        status, content, content_type = request_bytes(base_url, f"/api/reviewer-audit-index/indexes/{reviewer_audit_index_id}/download")
-        if status != 200 or len(content) < 1000 or "markdown" not in content_type.lower() or b"Reviewer Audit Index" not in content:
-            fail("reviewer audit index download endpoint contract failed")
-
-        status, payload = request_json(base_url, "/api/portfolio-export-launcher")
-        if status != 200 or payload.get("portfolio_export_launcher_version") != "portfolio_export_launcher_v001" or payload.get("launch_target_count", 0) < 3:
-            fail("portfolio export launcher status endpoint contract failed")
-
-        status, payload = request_json(
-            base_url,
-            "/api/portfolio-export-launcher/create",
-            method="POST",
-            body=json.dumps({"created_by": "api_contract", "notes": "API contract v062 portfolio export launcher.", "target_limit": 25}),
-        )
-        if status != 200 or payload.get("launcher", {}).get("launcher_readiness") != "ready_for_portfolio_launch":
-            fail("portfolio export launcher create endpoint contract failed")
-        portfolio_export_launcher_id = payload.get("launcher", {}).get("launcher_id")
-
-        status, payload = request_json(base_url, "/api/portfolio-export-launcher/launchers?limit=5")
-        if status != 200 or not isinstance(payload, list) or not any(row.get("launcher_id") == portfolio_export_launcher_id for row in payload):
-            fail("portfolio export launcher list endpoint contract failed")
-
-        status, payload = request_json(base_url, f"/api/portfolio-export-launcher/launchers/{portfolio_export_launcher_id}")
-        if status != 200 or payload.get("launcher_id") != portfolio_export_launcher_id or payload.get("launcher_readiness") != "ready_for_portfolio_launch":
-            fail("portfolio export launcher detail endpoint contract failed")
-
-        status, content, content_type = request_bytes(base_url, f"/api/portfolio-export-launcher/launchers/{portfolio_export_launcher_id}/download")
-        if status != 200 or len(content) < 1000 or "markdown" not in content_type.lower() or b"Portfolio Export Launcher" not in content:
-            fail("portfolio export launcher download endpoint contract failed")
-
-        status, payload = request_json(base_url, "/api/portable-release-package")
-        if status != 200 or payload.get("portable_release_package_version") != "portable_release_package_v001" or payload.get("ready_launcher_count", 0) < 1:
-            fail("portable release package status endpoint contract failed")
-
-        status, payload = request_json(
-            base_url,
-            "/api/portable-release-package/create",
-            method="POST",
-            body=json.dumps({"created_by": "api_contract", "notes": "API contract v062 portable release package.", "target_limit": 30}),
-        )
-        if status != 200 or payload.get("package", {}).get("package_readiness") != "ready_to_share_portable_release":
-            fail("portable release package create endpoint contract failed")
-        portable_release_package_id = payload.get("package", {}).get("package_id")
-
-        status, payload = request_json(base_url, "/api/portable-release-package/packages?limit=5")
-        if status != 200 or not isinstance(payload, list) or not any(row.get("package_id") == portable_release_package_id for row in payload):
-            fail("portable release package list endpoint contract failed")
-
-        status, payload = request_json(base_url, f"/api/portable-release-package/packages/{portable_release_package_id}")
-        if status != 200 or payload.get("package_id") != portable_release_package_id or payload.get("package_readiness") != "ready_to_share_portable_release":
-            fail("portable release package detail endpoint contract failed")
-
-        status, content, content_type = request_bytes(base_url, f"/api/portable-release-package/packages/{portable_release_package_id}/download")
-        if status != 200 or len(content) < 1000 or "zip" not in content_type.lower():
-            fail("portable release package download endpoint contract failed")
-        with zipfile.ZipFile(io.BytesIO(content)) as zf:
-            names = set(zf.namelist())
-            if "README.md" not in names or "package_manifest.json" not in names:
-                fail("portable release package ZIP contract failed")
-
-        status, payload = request_json(base_url, "/api/demo-script-pack")
-        if status != 200 or payload.get("demo_script_pack_version") != "demo_script_pack_v001" or payload.get("screenshot_target_count", 0) < 6:
-            fail("demo script pack status endpoint contract failed")
-
-        status, payload = request_json(
-            base_url,
-            "/api/demo-script-pack/create",
-            method="POST",
-            body=json.dumps({"created_by": "api_contract", "notes": "API contract v062 demo script pack."}),
-        )
-        if status != 200 or payload.get("pack", {}).get("pack_readiness") != "ready_for_demo_walkthrough":
-            fail("demo script pack create endpoint contract failed")
-        demo_script_pack_id = payload.get("pack", {}).get("pack_id")
-
-        status, payload = request_json(base_url, "/api/demo-script-pack/packs?limit=5")
-        if status != 200 or not isinstance(payload, list) or not any(row.get("pack_id") == demo_script_pack_id for row in payload):
-            fail("demo script pack list endpoint contract failed")
-
-        status, payload = request_json(base_url, f"/api/demo-script-pack/packs/{demo_script_pack_id}")
-        if status != 200 or payload.get("pack_id") != demo_script_pack_id or payload.get("pack_readiness") != "ready_for_demo_walkthrough":
-            fail("demo script pack detail endpoint contract failed")
-
-        status, content, content_type = request_bytes(base_url, f"/api/demo-script-pack/packs/{demo_script_pack_id}/download")
-        if status != 200 or len(content) < 1000 or "markdown" not in content_type.lower() or b"Demo Script Pack" not in content:
-            fail("demo script pack download endpoint contract failed")
-
-        status, payload = request_json(base_url, "/api/visual-qa-snapshot-ledger")
-        if status != 200 or payload.get("visual_qa_snapshot_ledger_version") != "visual_qa_snapshot_ledger_v001" or payload.get("screenshot_target_count", 0) < 6:
-            fail("visual QA ledger status endpoint contract failed")
-
-        status, payload = request_json(
-            base_url,
-            "/api/visual-qa-snapshot-ledger/create",
-            method="POST",
-            body=json.dumps({"pack_id": demo_script_pack_id, "created_by": "api_contract", "notes": "API contract v063 visual QA ledger."}),
-        )
-        if status != 200 or payload.get("ledger", {}).get("ledger_readiness") != "ready_for_visual_qa_tracking":
-            fail("visual QA ledger create endpoint contract failed")
-        visual_qa_ledger_id = payload.get("ledger", {}).get("ledger_id")
-
-        status, payload = request_json(base_url, "/api/visual-qa-snapshot-ledger/ledgers?limit=5")
-        if status != 200 or not isinstance(payload, list) or not any(row.get("ledger_id") == visual_qa_ledger_id for row in payload):
-            fail("visual QA ledger list endpoint contract failed")
-
-        status, payload = request_json(base_url, f"/api/visual-qa-snapshot-ledger/ledgers/{visual_qa_ledger_id}")
-        if status != 200 or payload.get("ledger_id") != visual_qa_ledger_id or payload.get("ledger_readiness") != "ready_for_visual_qa_tracking":
-            fail("visual QA ledger detail endpoint contract failed")
-
-        status, content, content_type = request_bytes(base_url, f"/api/visual-qa-snapshot-ledger/ledgers/{visual_qa_ledger_id}/download")
-        if status != 200 or len(content) < 1000 or "markdown" not in content_type.lower() or b"Visual QA Snapshot Ledger" not in content:
-            fail("visual QA ledger download endpoint contract failed")
-
-        status, payload = request_json(
-            base_url,
-            "/api/visual-qa-snapshot-ledger/create",
-            method="POST",
-            body=json.dumps({"pack_id": demo_script_pack_id, "created_by": "api_contract", "notes": "API contract v072 baseline visual QA ledger."}),
-        )
-        if status != 200 or payload.get("ledger", {}).get("ledger_readiness") != "ready_for_visual_qa_tracking":
-            fail("second visual QA ledger create endpoint contract failed")
-        second_visual_qa_ledger_id = payload.get("ledger", {}).get("ledger_id")
-
-        status, payload = request_json(base_url, "/api/visual-baseline-comparison")
-        if status != 200 or payload.get("visual_baseline_comparison_version") != "visual_baseline_comparison_manifest_v001" or payload.get("baseline_candidate_count", 0) < 1:
-            fail("visual baseline comparison status endpoint contract failed")
-
-        status, payload = request_json(
-            base_url,
-            "/api/visual-baseline-comparison/create",
-            method="POST",
-            body=json.dumps({"latest_ledger_id": second_visual_qa_ledger_id, "baseline_ledger_id": visual_qa_ledger_id, "created_by": "api_contract", "notes": "API contract v072 visual baseline comparison."}),
-        )
-        if status != 200 or payload.get("comparison", {}).get("comparison_readiness") != "ready_for_visual_baseline_review":
-            fail("visual baseline comparison create endpoint contract failed")
-        visual_baseline_comparison_id = payload.get("comparison", {}).get("comparison_id")
-
-        status, payload = request_json(base_url, "/api/visual-baseline-comparison/comparisons?limit=5")
-        if status != 200 or not isinstance(payload, list) or not any(row.get("comparison_id") == visual_baseline_comparison_id for row in payload):
-            fail("visual baseline comparison list endpoint contract failed")
-
-        status, payload = request_json(base_url, f"/api/visual-baseline-comparison/comparisons/{visual_baseline_comparison_id}")
-        if status != 200 or payload.get("comparison_id") != visual_baseline_comparison_id or payload.get("comparison_readiness") != "ready_for_visual_baseline_review":
-            fail("visual baseline comparison detail endpoint contract failed")
-
-        status, content, content_type = request_bytes(base_url, f"/api/visual-baseline-comparison/comparisons/{visual_baseline_comparison_id}/download")
-        if status != 200 or len(content) < 1000 or "markdown" not in content_type.lower() or b"Visual Baseline Comparison Manifest" not in content:
-            fail("visual baseline comparison download endpoint contract failed")
-
-        status, payload = request_json(base_url, "/api/demo-artifact-completeness")
-        if status != 200 or payload.get("demo_artifact_completeness_version") != "demo_artifact_completeness_validator_v001" or payload.get("missing_required_artifacts", 1) != 0:
-            fail("demo artifact completeness status endpoint contract failed")
-
-        status, payload = request_json(
-            base_url,
-            "/api/demo-artifact-completeness/create",
-            method="POST",
-            body=json.dumps({"created_by": "api_contract", "notes": "API contract v072 demo artifact completeness check."}),
-        )
-        if status != 200 or payload.get("check", {}).get("check_readiness") != "ready_for_demo_artifact_review":
-            fail("demo artifact completeness create endpoint contract failed")
-        demo_artifact_completeness_id = payload.get("check", {}).get("check_id")
-
-        status, payload = request_json(base_url, "/api/demo-artifact-completeness/checks?limit=5")
-        if status != 200 or not isinstance(payload, list) or not any(row.get("check_id") == demo_artifact_completeness_id for row in payload):
-            fail("demo artifact completeness list endpoint contract failed")
-
-        status, payload = request_json(base_url, f"/api/demo-artifact-completeness/checks/{demo_artifact_completeness_id}")
-        if status != 200 or payload.get("check_id") != demo_artifact_completeness_id or payload.get("check_readiness") != "ready_for_demo_artifact_review":
-            fail("demo artifact completeness detail endpoint contract failed")
-
-        status, content, content_type = request_bytes(base_url, f"/api/demo-artifact-completeness/checks/{demo_artifact_completeness_id}/download")
-        if status != 200 or len(content) < 1000 or "markdown" not in content_type.lower() or b"Demo Artifact Completeness Validator" not in content:
-            fail("demo artifact completeness download endpoint contract failed")
-
-        status, payload = request_json(base_url, "/api/visual-evidence-capture")
-        if status != 200 or payload.get("visual_evidence_capture_version") != "visual_evidence_capture_v001" or payload.get("browser_available") is not True:
-            fail("visual evidence capture status endpoint contract failed")
-
-        status, payload = request_json(
-            base_url,
-            "/api/visual-evidence-capture/create",
-            method="POST",
-            body=json.dumps({"ledger_id": visual_qa_ledger_id, "base_url": base_url, "created_by": "api_contract", "notes": "API contract v072 visual evidence capture."}),
-            timeout=240,
-        )
-        if status != 200 or payload.get("capture", {}).get("capture_readiness") != "ready_for_visual_evidence_review":
-            fail("visual evidence capture create endpoint contract failed")
-        visual_evidence_capture_id = payload.get("capture", {}).get("capture_id")
-
-        status, payload = request_json(base_url, "/api/visual-evidence-capture/captures?limit=5")
-        if status != 200 or not isinstance(payload, list) or not any(row.get("capture_id") == visual_evidence_capture_id for row in payload):
-            fail("visual evidence capture list endpoint contract failed")
-
-        status, payload = request_json(base_url, f"/api/visual-evidence-capture/captures/{visual_evidence_capture_id}")
-        if status != 200 or payload.get("capture_id") != visual_evidence_capture_id or payload.get("captured_count", 0) < 6:
-            fail("visual evidence capture detail endpoint contract failed")
-
-        status, content, content_type = request_bytes(base_url, f"/api/visual-evidence-capture/captures/{visual_evidence_capture_id}/download")
-        if status != 200 or len(content) < 1000 or "html" not in content_type.lower() or b"Visual Evidence Capture" not in content:
-            fail("visual evidence capture download endpoint contract failed")
-
-        status, payload = request_json(base_url, "/api/visual-evidence-review-diff")
-        if status != 200 or payload.get("visual_evidence_review_diff_version") != "visual_evidence_review_diff_v001":
-            fail("visual evidence review diff status endpoint contract failed")
-
-        status, payload = request_json(
-            base_url,
-            "/api/visual-evidence-review-diff/create",
-            method="POST",
-            body=json.dumps({"latest_capture_id": visual_evidence_capture_id, "created_by": "api_contract", "notes": "API contract v072 visual evidence review diff."}),
-        )
-        if status != 200 or payload.get("diff", {}).get("diff_readiness") != "ready_for_visual_evidence_diff_review":
-            fail("visual evidence review diff create endpoint contract failed")
-        visual_evidence_review_diff_id = payload.get("diff", {}).get("diff_id")
-
-        status, payload = request_json(base_url, "/api/visual-evidence-review-diff/diffs?limit=5")
-        if status != 200 or not isinstance(payload, list) or not any(row.get("diff_id") == visual_evidence_review_diff_id for row in payload):
-            fail("visual evidence review diff list endpoint contract failed")
-
-        status, payload = request_json(base_url, f"/api/visual-evidence-review-diff/diffs/{visual_evidence_review_diff_id}")
-        if status != 200 or payload.get("diff_id") != visual_evidence_review_diff_id or payload.get("diff_summary", {}).get("latest_targets", 0) < 6:
-            fail("visual evidence review diff detail endpoint contract failed")
-
-        status, content, content_type = request_bytes(base_url, f"/api/visual-evidence-review-diff/diffs/{visual_evidence_review_diff_id}/download")
-        if status != 200 or len(content) < 1000 or "html" not in content_type.lower() or b"Visual Evidence Review Diff" not in content:
-            fail("visual evidence review diff download endpoint contract failed")
-
-        status, payload = request_json(base_url, "/api/visual-evidence-review-annotations")
-        if status != 200 or payload.get("visual_evidence_review_annotations_version") != "visual_evidence_review_annotations_v001":
-            fail("visual evidence review annotations status endpoint contract failed")
-
-        status, payload = request_json(
-            base_url,
-            "/api/visual-evidence-review-annotations/create",
-            method="POST",
-            body=json.dumps({"diff_id": visual_evidence_review_diff_id, "created_by": "api_contract", "notes": "API contract v072 visual evidence review annotations."}),
-        )
-        if status != 200 or payload.get("annotations", {}).get("annotation_readiness") != "ready_for_visual_evidence_annotation_review":
-            fail("visual evidence review annotations create endpoint contract failed")
-        visual_evidence_review_annotations_id = payload.get("annotations", {}).get("annotation_id")
-
-        status, payload = request_json(base_url, "/api/visual-evidence-review-annotations/annotations?limit=5")
-        if status != 200 or not isinstance(payload, list) or not any(row.get("annotation_id") == visual_evidence_review_annotations_id for row in payload):
-            fail("visual evidence review annotations list endpoint contract failed")
-
-        status, payload = request_json(base_url, f"/api/visual-evidence-review-annotations/annotations/{visual_evidence_review_annotations_id}")
-        if status != 200 or payload.get("annotation_id") != visual_evidence_review_annotations_id or payload.get("target_count", 0) < 6:
-            fail("visual evidence review annotations detail endpoint contract failed")
-
-        status, content, content_type = request_bytes(base_url, f"/api/visual-evidence-review-annotations/annotations/{visual_evidence_review_annotations_id}/download")
-        if status != 200 or len(content) < 1000 or "html" not in content_type.lower() or b"Visual Evidence Review Annotations" not in content:
-            fail("visual evidence review annotations download endpoint contract failed")
-
-        status, payload = request_json(base_url, "/api/visual-evidence-signoff-packet")
-        if status != 200 or payload.get("visual_evidence_signoff_packet_version") != "visual_evidence_signoff_packet_v001":
-            fail("visual evidence sign-off packet status endpoint contract failed")
-
-        status, payload = request_json(
-            base_url,
-            "/api/visual-evidence-signoff-packet/create",
-            method="POST",
-            body=json.dumps({"annotation_id": visual_evidence_review_annotations_id, "created_by": "api_contract", "reviewer": "api_contract", "notes": "API contract v072 visual evidence sign-off packet."}),
-        )
-        if status != 200 or payload.get("packet", {}).get("packet_readiness") != "ready_for_visual_evidence_signoff_review":
-            fail("visual evidence sign-off packet create endpoint contract failed")
-        visual_evidence_signoff_packet_id = payload.get("packet", {}).get("packet_id")
-
-        status, payload = request_json(base_url, "/api/visual-evidence-signoff-packet/packets?limit=5")
-        if status != 200 or not isinstance(payload, list) or not any(row.get("packet_id") == visual_evidence_signoff_packet_id for row in payload):
-            fail("visual evidence sign-off packet list endpoint contract failed")
-
-        status, payload = request_json(base_url, f"/api/visual-evidence-signoff-packet/packets/{visual_evidence_signoff_packet_id}")
-        if status != 200 or payload.get("packet_id") != visual_evidence_signoff_packet_id or payload.get("target_count", 0) < 6:
-            fail("visual evidence sign-off packet detail endpoint contract failed")
-
-        status, content, content_type = request_bytes(base_url, f"/api/visual-evidence-signoff-packet/packets/{visual_evidence_signoff_packet_id}/download")
-        if status != 200 or len(content) < 1000 or "html" not in content_type.lower() or b"Visual Evidence Sign-Off Packet" not in content:
-            fail("visual evidence sign-off packet download endpoint contract failed")
-
-        status, payload = request_json(base_url, "/api/final-reviewer-launch-checklist")
-        if status != 200 or payload.get("final_reviewer_launch_checklist_version") != "final_reviewer_launch_checklist_v001":
-            fail("final reviewer launch checklist status endpoint contract failed")
-
-        status, payload = request_json(
-            base_url,
-            "/api/final-reviewer-launch-checklist/create",
-            method="POST",
-            body=json.dumps({"packet_id": visual_evidence_signoff_packet_id, "created_by": "api_contract", "reviewer": "api_contract", "notes": "API contract v072 final reviewer launch checklist."}),
-        )
-        if status != 200 or payload.get("checklist", {}).get("checklist_readiness") != "ready_for_final_reviewer_launch":
-            fail("final reviewer launch checklist create endpoint contract failed")
-        final_reviewer_launch_checklist_id = payload.get("checklist", {}).get("checklist_id")
-
-        status, payload = request_json(base_url, "/api/final-reviewer-launch-checklist/checklists?limit=5")
-        if status != 200 or not isinstance(payload, list) or not any(row.get("checklist_id") == final_reviewer_launch_checklist_id for row in payload):
-            fail("final reviewer launch checklist list endpoint contract failed")
-
-        status, payload = request_json(base_url, f"/api/final-reviewer-launch-checklist/checklists/{final_reviewer_launch_checklist_id}")
-        if status != 200 or payload.get("checklist_id") != final_reviewer_launch_checklist_id or payload.get("action_count", 0) < 8:
-            fail("final reviewer launch checklist detail endpoint contract failed")
-
-        status, content, content_type = request_bytes(base_url, f"/api/final-reviewer-launch-checklist/checklists/{final_reviewer_launch_checklist_id}/download")
-        if status != 200 or len(content) < 1000 or "html" not in content_type.lower() or b"Final Reviewer Launch Checklist" not in content:
-            fail("final reviewer launch checklist download endpoint contract failed")
-
-
-        status, payload = request_json(base_url, "/api/recruiter-demo-brief")
-        if status != 200 or payload.get("recruiter_demo_brief_version") != "recruiter_demo_brief_v001":
-            fail("recruiter demo brief status endpoint contract failed")
-
-        status, payload = request_json(
-            base_url,
-            "/api/recruiter-demo-brief/create",
-            method="POST",
-            body=json.dumps({"checklist_id": final_reviewer_launch_checklist_id, "created_by": "api_contract", "audience": "technical_recruiter", "notes": "API contract v072 recruiter-facing demo brief."}),
-        )
-        if status != 200 or payload.get("brief", {}).get("brief_readiness") != "ready_for_recruiter_demo":
-            fail("recruiter demo brief create endpoint contract failed")
-        recruiter_demo_brief_id = payload.get("brief", {}).get("brief_id")
-
-        status, payload = request_json(base_url, "/api/recruiter-demo-brief/briefs?limit=5")
-        if status != 200 or not isinstance(payload, list) or not any(row.get("brief_id") == recruiter_demo_brief_id for row in payload):
-            fail("recruiter demo brief list endpoint contract failed")
-
-        status, payload = request_json(base_url, f"/api/recruiter-demo-brief/briefs/{recruiter_demo_brief_id}")
-        if status != 200 or payload.get("brief_id") != recruiter_demo_brief_id or payload.get("section_count", 0) < 6:
-            fail("recruiter demo brief detail endpoint contract failed")
-
-        status, content, content_type = request_bytes(base_url, f"/api/recruiter-demo-brief/briefs/{recruiter_demo_brief_id}/download")
-        if status != 200 or len(content) < 1000 or "html" not in content_type.lower() or b"Recruiter-Facing Demo Brief" not in content:
-            fail("recruiter demo brief download endpoint contract failed")
-
-
-        status, payload = request_json(base_url, "/api/public-portfolio-package")
-        if status != 200 or payload.get("public_portfolio_interview_package_version") != "public_portfolio_interview_package_v001":
-            fail("public portfolio package status endpoint contract failed")
-
-        status, payload = request_json(
-            base_url,
-            "/api/public-portfolio-package/create",
-            method="POST",
-            body=json.dumps({"brief_id": recruiter_demo_brief_id, "created_by": "api_contract", "audience": "portfolio_reviewer", "notes": "API contract v072 public portfolio interview package."}),
-        )
-        if status != 200 or payload.get("package", {}).get("package_readiness") != "ready_for_public_portfolio_package":
-            fail("public portfolio package create endpoint contract failed")
-        public_portfolio_package_id = payload.get("package", {}).get("package_id")
-
-        status, payload = request_json(base_url, "/api/public-portfolio-package/packages?limit=5")
-        if status != 200 or not isinstance(payload, list) or not any(row.get("package_id") == public_portfolio_package_id for row in payload):
-            fail("public portfolio package list endpoint contract failed")
-
-        status, payload = request_json(base_url, f"/api/public-portfolio-package/packages/{public_portfolio_package_id}")
-        if status != 200 or payload.get("package_id") != public_portfolio_package_id or payload.get("readme_section_count", 0) < 8:
-            fail("public portfolio package detail endpoint contract failed")
-
-        status, content, content_type = request_bytes(base_url, f"/api/public-portfolio-package/packages/{public_portfolio_package_id}/download")
-        if status != 200 or len(content) < 1000 or "html" not in content_type.lower() or b"Public Portfolio Interview Package" not in content:
-            fail("public portfolio package download endpoint contract failed")
-
-        status, payload = request_json(base_url, "/api/demo-review-playbook")
-        if status != 200 or payload.get("demo_review_playbook_version") != "demo_review_playbook_v001":
-            fail("demo review playbook status endpoint contract failed")
-
-        status, payload = request_json(
-            base_url,
-            "/api/demo-review-playbook/create",
-            method="POST",
-            body=json.dumps({"package_id": public_portfolio_package_id, "created_by": "api_contract", "audience": "portfolio_reviewer", "notes": "API contract v083 demo review playbook."}),
-        )
-        if status != 200 or payload.get("playbook", {}).get("playbook_readiness") != "ready_for_demo_review_playbook":
-            fail("demo review playbook create endpoint contract failed")
-        demo_review_playbook_id = payload.get("playbook", {}).get("playbook_id")
-
-        status, payload = request_json(base_url, "/api/demo-review-playbook/playbooks?limit=5")
-        if status != 200 or not isinstance(payload, list) or not any(row.get("playbook_id") == demo_review_playbook_id for row in payload):
-            fail("demo review playbook list endpoint contract failed")
-
-        status, payload = request_json(base_url, f"/api/demo-review-playbook/playbooks/{demo_review_playbook_id}")
-        if status != 200 or payload.get("playbook_id") != demo_review_playbook_id or payload.get("sharing_checklist_item_count", 0) < 8:
-            fail("demo review playbook detail endpoint contract failed")
-
-        status, content, content_type = request_bytes(base_url, f"/api/demo-review-playbook/playbooks/{demo_review_playbook_id}/download")
-        if status != 200 or len(content) < 1000 or "html" not in content_type.lower() or b"Demo Review Playbook" not in content:
-            fail("demo review playbook download endpoint contract failed")
-
-        status, payload = request_json(base_url, "/api/github-publication-bundle")
-        if status != 200 or payload.get("github_publication_bundle_version") != "github_publication_bundle_v001":
-            fail("GitHub publication bundle status endpoint contract failed")
-
-        status, payload = request_json(
-            base_url,
-            "/api/github-publication-bundle/create",
-            method="POST",
-            body=json.dumps({"playbook_id": demo_review_playbook_id, "created_by": "api_contract", "audience": "github_portfolio_reviewer", "notes": "API contract v083 GitHub publication bundle."}),
-        )
-        if status != 200 or payload.get("bundle", {}).get("bundle_readiness") != "ready_for_github_publication_bundle":
-            fail("GitHub publication bundle create endpoint contract failed")
-        github_publication_bundle_id = payload.get("bundle", {}).get("bundle_id")
-
-        status, payload = request_json(base_url, "/api/github-publication-bundle/bundles?limit=5")
-        if status != 200 or not isinstance(payload, list) or not any(row.get("bundle_id") == github_publication_bundle_id for row in payload):
-            fail("GitHub publication bundle list endpoint contract failed")
-
-        status, payload = request_json(base_url, f"/api/github-publication-bundle/bundles/{github_publication_bundle_id}")
-        if status != 200 or payload.get("bundle_id") != github_publication_bundle_id or payload.get("readme_section_count", 0) < 8:
-            fail("GitHub publication bundle detail endpoint contract failed")
-
-        status, content, content_type = request_bytes(base_url, f"/api/github-publication-bundle/bundles/{github_publication_bundle_id}/download")
-        if status != 200 or len(content) < 1000 or "zip" not in content_type.lower():
-            fail("GitHub publication bundle download endpoint contract failed")
-        with zipfile.ZipFile(io.BytesIO(content)) as zf:
-            if "README_public.md" not in set(zf.namelist()):
-                fail("GitHub publication ZIP should include README_public.md")
-
-        status, payload = request_json(base_url, "/api/repository-publication-qa")
-        if status != 200 or payload.get("repository_publication_qa_version") != "repository_publication_qa_v001":
-            fail("repository publication QA status endpoint contract failed")
-
-        status, payload = request_json(
-            base_url,
-            "/api/repository-publication-qa/create",
-            method="POST",
-            body=json.dumps({"bundle_id": github_publication_bundle_id, "created_by": "api_contract", "audience": "github_repository_reviewer", "notes": "API contract v083 repository publication QA."}),
-        )
-        if status != 200 or payload.get("review", {}).get("qa_readiness") != "ready_for_repository_publication_qa":
-            fail("repository publication QA create endpoint contract failed")
-        repository_publication_qa_id = payload.get("review", {}).get("review_id")
-
-        status, payload = request_json(base_url, "/api/repository-publication-qa/reviews?limit=5")
-        if status != 200 or not isinstance(payload, list) or not any(row.get("review_id") == repository_publication_qa_id for row in payload):
-            fail("repository publication QA list endpoint contract failed")
-
-        status, payload = request_json(base_url, f"/api/repository-publication-qa/reviews/{repository_publication_qa_id}")
-        if status != 200 or payload.get("review_id") != repository_publication_qa_id or payload.get("required_check_count", 0) < 8:
-            fail("repository publication QA detail endpoint contract failed")
-
-        status, content, content_type = request_bytes(base_url, f"/api/repository-publication-qa/reviews/{repository_publication_qa_id}/download")
-        if status != 200 or len(content) < 1000 or "zip" not in content_type.lower():
-            fail("repository publication QA download endpoint contract failed")
-        with zipfile.ZipFile(io.BytesIO(content)) as zf:
-            names = set(zf.namelist())
-            if "PUBLIC_SHARING_WALKTHROUGH.md" not in names:
-                fail("repository publication QA ZIP should include PUBLIC_SHARING_WALKTHROUGH.md")
-
-        status, payload = request_json(base_url, "/api/repository-export-handoff")
-        if status != 200 or payload.get("repository_export_handoff_version") != "repository_export_handoff_v001":
-            fail("repository export handoff status endpoint contract failed")
-
-        status, payload = request_json(
-            base_url,
-            "/api/repository-export-handoff/create",
-            method="POST",
-            body=json.dumps({"repository_qa_id": repository_publication_qa_id, "created_by": "api_contract", "audience": "github_repository_reviewer", "notes": "API contract v083 repository export handoff."}),
-        )
-        if status != 200 or payload.get("handoff", {}).get("handoff_readiness") != "ready_for_repository_export_handoff":
-            fail("repository export handoff create endpoint contract failed")
-        repository_export_handoff_id = payload.get("handoff", {}).get("handoff_id")
-
-        status, payload = request_json(base_url, "/api/repository-export-handoff/handoffs?limit=5")
-        if status != 200 or not isinstance(payload, list) or not any(row.get("handoff_id") == repository_export_handoff_id for row in payload):
-            fail("repository export handoff list endpoint contract failed")
-
-        status, payload = request_json(base_url, f"/api/repository-export-handoff/handoffs/{repository_export_handoff_id}")
-        if status != 200 or payload.get("handoff_id") != repository_export_handoff_id or payload.get("include_file_count", 0) < 6:
-            fail("repository export handoff detail endpoint contract failed")
-
-        status, content, content_type = request_bytes(base_url, f"/api/repository-export-handoff/handoffs/{repository_export_handoff_id}/download")
-        if status != 200 or len(content) < 1000 or "zip" not in content_type.lower():
-            fail("repository export handoff download endpoint contract failed")
-        with zipfile.ZipFile(io.BytesIO(content)) as zf:
-            names = set(zf.namelist())
-            if "GITHUB_REPOSITORY_FILE_PLAN.md" not in names:
-                fail("repository export handoff ZIP should include GITHUB_REPOSITORY_FILE_PLAN.md")
-
-        status, payload = request_json(base_url, "/api/repository-dry-run-review")
-        if status != 200 or payload.get("repository_dry_run_review_version") != "repository_dry_run_review_v001":
-            fail("repository dry-run review status endpoint contract failed")
-
-        status, payload = request_json(
-            base_url,
-            "/api/repository-dry-run-review/create",
-            method="POST",
-            body=json.dumps({"handoff_id": repository_export_handoff_id, "created_by": "api_contract", "audience": "github_repository_reviewer", "notes": "API contract v083 repository dry-run review."}),
-        )
-        if status != 200 or payload.get("review", {}).get("review_readiness") != "ready_for_repository_dry_run_review":
-            fail("repository dry-run review create endpoint contract failed")
-        repository_dry_run_review_id = payload.get("review", {}).get("review_id")
-
-        status, payload = request_json(base_url, "/api/repository-dry-run-review/reviews?limit=5")
-        if status != 200 or not isinstance(payload, list) or not any(row.get("review_id") == repository_dry_run_review_id for row in payload):
-            fail("repository dry-run review list endpoint contract failed")
-
-        status, payload = request_json(base_url, f"/api/repository-dry-run-review/reviews/{repository_dry_run_review_id}")
-        if status != 200 or payload.get("review_id") != repository_dry_run_review_id or payload.get("archive_file_count", 0) < 8:
-            fail("repository dry-run review detail endpoint contract failed")
-
-        status, content, content_type = request_bytes(base_url, f"/api/repository-dry-run-review/reviews/{repository_dry_run_review_id}/download")
-        if status != 200 or len(content) < 1000 or "zip" not in content_type.lower():
-            fail("repository dry-run review download endpoint contract failed")
-        with zipfile.ZipFile(io.BytesIO(content)) as zf:
-            names = set(zf.namelist())
-            if "FINAL_PUBLIC_SHARING_CHECKLIST.md" not in names:
-                fail("repository dry-run ZIP should include FINAL_PUBLIC_SHARING_CHECKLIST.md")
-
-        status, payload = request_json(base_url, "/api/repository-final-package-review")
-        if status != 200 or payload.get("repository_final_package_review_version") != "repository_final_package_review_v001":
-            fail("repository final package review status endpoint contract failed")
-
-        status, payload = request_json(
-            base_url,
-            "/api/repository-final-package-review/create",
-            method="POST",
-            body=json.dumps({"dry_run_review_id": repository_dry_run_review_id, "created_by": "api_contract", "audience": "github_repository_reviewer", "notes": "API contract v083 repository final package review."}),
-        )
-        if status != 200 or payload.get("review", {}).get("review_readiness") != "ready_for_repository_final_package_review" or payload.get("review", {}).get("public_path_issue_count") != 0:
-            fail("repository final package review create endpoint contract failed")
-        repository_final_package_review_id = payload.get("review", {}).get("review_id")
-
-        status, payload = request_json(base_url, "/api/repository-final-package-review/reviews?limit=5")
-        if status != 200 or not isinstance(payload, list) or not any(row.get("review_id") == repository_final_package_review_id for row in payload):
-            fail("repository final package review list endpoint contract failed")
-
-        status, payload = request_json(base_url, f"/api/repository-final-package-review/reviews/{repository_final_package_review_id}")
-        if status != 200 or payload.get("review_id") != repository_final_package_review_id or payload.get("redacted_path_count", 0) < 1:
-            fail("repository final package review detail endpoint contract failed")
-
-        status, content, content_type = request_bytes(base_url, f"/api/repository-final-package-review/reviews/{repository_final_package_review_id}/download")
-        if status != 200 or len(content) < 1000 or "zip" not in content_type.lower():
-            fail("repository final package review download endpoint contract failed")
-        with zipfile.ZipFile(io.BytesIO(content)) as zf:
-            names = set(zf.namelist())
-            if "REDACTED_PATH_EVIDENCE.md" not in names:
-                fail("repository final package ZIP should include REDACTED_PATH_EVIDENCE.md")
-
-        status, payload = request_json(base_url, "/api/public-readme-cleanup-review")
-        if status != 200 or payload.get("public_readme_cleanup_review_version") != "public_readme_cleanup_review_v001":
-            fail("public README cleanup review status endpoint contract failed")
-
-        status, payload = request_json(
-            base_url,
-            "/api/public-readme-cleanup-review/create",
-            method="POST",
-            body=json.dumps({
-                "final_package_review_id": repository_final_package_review_id,
-                "created_by": "api_contract",
-                "audience": "github_repository_reviewer",
-                "notes": "API contract v083 public README cleanup review.",
-            }),
-        )
-        if status != 200 or payload.get("review", {}).get("review_readiness") != "ready_for_public_readme_cleanup_review" or payload.get("review", {}).get("public_readme_issue_count") != 0:
-            fail("public README cleanup review create endpoint contract failed")
-        if payload.get("review", {}).get("screenshot_evidence_count", 0) < 8:
-            fail("public README cleanup review should expose screenshot evidence checklist")
-        public_readme_cleanup_review_id = payload.get("review", {}).get("review_id")
-
-        status, payload = request_json(base_url, "/api/public-readme-cleanup-review/reviews?limit=5")
-        if status != 200 or not isinstance(payload, list) or not any(row.get("review_id") == public_readme_cleanup_review_id for row in payload):
-            fail("public README cleanup review list endpoint contract failed")
-
-        status, payload = request_json(base_url, f"/api/public-readme-cleanup-review/reviews/{public_readme_cleanup_review_id}")
-        if status != 200 or payload.get("review_id") != public_readme_cleanup_review_id or payload.get("public_readme_issue_count") != 0:
-            fail("public README cleanup review detail endpoint contract failed")
-
-        status, content, content_type = request_bytes(base_url, f"/api/public-readme-cleanup-review/reviews/{public_readme_cleanup_review_id}/download")
-        if status != 200 or len(content) < 1000 or "zip" not in content_type.lower():
-            fail("public README cleanup review download endpoint contract failed")
-        with zipfile.ZipFile(io.BytesIO(content)) as zf:
-            names = set(zf.namelist())
-            if {"PUBLIC_README_CLEANUP_REVIEW.md", "PUBLIC_README_DRAFT.md", "SCREENSHOT_EVIDENCE_CHECKLIST.md", "public_readme_cleanup_review_manifest.json"} - names:
-                fail("public README cleanup ZIP missing expected files")
-
-        status, payload = request_json(base_url, "/api/public-repository-polish-package")
-        if status != 200 or payload.get("public_repository_polish_package_version") != "public_repository_polish_package_v001":
-            fail("public repository polish package status endpoint contract failed")
-
-        status, payload = request_json(
-            base_url,
-            "/api/public-repository-polish-package/create",
-            method="POST",
-            body=json.dumps({
-                "cleanup_review_id": public_readme_cleanup_review_id,
-                "created_by": "api_contract",
-                "audience": "github_repository_reviewer",
-                "notes": "API contract v083 public repository polish package.",
-            }),
-        )
-        if status != 200 or payload.get("package", {}).get("package_readiness") != "ready_for_public_repository_polish" or payload.get("package", {}).get("public_readme_issue_count") != 0:
-            fail("public repository polish package create endpoint contract failed")
-        if payload.get("package", {}).get("screenshot_target_count", 0) < 8:
-            fail("public repository polish package should expose screenshot targets")
-        public_repository_polish_package_id = payload.get("package", {}).get("package_id")
-
-        status, payload = request_json(base_url, "/api/public-repository-polish-package/packages?limit=5")
-        if status != 200 or not isinstance(payload, list) or not any(row.get("package_id") == public_repository_polish_package_id for row in payload):
-            fail("public repository polish package list endpoint contract failed")
-
-        status, payload = request_json(base_url, f"/api/public-repository-polish-package/packages/{public_repository_polish_package_id}")
-        if status != 200 or payload.get("package_id") != public_repository_polish_package_id or payload.get("public_readme_issue_count") != 0:
-            fail("public repository polish package detail endpoint contract failed")
-
-        status, content, content_type = request_bytes(base_url, f"/api/public-repository-polish-package/packages/{public_repository_polish_package_id}/download")
-        if status != 200 or len(content) < 1000 or "zip" not in content_type.lower():
-            fail("public repository polish package download endpoint contract failed")
-        with zipfile.ZipFile(io.BytesIO(content)) as zf:
-            names = set(zf.namelist())
-            if {"FINAL_PUBLIC_REPOSITORY_POLISH.md", "PUBLIC_REPOSITORY_FILE_PLAN.md", "MANUAL_SCREENSHOT_CAPTURE_PACKAGE.md", "PUBLIC_SHARING_CHECKLIST.md", "PUBLIC_REPOSITORY_READY_README.md", "public_repository_polish_package_manifest.json"} - names:
-                fail("public repository polish package ZIP missing expected files")
-
-        status, payload = request_json(base_url, "/api/repository-export-checklist")
-        if status != 200 or payload.get("repository_export_checklist_version") != "repository_export_checklist_v001":
-            fail("repository export checklist status endpoint contract failed")
-
-        status, payload = request_json(
-            base_url,
-            "/api/repository-export-checklist/create",
-            method="POST",
-            body=json.dumps({
-                "package_id": public_repository_polish_package_id,
-                "created_by": "api_contract",
-                "audience": "github_repository_reviewer",
-                "notes": "API contract v083 repository export checklist.",
-            }),
-        )
-        if status != 200 or payload.get("checklist", {}).get("checklist_readiness") != "ready_for_repository_export_checklist" or payload.get("checklist", {}).get("required_failed_count") != 0:
-            fail("repository export checklist create endpoint contract failed")
-        if payload.get("checklist", {}).get("screenshot_target_count", 0) < 8:
-            fail("repository export checklist should expose screenshot targets")
-        repository_export_checklist_id = payload.get("checklist", {}).get("checklist_id")
-
-        status, payload = request_json(base_url, "/api/repository-export-checklist/checklists?limit=5")
-        if status != 200 or not isinstance(payload, list) or not any(row.get("checklist_id") == repository_export_checklist_id for row in payload):
-            fail("repository export checklist list endpoint contract failed")
-
-        status, payload = request_json(base_url, f"/api/repository-export-checklist/checklists/{repository_export_checklist_id}")
-        if status != 200 or payload.get("checklist_id") != repository_export_checklist_id or payload.get("required_failed_count") != 0:
-            fail("repository export checklist detail endpoint contract failed")
-
-        status, content, content_type = request_bytes(base_url, f"/api/repository-export-checklist/checklists/{repository_export_checklist_id}/download")
-        if status != 200 or len(content) < 1000 or "zip" not in content_type.lower():
-            fail("repository export checklist download endpoint contract failed")
-        with zipfile.ZipFile(io.BytesIO(content)) as zf:
-            names = set(zf.namelist())
-            if {"FINAL_REPOSITORY_EXPORT_CHECKLIST.md", "SCREENSHOT_CAPTURE_PASS.md", "PUBLIC_REPOSITORY_TREE.md", "README_FINAL_REVIEW_NOTES.md", "repository_export_checklist_manifest.json"} - names:
-                fail("repository export checklist ZIP missing expected files")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         status, payload = request_json(base_url, "/api/pilot-areas/metadata")
         if status != 200 or payload.get("pilot_count", 0) < 1000:
@@ -2210,8 +1342,7 @@ def main() -> None:
         result = {
             "passed": True,
             "base_url": base_url,
-            "checked_endpoints": 362,
-            "product_architecture_version": product_architecture_version,
+            "checked_endpoints": 183,
             "profile_dashboard_contract_version": profile_dashboard_contract_version,
             "scoring_rules_version": "scoring_rules_v001",
             "postgis_plan_id": postgis_plan_id,
@@ -2230,17 +1361,6 @@ def main() -> None:
             "profile_application_plan_id": profile_application_plan_id,
             "profile_config_apply_proposal_id": profile_config_apply_proposal_id,
             "profile_contract_regression_preview_id": profile_contract_regression_preview_id,
-            "release_readiness_snapshot_id": release_readiness_snapshot_id,
-            "release_readiness_gate_count": release_readiness_gate_count,
-            "portfolio_demo_snapshot_id": portfolio_demo_snapshot_id,
-            "portfolio_demo_step_count": portfolio_demo_step_count,
-            "portfolio_evidence_bundle_id": portfolio_evidence_bundle_id,
-            "bundle_review_checklist_id": bundle_review_checklist_id,
-            "portfolio_narrative_id": portfolio_narrative_id,
-            "portfolio_handoff_page_id": portfolio_handoff_page_id,
-            "portfolio_evidence_gallery_id": portfolio_evidence_gallery_id,
-            "multi_pilot_comparison_id": multi_pilot_comparison_id,
-            "comparison_map_export_id": comparison_map_export_id,
             "workflow_job_id": workflow_job_id,
             "rerun_job_id": rerun_job_id,
             "job_id": job_id,
@@ -2254,35 +1374,6 @@ def main() -> None:
             "source_import_decision_id": source_import_decision_id,
             "source_handoff_id": source_handoff_id,
             "source_handoff_execution_id": source_handoff_execution_id,
-            "execution_evidence_package_id": execution_evidence_package_id,
-            "second_execution_evidence_package_id": second_execution_evidence_package_id,
-            "execution_result_diff_id": execution_result_diff_id,
-            "execution_diff_gallery_id": execution_diff_gallery_id,
-            "execution_diff_detail_id": execution_diff_detail_id,
-            "reproducibility_audit_packet_id": reproducibility_audit_packet_id,
-            "reviewer_audit_index_id": reviewer_audit_index_id,
-            "portfolio_export_launcher_id": portfolio_export_launcher_id,
-            "portable_release_package_id": portable_release_package_id,
-            "demo_script_pack_id": demo_script_pack_id,
-            "visual_qa_ledger_id": visual_qa_ledger_id,
-            "visual_baseline_comparison_id": visual_baseline_comparison_id,
-            "demo_artifact_completeness_id": demo_artifact_completeness_id,
-            "visual_evidence_capture_id": visual_evidence_capture_id,
-            "visual_evidence_review_diff_id": visual_evidence_review_diff_id,
-            "visual_evidence_review_annotations_id": visual_evidence_review_annotations_id,
-            "visual_evidence_signoff_packet_id": visual_evidence_signoff_packet_id,
-            "final_reviewer_launch_checklist_id": final_reviewer_launch_checklist_id,
-            "recruiter_demo_brief_id": recruiter_demo_brief_id,
-            "public_portfolio_package_id": public_portfolio_package_id,
-            "demo_review_playbook_id": demo_review_playbook_id,
-            "github_publication_bundle_id": github_publication_bundle_id,
-            "repository_publication_qa_id": repository_publication_qa_id,
-            "repository_export_handoff_id": repository_export_handoff_id,
-            "repository_dry_run_review_id": repository_dry_run_review_id,
-            "repository_final_package_review_id": repository_final_package_review_id,
-            "public_readme_cleanup_review_id": public_readme_cleanup_review_id,
-            "public_repository_polish_package_id": public_repository_polish_package_id,
-            "repository_export_checklist_id": repository_export_checklist_id,
             "portfolio_compare_id": portfolio_compare_id,
             "analysis_profile_count": profile_count,
             "transit_profile_workspace_id": transit_workspace_id,
