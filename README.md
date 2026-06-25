@@ -15,27 +15,24 @@ Municipal road-safety planners, pedestrian-access reviewers and GIS analysts who
 ## What to look at
 
 - **The product**: the dashboard (map + review queue + selected-candidate evidence), the Kfar Saba pilot results in [`portfolio/case_study.md`](portfolio/case_study.md), and the transparent, audited scoring in [`config/scoring_rules_v001.json`](config/scoring_rules_v001.json) + [`docs/scoring_rules.md`](docs/scoring_rules.md).
-- **The GIS workflow** (~12 endpoints): source onboarding → selected-pilot preflight → run analysis profile → dashboard candidates → portfolio report.
-- **Scope note**: the repository also carries an internal *tooling layer* (publication / handoff / QA / release-readiness endpoints and docs) used to package and review the project itself. That layer is supporting scaffolding, not the product — see [`docs/README.md`](docs/README.md) for a guided index that separates the two.
+- **The GIS workflow**: source onboarding → selected-pilot preflight → run analysis profile → dashboard candidates → **review-worklist export (CSV / GeoJSON)** → portfolio report.
+- **Editorial note**: an earlier AI-assisted build had accreted ~50 self-referential "tooling" endpoints (publication / QA / release-readiness machinery that mostly packaged the project itself). I removed them to keep the product core honest and reviewable — the backend is now ~32 focused modules. The full pre-subtraction tree is preserved on the `archive/full-app-2026-06-25` branch.
 
-## Current Release
+## How to read the score (and what it is not)
 
-- App version: `v083`
-- Project manifest: `v083_2026-06-01`
-- Local URL: `http://127.0.0.1:8847`
-- Focus: Figma-aligned dashboard polish
+The score is a **transparent but UNCALIBRATED** heuristic: it measures where mapped, signalised pedestrian-crossing access is *sparse* near a destination — it is **never checked against real crash or outcome data**. So it tells you **where to look first, not where it is worst**. It is a triage aid for on-site review, not a verdict.
 
-## v083 Focus
-
-v083 applies the prepared Figma direction to the local dashboard. The first workflow now keeps the map, review queue, selected candidate detail and compact workflow sidebar visible as the primary product surface. Advanced evidence and publication operations remain available, but they stay behind an explicit toggle.
-
-## Data Boundary
-
-This project supports infrastructure risk indicator review. It does not make absolute safety conclusions about a place. Missing OSM tags are data-quality flags, not proof that infrastructure is absent.
+- NOT crash / accident prediction. NOT a calibrated severity ranking.
+- A missing OSM tag is a **data-quality flag**, never proof that infrastructure is absent.
+- Analysis CRS is EPSG:2039 (Israeli grid): the pipeline generalises to other regions by reprojection, but the distance thresholds stay Israel/OSM-shaped until recalibrated.
 
 Approved wording:
 
 `This location has infrastructure risk indicators and should be reviewed on-site.`
+
+## Current Release
+
+App version `v083` · manifest `v083_2026-06-01` · local URL `http://127.0.0.1:8847`
 
 ## Run Locally
 

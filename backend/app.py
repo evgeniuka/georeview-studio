@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+import io
 import json
 import logging
 import mimetypes
@@ -981,6 +982,69 @@ def normalize_candidate(row: dict) -> dict:
     }
 
 
+WORKLIST_COLUMNS = [
+    "rank", "generator_id", "name", "generator_type", "risk_score",
+    "route_review_priority_score", "nearest_crossing_m", "route_nearest_crossing_m",
+    "crossing_within_150m", "major_road_within_150m", "lat", "lon",
+    "risk_flags", "data_quality_flags",
+    "review_status", "review_note", "review_assignee", "review_wording",
+]
+
+
+def worklist_csv(candidates: list[dict], decisions: dict[str, dict]) -> bytes:
+    """Ranked review worklist as CSV (Excel-friendly UTF-8 BOM), joined with reviewer decisions."""
+    buf = io.StringIO()
+    writer = csv.writer(buf)
+    writer.writerow(WORKLIST_COLUMNS)
+    for rank, candidate in enumerate(candidates, start=1):
+        decision = decisions.get(candidate.get("generator_id"), {})
+        writer.writerow([
+            rank, candidate.get("generator_id"), candidate.get("name"),
+            candidate.get("generator_type"), candidate.get("risk_score"),
+            candidate.get("route_review_priority_score", ""), candidate.get("nearest_crossing_m"),
+            candidate.get("route_nearest_crossing_m", ""), candidate.get("crossing_within_150m"),
+            candidate.get("major_road_within_150m"), candidate.get("lat"), candidate.get("lon"),
+            ";".join(candidate.get("risk_flags", [])), ";".join(candidate.get("data_quality_flags", [])),
+            decision.get("status", ""), decision.get("note", ""), decision.get("assignee", ""),
+            REVIEW_WORDING,
+        ])
+    return buf.getvalue().encode("utf-8-sig")
+
+
+def worklist_geojson(candidates: list[dict], decisions: dict[str, dict], workspace_id: str) -> bytes:
+    """Ranked review worklist as GeoJSON (opens in QGIS/any GIS); decisions joined per feature."""
+    features = []
+    for rank, candidate in enumerate(candidates, start=1):
+        decision = decisions.get(candidate.get("generator_id"), {})
+        features.append({
+            "type": "Feature",
+            "geometry": {"type": "Point", "coordinates": [candidate.get("lon"), candidate.get("lat")]},
+            "properties": {
+                "rank": rank,
+                "generator_id": candidate.get("generator_id"),
+                "name": candidate.get("name"),
+                "generator_type": candidate.get("generator_type"),
+                "risk_score": candidate.get("risk_score"),
+                "route_review_priority_score": candidate.get("route_review_priority_score"),
+                "nearest_crossing_m": candidate.get("nearest_crossing_m"),
+                "risk_flags": candidate.get("risk_flags", []),
+                "data_quality_flags": candidate.get("data_quality_flags", []),
+                "review_status": decision.get("status", ""),
+                "review_note": decision.get("note", ""),
+                "review_assignee": decision.get("assignee", ""),
+                "review_wording": REVIEW_WORDING,
+            },
+        })
+    collection = {
+        "type": "FeatureCollection",
+        "name": f"georeview_worklist_{workspace_id}",
+        "note": REVIEW_WORDING,
+        "feature_count": len(features),
+        "features": features,
+    }
+    return json.dumps(collection, ensure_ascii=False, indent=2).encode("utf-8")
+
+
 def enrich_candidate_with_network(candidate: dict, network_row: dict | None) -> None:
     candidate["route_aware_available"] = bool(network_row)
     if not network_row:
@@ -1473,6 +1537,8 @@ class Handler(BaseHTTPRequestHandler):
                     self.json_or_error_response(DASHBOARDS.validation(workspace_id))
                 elif action == "review-decisions":
                     self.json_or_error_response(REVIEW_DECISIONS.list_for_workspace(workspace_id))
+                elif action == "candidates-export":
+                    self.dashboard_candidate_export_response(workspace_id, query)
                 else:
                     self.json_response({"error": "not_found", "path": path}, status=404)
             elif path.startswith("/api/"):
@@ -1622,6 +1688,29 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Content-Type", "text/markdown; charset=utf-8")
         self.send_header("Content-Length", str(len(content)))
         self.send_header("Content-Disposition", f'attachment; filename="{path.name}"')
+        self.send_header("Cache-Control", "no-store")
+        self.end_headers()
+        self.wfile.write(content)
+
+    def dashboard_candidate_export_response(self, workspace_id: str, query: dict[str, list[str]]) -> None:
+        candidates = DASHBOARDS.candidates(workspace_id, query)
+        if isinstance(candidates, dict):  # error payload
+            self.json_or_error_response(candidates)
+            return
+        decisions_result = REVIEW_DECISIONS.list_for_workspace(workspace_id)
+        decisions = {d["generator_id"]: d for d in decisions_result.get("decisions", [])}
+        if first(query, "format", "csv").lower() == "geojson":
+            content = worklist_geojson(candidates, decisions, workspace_id)
+            content_type = "application/geo+json; charset=utf-8"
+            filename = f"georeview_worklist_{workspace_id}.geojson"
+        else:
+            content = worklist_csv(candidates, decisions)
+            content_type = "text/csv; charset=utf-8"
+            filename = f"georeview_worklist_{workspace_id}.csv"
+        self.send_response(200)
+        self.send_header("Content-Type", content_type)
+        self.send_header("Content-Length", str(len(content)))
+        self.send_header("Content-Disposition", f'attachment; filename="{filename}"')
         self.send_header("Cache-Control", "no-store")
         self.end_headers()
         self.wfile.write(content)

@@ -109,6 +109,27 @@ def main() -> None:
             if not app.served_in_product_mode(product_path):
                 fail(f"product gate should serve {product_path}")
 
+        # 5. Review-worklist export (CSV + GeoJSON), the field-handoff artifact.
+        workspaces = get(base_url, "/api/dashboard-workspaces")[1]
+        if not (isinstance(workspaces, list) and workspaces):
+            fail("no dashboard workspaces to export")
+        export_ws = ""
+        for entry in workspaces:
+            wid = entry.get("workspace_id", "")
+            rows = get(base_url, f"/api/dashboard-workspaces/{wid}/candidates?limit=1")[1]
+            if isinstance(rows, list) and rows:
+                export_ws = wid
+                break
+        if not export_ws:
+            fail("no dashboard workspace with review candidates to export")
+        csv_status, csv_body = get(base_url, f"/api/dashboard-workspaces/{export_ws}/candidates-export?format=csv&limit=5")
+        if csv_status != 200 or "rank,generator_id" not in csv_body or "reviewed on-site" not in csv_body:
+            fail("CSV worklist export failed")
+        gj_status, gj_body = get(base_url, f"/api/dashboard-workspaces/{export_ws}/candidates-export?format=geojson&limit=5")
+        gj = json.loads(gj_body) if isinstance(gj_body, str) else gj_body
+        if gj_status != 200 or gj.get("type") != "FeatureCollection" or not gj.get("note", "").startswith("This location"):
+            fail("GeoJSON worklist export failed")
+
         summary = {
             "passed": True,
             "app_version": "v083",
