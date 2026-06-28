@@ -440,6 +440,8 @@ const els = {
   rows: document.getElementById("candidateRows"),
   detail: document.getElementById("candidateDetail"),
   exportCsv: document.getElementById("exportCsv"),
+  downloadWorklistCsv: document.getElementById("downloadWorklistCsv"),
+  downloadWorklistGeojson: document.getElementById("downloadWorklistGeojson"),
   tabSetup: document.getElementById("tabSetup"),
   tabReview: document.getElementById("tabReview"),
   tabReports: document.getElementById("tabReports"),
@@ -494,6 +496,19 @@ function flagPills(flags) {
 
 function dashboardBase() {
   return `/api/dashboard-workspaces/${encodeURIComponent(state.activeWorkspaceId)}`;
+}
+
+// Server-side review-worklist export (ranked shortlist + reviewer decisions, approved
+// wording stamped). The endpoint sends Content-Disposition: attachment, so a plain
+// anchor click downloads without navigating away.
+function downloadWorklist(format) {
+  if (!state.activeWorkspaceId) return;
+  const anchor = document.createElement("a");
+  anchor.href = `${dashboardBase()}/candidates-export?format=${format}`;
+  anchor.rel = "noopener";
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
 }
 
 function bounds(points) {
@@ -5711,6 +5726,8 @@ els.buildWorkspace.addEventListener("click", buildWorkspace);
 els.buildGenericWorkspace.addEventListener("click", buildGenericWorkspace);
 els.buildRouteAwareWorkspace.addEventListener("click", buildRouteAwareWorkspace);
 els.exportCsv.addEventListener("click", exportVisibleCsv);
+els.downloadWorklistCsv?.addEventListener("click", () => downloadWorklist("csv"));
+els.downloadWorklistGeojson?.addEventListener("click", () => downloadWorklist("geojson"));
 window.addEventListener("resize", renderMap);
 
 init();
