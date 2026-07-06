@@ -11,7 +11,7 @@ pedestrian crossings, and rank which ones a human should **inspect on-site first
 - **SUBJECT of the analysis = pedestrian "generators" / destinations:** schools,
   kindergartens, childcare, parks, playgrounds, bus stops, community centres —
   the places people (often children) walk to.
-- **YARDSTICK = mapped (signalised) pedestrian crossings.** We measure how far
+- **YARDSTICK = mapped pedestrian crossings.** We measure how far
   each destination is from the nearest crossing — straight-line **and** route-aware
   along the road network — plus context flags (major road within 150 m, no mapped
   crossing within 150 m, near a major road without a signal, weak traffic calming).

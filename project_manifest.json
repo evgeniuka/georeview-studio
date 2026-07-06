@@ -2,7 +2,7 @@
   "project": "GeoReview Studio",
   "version": "v083_2026-06-01",
   "domain": "GIS infrastructure risk indicators for pedestrian access review",
-  "product_summary": "Scans OSM/Geofabrik data for a pilot area and ranks pedestrian destinations (schools, kindergartens, parks, bus stops) by how far they sit from a mapped signalised crossing, to prioritise on-site field review. Field-review prioritisation only, not crash prediction.",
+  "product_summary": "Scans OSM/Geofabrik data for a pilot area and ranks pedestrian destinations (schools, kindergartens, parks, bus stops) by how far they sit from a mapped crossing, to prioritise on-site field review. Field-review prioritisation only, not crash prediction.",
   "target_user": "Municipal road-safety planners, pedestrian-access reviewers and GIS analysts.",
   "core_workflow": [
     "source onboarding",

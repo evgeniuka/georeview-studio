@@ -43,7 +43,7 @@ Municipal road-safety planners, pedestrian-access reviewers and GIS analysts who
 
 ## How to read the score (and what it is not)
 
-The score is a **transparent but UNCALIBRATED** heuristic: it measures where mapped, signalised pedestrian-crossing access is *sparse* near a destination — it is **never checked against real crash or outcome data**. So it tells you **where to look first, not where it is worst**. It is a triage aid for on-site review, not a verdict.
+The score is a **transparent but UNCALIBRATED** heuristic: it measures where mapped pedestrian-crossing access is *sparse* near a destination — it is **never checked against real crash or outcome data**. So it tells you **where to look first, not where it is worst**. It is a triage aid for on-site review, not a verdict.
 
 - NOT crash / accident prediction. NOT a calibrated severity ranking.
 - A missing OSM tag is a **data-quality flag**, never proof that infrastructure is absent.
