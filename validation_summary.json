@@ -1,8 +1,0 @@
-{
-  "passed": true,
-  "app_version": "v083",
-  "required_modules": 19,
-  "backend_module_count": 32,
-  "candidate_count": 50,
-  "forbidden_terms_clean": true
-}

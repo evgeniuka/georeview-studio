@@ -1,4 +1,4 @@
-# Project Rules
+# Project working rules
 
 - Treat GeoReview Studio as a local-first GIS review workbench for infrastructure risk indicators and data-quality evidence.
 - Do not describe outputs as crash prediction or as proof that a location is dangerous.
@@ -14,9 +14,8 @@
 
 1. `README.md`
 2. `project_manifest.json`
-3. `.codex/project-profile.md`
-4. Parent `LATEST.txt`
-5. `docs/` files relevant to the touched backend/frontend area
+3. Parent `LATEST.txt`
+4. `docs/` files relevant to the touched backend/frontend area
 
 ## Validation Focus
 

@@ -2,11 +2,13 @@
 
 GeoReview Studio scans OpenStreetMap / Geofabrik data for a pilot area (Kfar Saba) and surfaces the pedestrian destinations — schools, kindergartens, parks, bus stops — that sit far from a mapped, signalised crossing, so a municipal or road-safety reviewer can **prioritise which locations to inspect on-site first**. It is a local-first, field-review prioritisation tool that flags locations for human review; it makes no crash-prediction or absolute-safety claims.
 
+As a portfolio project, it demonstrates GIS data engineering, road-safety domain modelling, and pragmatic software engineering.
+
 ## Screenshots
 
 ![GeoReview Studio dashboard — Safe Access Kfar Saba review map, review queue and selected-candidate detail](screenshots/dashboard_desktop.png)
 
-<sub>Dashboard-first review workspace (desktop, 1440×1320). The mobile layout is in [screenshots/dashboard_mobile.png](screenshots/dashboard_mobile.png).</sub>
+<sub>Dashboard-first review workspace (desktop, 1440×1320).</sub>
 
 ## Who it's for
 
@@ -43,10 +45,9 @@ python -B backend\app.py
 
 Open `http://127.0.0.1:8847` after the local server starts.
 
-## Codex Navigation
+## Repository map
 
 - Project rules: `AGENTS.md`
-- Project profile: `.codex/project-profile.md`
 - Release manifest: `project_manifest.json`
 - Backend entrypoint: `backend/app.py`
 - Frontend assets: `frontend/static`
@@ -54,4 +55,4 @@ Open `http://127.0.0.1:8847` after the local server starts.
 - API contract tests: `tests/test_api_contract.py`
 - Product and release docs: `docs/`
 
-Before claiming portfolio readiness, verify actual validation outputs instead of relying on old chat state.
+The `AGENTS.md` working rules and the editorial note above — recording the deliberate removal of ~50 self-referential tooling endpoints — are kept in the repository as visible evidence that this AI-assisted build was scoped and pruned under human control rather than left to accrete.

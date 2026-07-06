@@ -1,0 +1,2 @@
+# Vendored third-party assets (Leaflet) — exclude from GitHub language statistics.
+frontend/static/vendor/** linguist-vendored

@@ -35,3 +35,10 @@ installation_id
 *.cpg
 *.gpkg
 source_data/
+
+# AI-assisted working notes (kept local, out of the published repo)
+Контекст.md
+
+# Test-suite output artifacts (written by the suites, never read by the app)
+api_contract_summary.json
+validation_summary.json
