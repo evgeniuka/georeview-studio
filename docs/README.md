@@ -1,9 +1,8 @@
 # Documentation index
 
-This folder has two kinds of docs. **If you are reviewing the project, read the
-"Product & methodology" set first** — that is the actual GIS work. Everything under
-"Internal tooling layer" documents how the project packages and reviews *itself*
-and is supporting scaffolding, not product features.
+This folder documents the GIS review workbench. **If you are reviewing the project,
+read the "Product & methodology" set first** — that is the actual GIS work; the
+section below it is deeper workflow dives.
 
 ## Product & methodology (start here)
 
@@ -26,18 +25,21 @@ and is supporting scaffolding, not product features.
 [contract_execution.md](contract_execution.md) ·
 [template_authoring.md](template_authoring.md) ·
 [authored_profile_runner.md](authored_profile_runner.md) ·
+[authored_dashboard_contract.md](authored_dashboard_contract.md) ·
 [postgis_backend.md](postgis_backend.md) (planning-only) ·
 [universal_gis_analytics_architecture.md](universal_gis_analytics_architecture.md) (direction)
 
-## Internal tooling layer (packaging / QA / publication — not product features)
+Profile governance workflow (authoring → promotion → acceptance):
+[profile_promotion_wizard.md](profile_promotion_wizard.md) ·
+[proposal_acceptance_workflow.md](proposal_acceptance_workflow.md) ·
+[accepted_contract_application_plan.md](accepted_contract_application_plan.md) ·
+[profile_contract_diff_review.md](profile_contract_diff_review.md) ·
+[profile_contract_regression_preview.md](profile_contract_regression_preview.md) ·
+[guarded_config_apply_proposal.md](guarded_config_apply_proposal.md)
 
-These document the machinery that turns finished analysis into shareable evidence
-(bundles, handoffs, screenshots, release-readiness gates, reviewer-audit indexes and
-the GitHub-publication pipeline). They exist so the project can package and quality-check
-itself reproducibly; a recruiter does not need to read them to understand the product.
+---
 
-Representative entries: `release_readiness_dashboard.md`, `portfolio_evidence_bundle.md`,
-`bundle_review_checklist.md`, `portfolio_handoff_page.md`, `reproducibility_audit_packet.md`,
-`reviewer_audit_index.md`, `github_publication_bundle.md`, `repository_*` reviews,
-`visual_evidence_*` and `visual_qa_*`, `demo_*`, `recruiter_demo_brief.md`,
-`public_*_package.md`, `profile_promotion_wizard.md` and the related promotion/contract-diff docs.
+> **Note (2026-07):** ~37 self-referential "tooling" docs — packaging / QA / publication
+> scaffolding that described how the project reviewed and shipped *itself* — were removed
+> together with the backend modules they documented (see the top-level `README.md` editorial
+> note on the cut). This index now covers product and workflow docs only.
