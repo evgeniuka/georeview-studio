@@ -1,6 +1,6 @@
 # GeoReview Studio v083
 
-GeoReview Studio scans OpenStreetMap / Geofabrik data for a pilot area (Kfar Saba) and surfaces the pedestrian destinations — schools, kindergartens, parks, bus stops — that sit far from a mapped, signalised crossing, so a municipal or road-safety reviewer can **prioritise which locations to inspect on-site first**. It is a local-first, field-review prioritisation tool that flags locations for human review; it makes no crash-prediction or absolute-safety claims.
+GeoReview Studio scans OpenStreetMap / Geofabrik data for a pilot area (Kfar Saba) and surfaces the pedestrian destinations — schools, kindergartens, parks, bus stops — that sit far from a mapped crossing, so a municipal or road-safety reviewer can **prioritise which locations to inspect on-site first**. It is a local-first, field-review prioritisation tool that flags locations for human review; it makes no crash-prediction or absolute-safety claims.
 
 As a portfolio project, it demonstrates GIS data engineering, road-safety domain modelling, and pragmatic software engineering.
 
@@ -9,6 +9,27 @@ As a portfolio project, it demonstrates GIS data engineering, road-safety domain
 ![GeoReview Studio dashboard — Safe Access Kfar Saba review map, review queue and selected-candidate detail](screenshots/dashboard_desktop.png)
 
 <sub>Dashboard-first review workspace (desktop, 1440×1320).</sub>
+
+## Data highlights
+
+One local pipeline turns raw OpenStreetMap / Geofabrik extracts into a ranked, explainable review shortlist for a pilot city (Kfar Saba). Every figure below is the committed pilot run.
+
+| Layer built from OSM (analysis CRS EPSG:2039) | Count |
+|---|---:|
+| Pedestrian destinations — schools, kindergartens, parks, playgrounds, bus stops | **391** |
+| Mapped pedestrian crossings | **342** |
+| Road segments | **2 603** |
+| Major roads | 374 |
+| Mapped traffic-calming features | 11 |
+
+- **How each destination is measured** — distance to the nearest **mapped pedestrian crossing**, computed two ways: straight-line **and** along an OSM road-network proxy graph (9 828 nodes / 11 366 edges), plus a route-vs-straight **detour ratio**. It is a *mapped* crossing, not a "signalised" one: only 155 of the 342 crossings (45 %) carry a `traffic_signals` tag — the rest are marked, uncontrolled or generic.
+- **What the pilot found** — median route distance to the nearest mapped crossing is **218.6 m** (p90 627.2 m); **169 of 391** destinations (43 %) are over **250 m** away by route, and 244 are over 150 m. Median detour ratio is 1.26 (p90 1.67); 13 destinations combine a long route with a high detour.
+- **Transparent, auditable scoring** — every point traces to one rule in [`config/scoring_rules_v001.json`](config/scoring_rules_v001.json) (major road within 150 m = 25, no mapped crossing within 150 m = 25, route over 250 m = 20, …). Scores range 25–110; every destination scored ≥ 25, so all 391 are candidates and the queue ranks *degree* of concern worst-first rather than splitting "flagged vs clean".
+- **Data-quality kept separate from risk** — a missing OSM tag (no sidewalk / lighting / signal tag) lands in a `data_quality_flags` column and adds **zero** points; it is never counted as evidence of risk. Network-unreachability is treated the same way, since the proxy graph may be incomplete.
+- **Engineering** — stdlib-only Python + vanilla JS, zero runtime dependencies; reviewer decisions (status / note / assignee) persist in a local **SQLite** store; the shortlist exports as a **CSV or GeoJSON** field worklist (Excel- and QGIS-ready).
+- **Limits, up front** — the score is transparent but **uncalibrated** and never checked against crash or outcome data (see the honesty box below); the road-network distance is an OSM proxy, not verified pedestrian routing; the thresholds and EPSG:2039 projection are Israel/OSM-shaped; the pilot boundary is OSM/Geofabrik, not an official municipal boundary.
+
+Full method, a findings table and the ranked top 20 are in [`portfolio/case_study.md`](portfolio/case_study.md).
 
 ## Who it's for
 
@@ -43,7 +64,9 @@ cd <repo-or-release-root>
 python -B backend\app.py
 ```
 
-Open `http://127.0.0.1:8847` after the local server starts.
+Open `http://127.0.0.1:8847` after the local server starts. Stdlib-only Python — there are no packages to install.
+
+> **Note — the data is not bundled yet.** The multi-GB analysis artifact store that holds the Kfar Saba results lives outside this repository, so a fresh clone launches the app shell **without** the pilot data. A self-contained demo bundle (a trimmed workspace the app can point at) is planned; until it ships, the committed pilot numbers are documented in [`portfolio/case_study.md`](portfolio/case_study.md) and [`portfolio/sample_review_candidates_top20.csv`](portfolio/sample_review_candidates_top20.csv).
 
 ## Repository map
 
