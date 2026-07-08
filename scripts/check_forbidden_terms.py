@@ -7,11 +7,12 @@ review-wording string is missing. New map/legend copy added during the UI rework
 is the most likely place to accidentally introduce a banned substring, so this
 script lets us catch it before running the (slow, browser-backed) suite.
 
-It scans the files this rework actually edits — the frontend trio + backend *.py
-— which is where new map/legend copy (the real risk) lands. It deliberately does
-NOT scan docs that legitimately quote the banned list (e.g. docs/scope.md,
-CLAUDE.md), since the validator does not scan those either. Exit code 1 on any
-violation.
+It scans the frontend trio + backend *.py — where new map/legend copy (the real
+risk) lands — plus the recomputed analysis package (docs/analysis/*.md, sql/*.sql
+and scripts/generate_analysis_report.py), which are portfolio-facing artifacts that
+must stay clean. It deliberately does NOT scan docs that legitimately reference the
+policy list (e.g. docs/scope.md, CLAUDE.md), since the validator does not scan those
+either. Exit code 1 on any violation.
 
 Usage:  python -B scripts/check_forbidden_terms.py
 """
@@ -34,6 +35,10 @@ def scanned_files() -> list[Path]:
     for name in ("index.html", "app.js", "styles.css"):
         files.append(static / name)
     files.extend(sorted((PROJECT_DIR / "backend").glob("*.py")))
+    # recomputed analysis package: report prose, committed SQL, and the generator script
+    files.extend(sorted((PROJECT_DIR / "docs" / "analysis").glob("*.md")))
+    files.extend(sorted((PROJECT_DIR / "sql").rglob("*.sql")))
+    files.append(PROJECT_DIR / "scripts" / "generate_analysis_report.py")
     # never scan this guard itself (it holds the term fragments by design)
     return [f for f in files if f.exists() and f.resolve() != SELF]
 

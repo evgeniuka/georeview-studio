@@ -1,2 +1,5 @@
 # Vendored third-party assets (Leaflet) — exclude from GitHub language statistics.
 frontend/static/vendor/** linguist-vendored
+
+# Generated analysis report + figures: pin to LF so re-running the generator is a clean no-op.
+docs/analysis/** text eol=lf
