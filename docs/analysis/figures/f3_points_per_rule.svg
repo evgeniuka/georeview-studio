@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" font-family="sans-serif">
+<rect x="0" y="0" width="640" height="360" fill="#ffffff"/>
+<text x="320.00" y="24.00" font-size="13" text-anchor="middle" fill="#222">Total priority points contributed per rule</text>
+<text x="208.00" y="62.00" font-size="9" text-anchor="end" fill="#333">major road &lt;=150 m</text>
+<rect x="214.00" y="51.50" width="392.00" height="15.00" fill="#4575b4"/>
+<text x="610.00" y="62.00" font-size="9" text-anchor="start" fill="#333">8000</text>
+<text x="208.00" y="92.00" font-size="9" text-anchor="end" fill="#333">no crossing &lt;=150 m</text>
+<rect x="214.00" y="81.50" width="252.35" height="15.00" fill="#4575b4"/>
+<text x="470.35" y="92.00" font-size="9" text-anchor="start" fill="#333">5150</text>
+<text x="208.00" y="122.00" font-size="9" text-anchor="end" fill="#333">no traffic calming &lt;=100 m</text>
+<rect x="214.00" y="111.50" width="188.65" height="15.00" fill="#4575b4"/>
+<text x="406.65" y="122.00" font-size="9" text-anchor="start" fill="#333">3850</text>
+<text x="208.00" y="152.00" font-size="9" text-anchor="end" fill="#333">route to crossing &gt;250 m</text>
+<rect x="214.00" y="141.50" width="165.62" height="15.00" fill="#d73027"/>
+<text x="383.62" y="152.00" font-size="9" text-anchor="start" fill="#333">3380</text>
+<text x="208.00" y="182.00" font-size="9" text-anchor="end" fill="#333">crossing on major road, no signal</text>
+<rect x="214.00" y="171.50" width="152.15" height="15.00" fill="#4575b4"/>
+<text x="370.14" y="182.00" font-size="9" text-anchor="start" fill="#333">3105</text>
+<text x="208.00" y="212.00" font-size="9" text-anchor="end" fill="#333">high detour ratio</text>
+<rect x="214.00" y="201.50" width="6.37" height="15.00" fill="#d73027"/>
+<text x="224.37" y="212.00" font-size="9" text-anchor="start" fill="#333">130</text>
+<text x="208.00" y="242.00" font-size="9" text-anchor="end" fill="#333">far from road network</text>
+<rect x="214.00" y="231.50" width="5.39" height="15.00" fill="#d73027"/>
+<text x="223.39" y="242.00" font-size="9" text-anchor="start" fill="#333">110</text>
+<text x="208.00" y="272.00" font-size="9" text-anchor="end" fill="#333">sidewalk=no &lt;=50 m</text>
+<rect x="214.00" y="261.50" width="1.47" height="15.00" fill="#4575b4"/>
+<text x="219.47" y="272.00" font-size="9" text-anchor="start" fill="#333">30</text>
+<text x="208.00" y="302.00" font-size="9" text-anchor="end" fill="#333">lit=no &lt;=50 m</text>
+<rect x="214.00" y="291.50" width="0.00" height="15.00" fill="#4575b4"/>
+<text x="218.00" y="302.00" font-size="9" text-anchor="start" fill="#333">0</text>
+<text x="320.00" y="340.00" font-size="9" text-anchor="middle" fill="#555">23755 points total; crossing-access rules = 49.0% (red = route add-on)</text>
+</svg>
