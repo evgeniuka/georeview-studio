@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" font-family="sans-serif">
+<rect x="0" y="0" width="640" height="360" fill="#ffffff"/>
+<text x="320.00" y="24.00" font-size="13" text-anchor="middle" fill="#222">Evidence coverage: share of features whose tag is mapped</text>
+<text x="208.00" y="69.50" font-size="9" text-anchor="end" fill="#333">crossings.tactile_paving</text>
+<rect x="214.00" y="59.00" width="0.00" height="15.00" fill="#d73027"/>
+<text x="218.00" y="69.50" font-size="9" text-anchor="start" fill="#333">0.0%</text>
+<text x="208.00" y="114.50" font-size="9" text-anchor="end" fill="#333">crossings.kerb</text>
+<rect x="214.00" y="104.00" width="6.70" height="15.00" fill="#d73027"/>
+<text x="224.70" y="114.50" font-size="9" text-anchor="start" fill="#333">0.6%</text>
+<text x="208.00" y="159.50" font-size="9" text-anchor="end" fill="#333">crossings.crossing_island</text>
+<rect x="214.00" y="149.00" width="392.00" height="15.00" fill="#1a9850"/>
+<text x="610.00" y="159.50" font-size="9" text-anchor="start" fill="#333">35.1%</text>
+<text x="208.00" y="204.50" font-size="9" text-anchor="end" fill="#333">roads.maxspeed_effective</text>
+<rect x="214.00" y="194.00" width="5.58" height="15.00" fill="#d73027"/>
+<text x="223.58" y="204.50" font-size="9" text-anchor="start" fill="#333">0.5%</text>
+<text x="208.00" y="249.50" font-size="9" text-anchor="end" fill="#333">roads.sidewalk</text>
+<rect x="214.00" y="239.00" width="5.58" height="15.00" fill="#d73027"/>
+<text x="223.58" y="249.50" font-size="9" text-anchor="start" fill="#333">0.5%</text>
+<text x="208.00" y="294.50" font-size="9" text-anchor="end" fill="#333">roads.lit</text>
+<rect x="214.00" y="284.00" width="17.87" height="15.00" fill="#d73027"/>
+<text x="235.87" y="294.50" font-size="9" text-anchor="start" fill="#333">1.6%</text>
+<text x="320.00" y="340.00" font-size="9" text-anchor="middle" fill="#555">low bars are evidence gaps (blank tags), never confirmed absence of infrastructure</text>
+</svg>

@@ -77,6 +77,14 @@ RULES = [
 ]
 # Rules about sparse or inadequate mapped-crossing access (by index into RULES).
 CROSSING_ACCESS_RULES = (1, 2, 6)
+# Rules that fire on the ABSENCE of a mapped feature (no crossing / no signal / no traffic calming).
+ABSENCE_RULES = (1, 2, 3)
+
+SQL_DIR = REPO_ROOT / "sql"
+SQL_FILES = [
+    "01_top20_worklist", "02_evidence_coverage", "03_distance_buckets", "04_score_integrity",
+    "05_dq_flag_pareto", "06_signal_gap_major_roads", "07_crossing_load", "08_absence_of_mapping_share",
+]
 
 
 # --------------------------------------------------------------------------- loading
@@ -530,6 +538,75 @@ def compute_s4(frame: list[dict]) -> dict:
     }
 
 
+# --------------------------------------------------------------------------- sql pack
+
+
+def setup_derived_tables(conn: sqlite3.Connection, store: Path) -> None:
+    """Add the two helper tables the sql/ pack needs: rule_weights (flag -> weight/kind) and a
+    decisions table, filled read-only from a review-decisions store if one exists (empty otherwise)."""
+    conn.execute("CREATE TABLE rule_weights (flag TEXT, weight INTEGER, kind TEXT)")
+    conn.executemany(
+        "INSERT INTO rule_weights VALUES (?, ?, ?)",
+        [(ru.name, ru.weight, "absence" if i in ABSENCE_RULES else "presence") for i, ru in enumerate(RULES)],
+    )
+    conn.execute("CREATE TABLE decisions (generator_id TEXT, status TEXT, note TEXT, assignee TEXT)")
+    review_dir = store / "georeview_studio_review_decisions"
+    if review_dir.is_dir():
+        for db_path in sorted(review_dir.glob("*.sqlite")) + sorted(review_dir.glob("*.db")):
+            try:
+                src = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
+                rows = src.execute(
+                    "SELECT generator_id, status, note, assignee FROM review_decisions WHERE workspace_id = ?",
+                    (WORKSPACE_ID,),
+                ).fetchall()
+                src.close()
+                conn.executemany("INSERT INTO decisions VALUES (?, ?, ?, ?)", rows)
+            except sqlite3.Error:
+                pass
+    conn.commit()
+
+
+def run_sql_pack(conn: sqlite3.Connection) -> dict[str, list[dict]]:
+    """Execute each committed sql/ query against the in-memory database and capture its rows."""
+    out: dict[str, list[dict]] = {}
+    for name in SQL_FILES:
+        cur = conn.execute((SQL_DIR / f"{name}.sql").read_text(encoding="utf-8"))
+        columns = [c[0] for c in cur.description]
+        out[name] = [dict(zip(columns, row)) for row in cur.fetchall()]
+    return out
+
+
+def compute_s5(sql_out: dict, summary: dict) -> dict:
+    coverage = [
+        {**r, "pct": round(100.0 * r["present"] / r["total"], 1) if r["total"] else 0.0}
+        for r in sql_out["02_evidence_coverage"]
+    ]
+    load = sql_out["07_crossing_load"]
+    crossings_used = sum(r["crossings_used"] for r in load)
+    total_crossings = sum(r["crossings"] for r in load)
+    absence = next(
+        (r for r in sql_out["08_absence_of_mapping_share"] if r["kind"] == "absence"),
+        {"points": 0, "share_pct": 0.0},
+    )
+    return {
+        "evidence_coverage": coverage,
+        "distance_buckets": sql_out["03_distance_buckets"],
+        "dq_flag_pareto": sql_out["05_dq_flag_pareto"],
+        "signal_gap": sql_out["06_signal_gap_major_roads"][0],
+        "crossing_load": load,
+        "crossings_used": crossings_used,
+        "crossings_unused": total_crossings - crossings_used,
+        "absence_points": absence["points"],
+        "absence_share_pct": absence["share_pct"],
+        "network_proxy": {
+            "reachable": summary.get("route_reachable_generators"),
+            "unreachable": summary.get("route_unreachable_generators"),
+            "far_attach": summary.get("generators_far_from_network_proxy"),
+            "excluded_segments": summary.get("excluded_road_segments"),
+        },
+    }
+
+
 # --------------------------------------------------------------------------- svg
 
 
@@ -681,6 +758,17 @@ def figure_f4(s4: dict) -> str:
     )
 
 
+def figure_f5(s5: dict) -> str:
+    cov = s5["evidence_coverage"]
+    colors = ["#d73027" if r["pct"] < 5 else "#fdae61" if r["pct"] < 25 else "#1a9850" for r in cov]
+    footer = "low bars are evidence gaps (blank tags), never confirmed absence of infrastructure"
+    return hbar_svg(
+        "Evidence coverage: share of features whose tag is mapped",
+        [f"{r['layer']}.{r['attribute']}" for r in cov], [r["pct"] for r in cov], colors,
+        lambda v: f"{v}%", footer,
+    )
+
+
 # --------------------------------------------------------------------------- report
 
 
@@ -691,7 +779,7 @@ def _mix_table(mix: dict[str, int], header: str) -> list[str]:
     return lines
 
 
-def build_report(n: dict, s3: dict, s4: dict) -> str:
+def build_report(n: dict, s3: dict, s4: dict, s5: dict, sql_out: dict) -> str:
     c = n["counts"]
     rd = n["route_distance"]
     sig = n["traffic_signal_tagged"]
@@ -804,7 +892,8 @@ def build_report(n: dict, s3: dict, s4: dict) -> str:
     L.append(
         f"Every priority score is a sum over a small fixed rule set. Recomputing each score from its fired "
         f"flags times the configured weights **reconciles with** the stored `route_review_priority_score` for "
-        f"all {audit['rows']} rows ({audit['reconciled']} of {audit['rows']}, 0 mismatches)."
+        f"all {audit['rows']} rows: the SQL integrity check (`sql/04_score_integrity.sql`) returns "
+        f"{len(sql_out['04_score_integrity'])} mismatching rows."
     )
     L.append("")
     L.append("| Rule | Group | Weight | Fires | Points | Share |")
@@ -892,6 +981,151 @@ def build_report(n: dict, s3: dict, s4: dict) -> str:
     L.append("")
     L.append("Kendall tau-b is computed once here, never inside the 1,000-trial loop where its O(n^2) cost would dominate.")
     L.append("")
+
+    # -- S5 --------------------------------------------------------------
+    npx = s5["network_proxy"]
+    sg = s5["signal_gap"]
+    L.append("## S5 — Data quality as a first-class finding")
+    L.append("")
+    L.append(
+        "The score can only see what OSM has mapped, and several safety-relevant attributes are almost blank in this "
+        "pilot. That is itself a finding: the score is a crossing-access triage signal and **cannot be read as a "
+        "sidewalk, lighting or crossing-quality assessment.**"
+    )
+    L.append("")
+    L.append("Route-distance distribution with a running share (window `SUM` over a CTE, `sql/03_distance_buckets.sql`):")
+    L.append("")
+    L.append("| Route distance | Destinations | Cumulative |")
+    L.append("|---|--:|--:|")
+    for r in s5["distance_buckets"]:
+        L.append(f"| {r['bucket']} | {r['destinations']} | {r['cumulative']} |")
+    L.append("")
+    L.append("**Evidence coverage** — how often each attribute is actually tagged; a blank is an evidence gap, never proof the feature is absent:")
+    L.append("")
+    L.append("| Layer | Attribute | Tagged / total | Coverage |")
+    L.append("|---|---|--:|--:|")
+    for r in s5["evidence_coverage"]:
+        L.append(f"| {r['layer']} | `{r['attribute']}` | {r['present']} / {r['total']} | {r['pct']} % |")
+    L.append("")
+    L.append("![Evidence coverage](figures/f5_evidence_coverage.svg)")
+    L.append("")
+    L.append("*Figure 5. Share of features whose tag is mapped. Low bars are evidence gaps, not confirmed absences.*")
+    L.append("")
+    L.append(f"**Data-quality flag census** — how many of the {c['pedestrian_destinations']} destinations carry each evidence gap (`sql/05_dq_flag_pareto.sql`):")
+    L.append("")
+    L.append("| Evidence gap (flag) | Destinations |")
+    L.append("|---|--:|")
+    for r in s5["dq_flag_pareto"]:
+        L.append(f"| `{r['flag']}` | {r['destinations']} |")
+    L.append("")
+    L.append(
+        f"**Network-proxy quality.** {npx['reachable']} of {c['pedestrian_destinations']} destinations reach a crossing "
+        f"across the proxy graph ({npx['unreachable']} does not, and is treated as a data-quality gap); {npx['far_attach']} "
+        f"attach to the road network more than 35 m away; {npx['excluded_segments']} road segments (motorway / trunk / "
+        f"track / unknown) are excluded from the walking proxy. Of the {c['mapped_crossings']} mapped crossings, "
+        f"{s5['crossings_used']} are the nearest by route for at least one destination and {s5['crossings_unused']} serve "
+        f"none. Those {c['mapped_crossings']} crossings are what remains after clipping the national Geofabrik extract to "
+        f"the OSM pilot boundary; the pre-clip source is not committed."
+    )
+    L.append("")
+    L.append(
+        f"**Signal gap** (conditional aggregation, `sql/06_signal_gap_major_roads.sql`). Of {sg['near_major_road']} "
+        f"destinations within 150 m of a mapped major road, {sg['near_major_road_no_signal_evidence']} have a nearest "
+        f"mapped crossing with no mapped signal within 50 m — an evidence gap, not proof a signal is absent."
+    )
+    L.append("")
+    L.append("Crossing load (reversed `LEFT JOIN`, `sql/07_crossing_load.sql`) — which crossing types carry the review load:")
+    L.append("")
+    L.append("| Crossing type | Crossings | Destinations served | Crossings used |")
+    L.append("|---|--:|--:|--:|")
+    for r in s5["crossing_load"]:
+        L.append(f"| `{r['crossing_type']}` | {r['crossings']} | {r['destinations_served']} | {r['crossings_used']} |")
+    L.append("")
+    L.append(
+        f"**What the score does not say.** {s5['absence_share_pct']} % of all priority points come from rules that fire "
+        f"on the ABSENCE of a mapped feature — no mapped crossing, no mapped traffic calming, no mapped signal at the "
+        f"nearest crossing (`sql/08_absence_of_mapping_share.sql`). Because a missing tag is a data-quality gap and not "
+        f"evidence that the feature is absent on the ground (see [`../scope.md`](../scope.md)), **the highest-leverage "
+        f"improvement here is better mapping, not a better model.**"
+    )
+    L.append("")
+
+    # -- S6 --------------------------------------------------------------
+    top20 = sql_out["01_top20_worklist"]
+    top_mix = Counter(row["generator_type"] for row in top20)
+    L.append("## S6 — The field worklist")
+    L.append("")
+    L.append(
+        "The top 20 destinations to inspect on-site first, in the exact order the dashboard candidates endpoint produces "
+        "(`sql/01_top20_worklist.sql`), joined to any recorded reviewer decision — the bundled demo has none, so every "
+        "status reads `unreviewed`."
+    )
+    L.append("")
+    L.append("| # | Generator | Type | Name | Straight (m) | Route (m) | Score | Review status |")
+    L.append("|--:|---|---|---|--:|--:|--:|---|")
+    for i, row in enumerate(top20, 1):
+        name = row["name"] or "—"
+        L.append(f"| {i} | `{row['generator_id']}` | {row['generator_type']} | {name} | {row['straight_m']} | {row['route_m']} | {row['score']} | {row['review_status']} |")
+    L.append("")
+    L.append(f"> {APPROVED_WORDING}")
+    L.append("")
+    L.append("Every row on the worklist carries exactly that approved review wording; no other verdict is attached to a location.")
+    L.append("")
+    L.append("**Top-20 vs population.** The shortlist over-represents schools and kindergartens and under-represents bus stops relative to the full inventory:")
+    L.append("")
+    L.append("| Type | In top 20 | In population |")
+    L.append("|---|--:|--:|")
+    for t in sorted(top_mix, key=lambda x: (-top_mix[x], x)):
+        L.append(f"| {t} | {top_mix[t]} | {n['generator_type_mix'].get(t, 0)} |")
+    L.append("")
+
+    # -- S7 --------------------------------------------------------------
+    L.append("## S7 — Methods and reproducibility")
+    L.append("")
+    L.append(
+        f"**Environment.** One file, `scripts/generate_analysis_report.py`, standard library only "
+        f"(csv, json, sqlite3, statistics, math, random, argparse) — no pandas, numpy or matplotlib; figures are "
+        f"hand-built SVG. Fixed random seed {SEED}; the run is read-only with respect to the data store and produces "
+        f"byte-identical output on rerun."
+    )
+    L.append("")
+    L.append(
+        "**Source snapshot.** OpenStreetMap / Geofabrik `israel-and-palestine` extract, 2026-05-21, (c) OpenStreetMap "
+        "contributors (ODbL), clipped to the Kfar Saba OSM pilot boundary and projected to EPSG:2039. The bundled "
+        "`demo_data/` store is a ~2 MB pilot subset; the full analysis store is not committed."
+    )
+    L.append("")
+    L.append("**Figure provenance.**")
+    L.append("")
+    L.append("| Figure | Built from |")
+    L.append("|---|---|")
+    L.append("| f1 route-distance bands | `network` table, banded per destination type |")
+    L.append("| f2 straight vs route | `network` table, one point per reachable destination |")
+    L.append("| f3 points per rule | fired flags x `config/scoring_rules_v001.json` weights |")
+    L.append("| f4 top-20 frequency | 1,000 weight-perturbation trials (Protocol A) |")
+    L.append("| f5 evidence coverage | `sql/02_evidence_coverage.sql` |")
+    L.append("")
+    L.append("**SQL pack.** Eight annotated queries in [`../../sql/`](../../sql/) run against the same in-memory SQLite database the report builds — no second loader:")
+    L.append("")
+    L.append("1. `01_top20_worklist.sql` — the field worklist (app tie-break + reviewer decisions).")
+    L.append("2. `02_evidence_coverage.sql` — attribute fill rates.")
+    L.append("3. `03_distance_buckets.sql` — route-distance buckets with a window `SUM`.")
+    L.append("4. `04_score_integrity.sql` — score-decomposition integrity check.")
+    L.append("5. `05_dq_flag_pareto.sql` — data-quality flag census.")
+    L.append("6. `06_signal_gap_major_roads.sql` — signal gap by conditional aggregation.")
+    L.append("7. `07_crossing_load.sql` — crossing load by reversed LEFT JOIN.")
+    L.append("8. `08_absence_of_mapping_share.sql` — share of points from absence-of-mapping rules.")
+    L.append("")
+    L.append("**Key SQL, verbatim** — the reconciliation check and the worklist join:")
+    L.append("")
+    L.append("```sql")
+    L.append((SQL_DIR / "04_score_integrity.sql").read_text(encoding="utf-8").rstrip())
+    L.append("```")
+    L.append("")
+    L.append("```sql")
+    L.append((SQL_DIR / "01_top20_worklist.sql").read_text(encoding="utf-8").rstrip())
+    L.append("```")
+    L.append("")
     return "\n".join(L) + "\n"
 
 
@@ -916,10 +1150,14 @@ def main() -> int:
     conn = sqlite3.connect(":memory:")
     try:
         load_store(conn, workspace)
+        setup_derived_tables(conn, args.store)
         numbers = compute_numbers(conn, summary)
         frame, reconciled = build_score_frame(conn)
         s3 = compute_s3(conn, frame, reconciled)
         s4 = compute_s4(frame)
+        sql_out = run_sql_pack(conn)
+        assert not sql_out["04_score_integrity"], sql_out["04_score_integrity"]  # scores reconcile
+        s5 = compute_s5(sql_out, summary)
     finally:
         conn.close()
 
@@ -934,16 +1172,19 @@ def main() -> int:
     )
     (FIG_DIR / "f3_points_per_rule.svg").write_text(figure_f3(s3), encoding="utf-8", newline="\n")
     (FIG_DIR / "f4_top20_frequency.svg").write_text(figure_f4(s4), encoding="utf-8", newline="\n")
-    REPORT_MD.write_text(build_report(numbers, s3, s4), encoding="utf-8", newline="\n")
+    (FIG_DIR / "f5_evidence_coverage.svg").write_text(figure_f5(s5), encoding="utf-8", newline="\n")
+    REPORT_MD.write_text(build_report(numbers, s3, s4, s5, sql_out), encoding="utf-8", newline="\n")
     # Machine-readable numbers (gitignored): drop the bulky scatter payload.
     persisted = {k: v for k, v in numbers.items() if k != "scatter_points"}
     persisted["s3_score_anatomy"] = s3
     persisted["s4_ranking_robustness"] = s4
+    persisted["s5_data_quality"] = s5
+    persisted["s6_worklist_top20"] = sql_out["01_top20_worklist"]
     NUMBERS_JSON.write_text(
         json.dumps(persisted, indent=2, ensure_ascii=False, sort_keys=True) + "\n",
         encoding="utf-8", newline="\n",
     )
-    print(f"wrote {REPORT_MD.relative_to(REPO_ROOT)}, 4 figures, and {NUMBERS_JSON.name}")
+    print(f"wrote {REPORT_MD.relative_to(REPO_ROOT)}, 5 figures, and {NUMBERS_JSON.name}")
     return 0
 
 

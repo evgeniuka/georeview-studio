@@ -12,6 +12,7 @@ section below it is deeper workflow dives.
 | [product_architecture.md](product_architecture.md) | Product direction and the reusable-profile model (with honest current limits). |
 | [data_model.md](data_model.md) | Canonical geospatial tables built from OSM/Geofabrik source. |
 | [scoring_rules.md](scoring_rules.md) | Transparent, audited scoring — and what the score actually measures. |
+| [analysis/kfar_saba_crossing_access_report.md](analysis/kfar_saba_crossing_access_report.md) | Recomputed pilot analysis: distances, score anatomy, ranking robustness, data quality — figures + the SQL (`../sql/`) that produced them. |
 | [osm_tag_quality.md](osm_tag_quality.md) | OSM tag coverage, missing-tag handling, risk vs data-quality separation. |
 | [profile_result_contract.md](profile_result_contract.md) | Normalized result contract shared across analysis profiles. |
 | [api.md](api.md) | Endpoint reference for the GIS workflow. |

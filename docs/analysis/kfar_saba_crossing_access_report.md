@@ -81,7 +81,7 @@ The live dashboard candidates endpoint orders destinations by `(-route_review_pr
 
 ## S3 — Anatomy of the score
 
-Every priority score is a sum over a small fixed rule set. Recomputing each score from its fired flags times the configured weights **reconciles with** the stored `route_review_priority_score` for all 391 rows (391 of 391, 0 mismatches).
+Every priority score is a sum over a small fixed rule set. Recomputing each score from its fired flags times the configured weights **reconciles with** the stored `route_review_priority_score` for all 391 rows: the SQL integrity check (`sql/04_score_integrity.sql`) returns 0 mismatching rows.
 
 | Rule | Group | Weight | Fires | Points | Share |
 |---|---|--:|--:|--:|--:|
@@ -153,4 +153,190 @@ The most disruptive single drops take the top-20 Jaccard down to 0.667 (`generat
 | `gen_0232` | park | 391 | 299 | +92 | 2.99 |
 
 Kendall tau-b is computed once here, never inside the 1,000-trial loop where its O(n^2) cost would dominate.
+
+## S5 — Data quality as a first-class finding
+
+The score can only see what OSM has mapped, and several safety-relevant attributes are almost blank in this pilot. That is itself a finding: the score is a crossing-access triage signal and **cannot be read as a sidewalk, lighting or crossing-quality assessment.**
+
+Route-distance distribution with a running share (window `SUM` over a CTE, `sql/03_distance_buckets.sql`):
+
+| Route distance | Destinations | Cumulative |
+|---|--:|--:|
+| 0-100 m | 92 | 92 |
+| 100-250 m | 129 | 221 |
+| 250-500 m | 104 | 325 |
+| 500+ m | 65 | 390 |
+| unreachable | 1 | 391 |
+
+**Evidence coverage** — how often each attribute is actually tagged; a blank is an evidence gap, never proof the feature is absent:
+
+| Layer | Attribute | Tagged / total | Coverage |
+|---|---|--:|--:|
+| crossings | `tactile_paving` | 0 / 342 | 0.0 % |
+| crossings | `kerb` | 2 / 342 | 0.6 % |
+| crossings | `crossing_island` | 120 / 342 | 35.1 % |
+| roads | `maxspeed_effective` | 13 / 2603 | 0.5 % |
+| roads | `sidewalk` | 12 / 2603 | 0.5 % |
+| roads | `lit` | 41 / 2603 | 1.6 % |
+
+![Evidence coverage](figures/f5_evidence_coverage.svg)
+
+*Figure 5. Share of features whose tag is mapped. Low bars are evidence gaps, not confirmed absences.*
+
+**Data-quality flag census** — how many of the 391 destinations carry each evidence gap (`sql/05_dq_flag_pareto.sql`):
+
+| Evidence gap (flag) | Destinations |
+|---|--:|
+| `pilot_boundary_osm_geofabrik_not_official` | 391 |
+| `cycleway_class_included_as_proxy_may_overestimate_walk_access` | 390 |
+| `motorway_trunk_track_classes_excluded_from_walk_proxy` | 390 |
+| `route_network_proxy_from_osm_roads_not_verified_walk_route` | 390 |
+| `nearby_sidewalk_tags_missing` | 371 |
+| `nearby_lit_tags_missing` | 352 |
+| `nearby_major_road_maxspeed_missing` | 313 |
+| `nearest_crossing_detail_tags_missing` | 118 |
+| `generator_far_from_mapped_network_proxy` | 22 |
+| `route_network_proxy_unavailable_for_generator` | 1 |
+
+**Network-proxy quality.** 390 of 391 destinations reach a crossing across the proxy graph (1 does not, and is treated as a data-quality gap); 22 attach to the road network more than 35 m away; 89 road segments (motorway / trunk / track / unknown) are excluded from the walking proxy. Of the 342 mapped crossings, 155 are the nearest by route for at least one destination and 187 serve none. Those 342 crossings are what remains after clipping the national Geofabrik extract to the OSM pilot boundary; the pre-clip source is not committed.
+
+**Signal gap** (conditional aggregation, `sql/06_signal_gap_major_roads.sql`). Of 320 destinations within 150 m of a mapped major road, 207 have a nearest mapped crossing with no mapped signal within 50 m — an evidence gap, not proof a signal is absent.
+
+Crossing load (reversed `LEFT JOIN`, `sql/07_crossing_load.sql`) — which crossing types carry the review load:
+
+| Crossing type | Crossings | Destinations served | Crossings used |
+|---|--:|--:|--:|
+| `uncontrolled` | 123 | 142 | 66 |
+| `pedestrian_crossing` | 29 | 117 | 15 |
+| `traffic_signals` | 155 | 100 | 62 |
+| `marked` | 35 | 31 | 12 |
+
+**What the score does not say.** 51.0 % of all priority points come from rules that fire on the ABSENCE of a mapped feature — no mapped crossing, no mapped traffic calming, no mapped signal at the nearest crossing (`sql/08_absence_of_mapping_share.sql`). Because a missing tag is a data-quality gap and not evidence that the feature is absent on the ground (see [`../scope.md`](../scope.md)), **the highest-leverage improvement here is better mapping, not a better model.**
+
+## S6 — The field worklist
+
+The top 20 destinations to inspect on-site first, in the exact order the dashboard candidates endpoint produces (`sql/01_top20_worklist.sql`), joined to any recorded reviewer decision — the bundled demo has none, so every status reads `unreviewed`.
+
+| # | Generator | Type | Name | Straight (m) | Route (m) | Score | Review status |
+|--:|---|---|---|--:|--:|--:|---|
+| 1 | `gen_0388` | school | רחל המשוררת | 170.8 | 430.6 | 110 | unreviewed |
+| 2 | `gen_0301` | park | — | 226.7 | 472.5 | 105 | unreviewed |
+| 3 | `gen_0372` | school | חטיבת שרת | 339.7 | 477.0 | 100 | unreviewed |
+| 4 | `gen_0373` | school | חטיבת שז"ר | 270.6 | 334.0 | 100 | unreviewed |
+| 5 | `gen_0366` | school | חטיבת הביניים ע"ש יורם טהרלב | 254.5 | 409.2 | 100 | unreviewed |
+| 6 | `gen_0379` | school | — | 221.0 | 273.4 | 100 | unreviewed |
+| 7 | `gen_0168` | bus_stop | דמרי סנטר/ספיר | 720.3 | 984.6 | 95 | unreviewed |
+| 8 | `gen_0190` | kindergarten | — | 668.6 | 1028.6 | 95 | unreviewed |
+| 9 | `gen_0215` | kindergarten | גן אפיק, יובל, מעיין, נחל | 660.4 | 812.0 | 95 | unreviewed |
+| 10 | `gen_0158` | bus_stop | דמרי סנטר/שלמה וחיה אנגל | 660.0 | 861.8 | 95 | unreviewed |
+| 11 | `gen_0216` | kindergarten | גן מעיין | 656.1 | 790.1 | 95 | unreviewed |
+| 12 | `gen_0390` | school | בית ספר לאה גולדברג | 583.4 | 797.6 | 95 | unreviewed |
+| 13 | `gen_0244` | park | — | 503.6 | 717.4 | 95 | unreviewed |
+| 14 | `gen_0154` | bus_stop | משה וילנסקי/ג׳ו עמר | 475.3 | 641.1 | 95 | unreviewed |
+| 15 | `gen_0344` | playground | — | 452.4 | 632.4 | 95 | unreviewed |
+| 16 | `gen_0217` | kindergarten | — | 422.1 | 550.0 | 95 | unreviewed |
+| 17 | `gen_0191` | kindergarten | — | 392.0 | 497.5 | 95 | unreviewed |
+| 18 | `gen_0320` | park | — | 391.2 | 500.0 | 95 | unreviewed |
+| 19 | `gen_0307` | park | — | 374.9 | 519.8 | 95 | unreviewed |
+| 20 | `gen_0321` | park | — | 374.2 | 495.7 | 95 | unreviewed |
+
+> This location has infrastructure risk indicators and should be reviewed on-site.
+
+Every row on the worklist carries exactly that approved review wording; no other verdict is attached to a location.
+
+**Top-20 vs population.** The shortlist over-represents schools and kindergartens and under-represents bus stops relative to the full inventory:
+
+| Type | In top 20 | In population |
+|---|--:|--:|
+| school | 6 | 28 |
+| kindergarten | 5 | 37 |
+| park | 5 | 103 |
+| bus_stop | 3 | 180 |
+| playground | 1 | 39 |
+
+## S7 — Methods and reproducibility
+
+**Environment.** One file, `scripts/generate_analysis_report.py`, standard library only (csv, json, sqlite3, statistics, math, random, argparse) — no pandas, numpy or matplotlib; figures are hand-built SVG. Fixed random seed 20260706; the run is read-only with respect to the data store and produces byte-identical output on rerun.
+
+**Source snapshot.** OpenStreetMap / Geofabrik `israel-and-palestine` extract, 2026-05-21, (c) OpenStreetMap contributors (ODbL), clipped to the Kfar Saba OSM pilot boundary and projected to EPSG:2039. The bundled `demo_data/` store is a ~2 MB pilot subset; the full analysis store is not committed.
+
+**Figure provenance.**
+
+| Figure | Built from |
+|---|---|
+| f1 route-distance bands | `network` table, banded per destination type |
+| f2 straight vs route | `network` table, one point per reachable destination |
+| f3 points per rule | fired flags x `config/scoring_rules_v001.json` weights |
+| f4 top-20 frequency | 1,000 weight-perturbation trials (Protocol A) |
+| f5 evidence coverage | `sql/02_evidence_coverage.sql` |
+
+**SQL pack.** Eight annotated queries in [`../../sql/`](../../sql/) run against the same in-memory SQLite database the report builds — no second loader:
+
+1. `01_top20_worklist.sql` — the field worklist (app tie-break + reviewer decisions).
+2. `02_evidence_coverage.sql` — attribute fill rates.
+3. `03_distance_buckets.sql` — route-distance buckets with a window `SUM`.
+4. `04_score_integrity.sql` — score-decomposition integrity check.
+5. `05_dq_flag_pareto.sql` — data-quality flag census.
+6. `06_signal_gap_major_roads.sql` — signal gap by conditional aggregation.
+7. `07_crossing_load.sql` — crossing load by reversed LEFT JOIN.
+8. `08_absence_of_mapping_share.sql` — share of points from absence-of-mapping rules.
+
+**Key SQL, verbatim** — the reconciliation check and the worklist join:
+
+```sql
+-- 04_score_integrity.sql
+-- Score-decomposition integrity check. Recompute every destination's priority score from its fired
+-- weighted rules (common risk flags UNION route-proxy flags, joined to rule_weights) and surface any
+-- row whose recompute does not RECONCILE WITH the stored route_review_priority_score.
+-- The report runs this and asserts the result set is empty (zero mismatching rows).
+WITH fired AS (
+    SELECT generator_id, flag FROM network__network_flags
+    UNION ALL
+    SELECT generator_id, flag FROM risk__risk_flags
+),
+recomputed AS (
+    SELECT f.generator_id, COALESCE(SUM(w.weight), 0) AS score
+    FROM fired f
+    JOIN rule_weights w ON w.flag = f.flag
+    GROUP BY f.generator_id
+)
+SELECT
+    n.generator_id,
+    n.route_review_priority_score AS stored,
+    COALESCE(rc.score, 0)         AS recomputed
+FROM network n
+LEFT JOIN recomputed rc ON rc.generator_id = n.generator_id
+WHERE n.route_review_priority_score <> COALESCE(rc.score, 0)
+ORDER BY n.generator_id;
+```
+
+```sql
+-- 01_top20_worklist.sql
+-- The field worklist: top 20 destinations to review on-site first, in the exact order the
+-- live dashboard candidates endpoint uses, joined to any recorded reviewer decision.
+--
+-- Ranking key mirrors the app: (-route_review_priority_score, -risk_score, -nearest_crossing_m),
+-- with generator_id appended as a final deterministic tie-break. The LEFT JOIN keeps every
+-- candidate even when no decision has been recorded yet (the bundled demo has none).
+SELECT
+    n.generator_id,
+    n.generator_type,
+    n.name,
+    r.nearest_crossing_m        AS straight_m,
+    n.route_nearest_crossing_m  AS route_m,
+    n.route_vs_straight_ratio   AS detour_ratio,
+    n.route_review_priority_score AS score,
+    COALESCE(d.status, 'unreviewed') AS review_status,
+    d.assignee,
+    n.review_wording
+FROM network n
+JOIN risk r ON r.generator_id = n.generator_id
+LEFT JOIN decisions d ON d.generator_id = n.generator_id
+ORDER BY
+    n.route_review_priority_score DESC,
+    r.risk_score DESC,
+    r.nearest_crossing_m DESC,
+    n.generator_id ASC
+LIMIT 20;
+```
 

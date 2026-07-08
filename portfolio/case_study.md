@@ -2,6 +2,8 @@
 
 A local-first GIS workbench that turns a raw OpenStreetMap extract into a ranked, explainable shortlist of pedestrian destinations to inspect on-site first. This case study covers the committed Safe Access Kfar Saba pilot run.
 
+A deeper, fully recomputed analysis — score anatomy, ranking-robustness tests and data-quality findings, with the SQL that produced them — is in [`../docs/analysis/kfar_saba_crossing_access_report.md`](../docs/analysis/kfar_saba_crossing_access_report.md).
+
 ## Method
 
 1. **Source.** OpenStreetMap / Geofabrik extract for Kfar Saba, Israel. Simplified geometry is enriched with raw OSM PBF tags; the analysis is projected to **EPSG:2039** (Israeli grid). The pilot boundary comes from OSM, not an official municipal boundary.
