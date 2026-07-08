@@ -60,13 +60,23 @@ App version `v083` · manifest `v083_2026-06-01` · local URL `http://127.0.0.1:
 ## Run Locally
 
 ```powershell
-cd <repo-or-release-root>
+git clone https://github.com/evgeniuka/georeview-studio.git
+cd georeview-studio
 python -B backend\app.py
 ```
 
-Open `http://127.0.0.1:8847` after the local server starts. Stdlib-only Python — there are no packages to install.
+Open `http://127.0.0.1:8847`. Stdlib-only Python — nothing to install, no build step.
 
-> **Note — the data is not bundled yet.** The multi-GB analysis artifact store that holds the Kfar Saba results lives outside this repository, so a fresh clone launches the app shell **without** the pilot data. A self-contained demo bundle (a trimmed workspace the app can point at) is planned; until it ships, the committed pilot numbers are documented in [`portfolio/case_study.md`](portfolio/case_study.md) and [`portfolio/sample_review_candidates_top20.csv`](portfolio/sample_review_candidates_top20.csv).
+A **bundled demo store** (~2 MB, the Kfar Saba pilot subset) ships in [`demo_data/`](demo_data/), so a fresh clone launches straight into the working product: the ranked review worklist, the Leaflet street map, and CSV / GeoJSON worklist export. The server starts in **product mode** by default (only the GIS-review endpoints — see [`docs/product_mode.md`](docs/product_mode.md)).
+
+To run against a different or fuller analysis store, point the app at a directory that contains an `analysis_output/` folder:
+
+```powershell
+$env:GEOREVIEW_DATA_ROOT = "C:\path\to\store"   # expects <store>\analysis_output\...
+python -B backend\app.py
+```
+
+> **Demo data & attribution.** The bundled tables are derived from OpenStreetMap / Geofabrik data, © OpenStreetMap contributors, licensed under the [Open Database License (ODbL)](https://opendatacommons.org/licenses/odbl/). They are a trimmed pilot extract for demonstration — not an authoritative dataset. The full multi-GB analysis store is intentionally not committed.
 
 ## Repository map
 

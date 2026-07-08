@@ -1,0 +1,483 @@
+﻿source,scope,category,layer_or_element,tag_or_field,value,count,examples,notes
+geofabrik_shapefile,whole_extract,crossings,gis_osm_traffic_free_1,fclass,pedestrian_crossing,26509,,
+geofabrik_shapefile,whole_extract,traffic_signals,gis_osm_traffic_free_1,fclass,traffic_signals,10419,,
+geofabrik_shapefile,whole_extract,schools,gis_osm_pois_*,fclass,school,5469,,
+geofabrik_shapefile,whole_extract,kindergartens,gis_osm_pois_*,fclass,kindergarten,2072,,
+geofabrik_shapefile,whole_extract,childcare_facilities,gis_osm_pois_*,fclass,childcare,0,,0 means not present in simplified fclass counts; raw PBF is checked separately.
+geofabrik_shapefile,whole_extract,bus_stops,gis_osm_transport_free_1,fclass,bus_stop,30990,,
+geofabrik_shapefile,whole_extract,parks,gis_osm_landuse_a + gis_osm_pois_a,fclass,park,38006,,
+geofabrik_shapefile,whole_extract,playgrounds,gis_osm_pois_*,fclass,playground,6135,,
+geofabrik_shapefile,whole_extract,major_roads,gis_osm_roads_free_1,fclass,motorway|trunk|primary|secondary|tertiary,73378,,
+geofabrik_shapefile,whole_extract,residential_roads,gis_osm_roads_free_1,fclass,residential,128726,,
+geofabrik_shapefile,whole_extract,living_streets,gis_osm_roads_free_1,fclass,living_street,4495,,
+geofabrik_shapefile,whole_extract,footways,gis_osm_roads_free_1,fclass,footway,80169,,
+geofabrik_shapefile,whole_extract,pedestrian_streets,gis_osm_roads_free_1,fclass,pedestrian,2672,,
+geofabrik_shapefile,whole_extract,traffic_calming_features,gis_osm_traffic_free_1,calming/fclass,any,-1,,See raw DBF field count and PBF exact traffic_calming count.
+geofabrik_shapefile,whole_extract,roads_with_sidewalk_tag,gis_osm_roads_free_1,sidewalk,any,0,,Not preserved in Geofabrik free shapefile schema.
+geofabrik_shapefile,whole_extract,roads_with_sidewalk_no,gis_osm_roads_free_1,sidewalk,no,0,,Not preserved in Geofabrik free shapefile schema.
+geofabrik_shapefile,whole_extract,roads_with_lit_tag,gis_osm_roads_free_1,lit,any,0,,Not preserved in Geofabrik free shapefile schema; street_lamp points are present separately.
+geofabrik_shapefile,whole_extract,roads_with_lit_no,gis_osm_roads_free_1,lit,no,0,,Not preserved in Geofabrik free shapefile schema.
+geofabrik_shapefile,whole_extract,roads_with_maxspeed_tag,gis_osm_roads_free_1,maxspeed,nonzero,41129,,Geofabrik stores unknown maxspeed as 0/blank in this layer.
+geofabrik_shapefile,whole_extract,traffic_calming_features,gis_osm_traffic_*,calming,nonempty,77,,Geofabrik traffic layer calming field.
+geofabrik_shapefile,kfar_saba_bbox_estimate,bus_stops,multiple,fclass/maxspeed/calming,bbox_intersects,256,,Approximate bbox from gis_osm_places_a_free_1 osm_id=53796999; not an exact municipal polygon clip.
+geofabrik_shapefile,kfar_saba_bbox_estimate,crossings,multiple,fclass/maxspeed/calming,bbox_intersects,411,,Approximate bbox from gis_osm_places_a_free_1 osm_id=53796999; not an exact municipal polygon clip.
+geofabrik_shapefile,kfar_saba_bbox_estimate,footways,multiple,fclass/maxspeed/calming,bbox_intersects,626,,Approximate bbox from gis_osm_places_a_free_1 osm_id=53796999; not an exact municipal polygon clip.
+geofabrik_shapefile,kfar_saba_bbox_estimate,kindergartens,multiple,fclass/maxspeed/calming,bbox_intersects,41,,Approximate bbox from gis_osm_places_a_free_1 osm_id=53796999; not an exact municipal polygon clip.
+geofabrik_shapefile,kfar_saba_bbox_estimate,living_streets,multiple,fclass/maxspeed/calming,bbox_intersects,40,,Approximate bbox from gis_osm_places_a_free_1 osm_id=53796999; not an exact municipal polygon clip.
+geofabrik_shapefile,kfar_saba_bbox_estimate,major_roads,multiple,fclass/maxspeed/calming,bbox_intersects,572,,Approximate bbox from gis_osm_places_a_free_1 osm_id=53796999; not an exact municipal polygon clip.
+geofabrik_shapefile,kfar_saba_bbox_estimate,parks,multiple,fclass/maxspeed/calming,bbox_intersects,270,,Approximate bbox from gis_osm_places_a_free_1 osm_id=53796999; not an exact municipal polygon clip.
+geofabrik_shapefile,kfar_saba_bbox_estimate,pedestrian_streets,multiple,fclass/maxspeed/calming,bbox_intersects,22,,Approximate bbox from gis_osm_places_a_free_1 osm_id=53796999; not an exact municipal polygon clip.
+geofabrik_shapefile,kfar_saba_bbox_estimate,playgrounds,multiple,fclass/maxspeed/calming,bbox_intersects,54,,Approximate bbox from gis_osm_places_a_free_1 osm_id=53796999; not an exact municipal polygon clip.
+geofabrik_shapefile,kfar_saba_bbox_estimate,residential_roads,multiple,fclass/maxspeed/calming,bbox_intersects,934,,Approximate bbox from gis_osm_places_a_free_1 osm_id=53796999; not an exact municipal polygon clip.
+geofabrik_shapefile,kfar_saba_bbox_estimate,roads_with_maxspeed_tag,multiple,fclass/maxspeed/calming,bbox_intersects,45,,Approximate bbox from gis_osm_places_a_free_1 osm_id=53796999; not an exact municipal polygon clip.
+geofabrik_shapefile,kfar_saba_bbox_estimate,schools,multiple,fclass/maxspeed/calming,bbox_intersects,44,,Approximate bbox from gis_osm_places_a_free_1 osm_id=53796999; not an exact municipal polygon clip.
+geofabrik_shapefile,kfar_saba_bbox_estimate,traffic_signals,multiple,fclass/maxspeed/calming,bbox_intersects,176,,Approximate bbox from gis_osm_places_a_free_1 osm_id=53796999; not an exact municipal polygon clip.
+osm_pbf_raw,whole_extract,bus_public_transport_features,nodes/ways/relations,derived_from_exact_osm_tags,,30982,,Counts from custom read-only PBF parser over relevant OSM tags.
+osm_pbf_raw,whole_extract,bus_stops_highway,nodes/ways/relations,derived_from_exact_osm_tags,,30990,,Counts from custom read-only PBF parser over relevant OSM tags.
+osm_pbf_raw,whole_extract,childcare_facilities,nodes/ways/relations,derived_from_exact_osm_tags,,85,,Counts from custom read-only PBF parser over relevant OSM tags.
+osm_pbf_raw,whole_extract,community_centres,nodes/ways/relations,derived_from_exact_osm_tags,,1002,,Counts from custom read-only PBF parser over relevant OSM tags.
+osm_pbf_raw,whole_extract,crossing_traffic_signals,nodes/ways/relations,derived_from_exact_osm_tags,,7791,,Counts from custom read-only PBF parser over relevant OSM tags.
+osm_pbf_raw,whole_extract,crossings,nodes/ways/relations,derived_from_exact_osm_tags,,26509,,Counts from custom read-only PBF parser over relevant OSM tags.
+osm_pbf_raw,whole_extract,footways,nodes/ways/relations,derived_from_exact_osm_tags,,79862,,Counts from custom read-only PBF parser over relevant OSM tags.
+osm_pbf_raw,whole_extract,kindergartens,nodes/ways/relations,derived_from_exact_osm_tags,,2072,,Counts from custom read-only PBF parser over relevant OSM tags.
+osm_pbf_raw,whole_extract,living_streets,nodes/ways/relations,derived_from_exact_osm_tags,,4495,,Counts from custom read-only PBF parser over relevant OSM tags.
+osm_pbf_raw,whole_extract,major_roads,nodes/ways/relations,derived_from_exact_osm_tags,,73378,,Counts from custom read-only PBF parser over relevant OSM tags.
+osm_pbf_raw,whole_extract,parks,nodes/ways/relations,derived_from_exact_osm_tags,,19105,,Counts from custom read-only PBF parser over relevant OSM tags.
+osm_pbf_raw,whole_extract,pedestrian_streets,nodes/ways/relations,derived_from_exact_osm_tags,,2672,,Counts from custom read-only PBF parser over relevant OSM tags.
+osm_pbf_raw,whole_extract,playgrounds,nodes/ways/relations,derived_from_exact_osm_tags,,6136,,Counts from custom read-only PBF parser over relevant OSM tags.
+osm_pbf_raw,whole_extract,recreation_grounds,nodes/ways/relations,derived_from_exact_osm_tags,,109,,Counts from custom read-only PBF parser over relevant OSM tags.
+osm_pbf_raw,whole_extract,residential_roads,nodes/ways/relations,derived_from_exact_osm_tags,,128726,,Counts from custom read-only PBF parser over relevant OSM tags.
+osm_pbf_raw,whole_extract,roads_with_lit_no,nodes/ways/relations,derived_from_exact_osm_tags,,586,,Counts from custom read-only PBF parser over relevant OSM tags.
+osm_pbf_raw,whole_extract,roads_with_lit_tag,nodes/ways/relations,derived_from_exact_osm_tags,,9394,,Counts from custom read-only PBF parser over relevant OSM tags.
+osm_pbf_raw,whole_extract,roads_with_maxspeed_tag,nodes/ways/relations,derived_from_exact_osm_tags,,37383,,Counts from custom read-only PBF parser over relevant OSM tags.
+osm_pbf_raw,whole_extract,roads_with_sidewalk_no,nodes/ways/relations,derived_from_exact_osm_tags,,917,,Counts from custom read-only PBF parser over relevant OSM tags.
+osm_pbf_raw,whole_extract,roads_with_sidewalk_tag,nodes/ways/relations,derived_from_exact_osm_tags,,5308,,Counts from custom read-only PBF parser over relevant OSM tags.
+osm_pbf_raw,whole_extract,schools,nodes/ways/relations,derived_from_exact_osm_tags,,5469,,Counts from custom read-only PBF parser over relevant OSM tags.
+osm_pbf_raw,whole_extract,traffic_calming_features,nodes/ways/relations,derived_from_exact_osm_tags,,2911,,Counts from custom read-only PBF parser over relevant OSM tags.
+osm_pbf_raw,whole_extract,traffic_signals,nodes/ways/relations,derived_from_exact_osm_tags,,10419,,Counts from custom read-only PBF parser over relevant OSM tags.
+osm_pbf_raw,whole_extract,tag_presence,node,access,__present__,4649,private; no; yes; customers; permissive; permit; destination; official,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,node,admin_level,__present__,1,2,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,node,amenity,__present__,41008,fuel; cinema; place_of_worship; parking; post_box; recycling; atm; post_office,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,node,bench,__present__,5323,yes; no; separate,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,node,bicycle,__present__,1785,yes; no; designated; destination; dismount; military; private; permit,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,node,boundary,__present__,11,political; civil; روضة الحنان,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,node,bus,__present__,31023,yes; designated; no,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,node,button_operated,__present__,2130,no; yes,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,node,crossing,__present__,25795,uncontrolled; traffic_signals; marked; zebra; informal; island; no; unmarked,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,node,crossing:island,__present__,5840,yes; no; יש,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,node,crossing_ref,__present__,3764,zebra; tiger; puffin; marked,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,node,cycleway,__present__,3,crossing; asl; no,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,node,cycleway:right,__present__,2,track,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,node,footway,__present__,1326,crossing; bus_stop,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,node,highway,__present__,80698,traffic_signals; crossing; motorway_junction; bus_stop; turning_circle; mini_roundabout; give_way; emergency_bay,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,node,kerb,__present__,3426,lowered; flush; raised; yes; no; normal,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,node,landuse,__present__,681,basin; quarry; industrial; cemetery; residential; commercial; construction; military,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,node,lanes,__present__,6,1; 5; 4; 2,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,node,leisure,__present__,2963,sports_centre; playground; pitch; park; picnic_table; garden; water_park; stadium,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,node,lit,__present__,2518,yes; no; disused,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,node,maxspeed,__present__,23,50; 40; 90; 70; 35,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,node,name,__present__,84902,מחלף ארלוזורוב; מחלף השלום; מחלף קיבוץ גלויות; מחלף בר אילן; מחלף מסובים; מחלף גנות; מחלף ראשון לציון; מחלף בית רימון,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,node,name:en,__present__,61086,Arlozorov; Ha'Shalom; Kibbutz Galuyot; Bar Ilan; Mesubim Interchange; Ganot Interchange; Rishon LeZion; Bet Rimon Interchange,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,node,name:he,__present__,55788,מחלף ארלוזורוב; מחלף השלום; מחלף קיבוץ גלויות; מחלף בר אילן; מחלף מסובים; מחלף גנות; מחלף ראשון לציון; מחלף בית רימון,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,node,network,__present__,140,carmelit; Tel-O-Fun; הבנק הבינלאומי; private; דן; Dan; הסעות תלמידים; בנק דיסקונט,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,node,oneway,__present__,2,yes,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,node,operator,__present__,2208,Israel Defense Forces; دور ألون; סינמה סיטי; בנק הפועלים; Home Center; Ministry of Tourism; ג׳ירף; שלמה סיקסט,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,node,place,__present__,3733,city; village; town; suburb; neighbourhood; farm; region; quarter,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,node,public_transport,__present__,31278,platform; stop_position; station; entrance,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,node,route_ref,__present__,29557,67;193;242;301; 1;9;9א;14;14א;16;17;18;19;19א;20;28;36;36א;38;76;77;80א;81;83א;84;85;86;86א;88א;90;91;96;123;144;145;148;200;217;581;972;974;978;986; 25;63;65;66;70;70א;83;148;149;605;650; 222;600;601;604;605;606;611;614;615;617;623;632;633;635;650;699;704;784;800;807;825;826;833;836;840;843;845;846;848;852;900;910; 601;604;606;617;619;623;699;807;852;910; 9א;80;263; 257;268; 1א,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,node,school,__present__,2,bus_stop; special_needs,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,node,segregated,__present__,8,yes,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,node,shelter,__present__,5842,yes; no,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,node,smoothness,__present__,5,intermediate; horrible; very_bad; excellent,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,node,surface,__present__,662,asphalt; paving_stones; cobblestone; paved; compacted; unpaved; sand; concrete,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,node,tactile_paving,__present__,3846,yes; no; limited,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,node,traffic_calming,__present__,2827,hump; table; bump; yes; rumble_strip; chicane; no; cushion,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,node,traffic_signals:sound,__present__,2096,yes; no,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,relation,access,__present__,9,yes; customers,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,relation,admin_level,__present__,572,2; 4; 5; 8; 9; 10; 6; 7,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,relation,amenity,__present__,99,parking; bicycle_rental; monastery; university; social_facility; place_of_worship; hospital; school,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,relation,bicycle,__present__,14,yes; unknown; designated,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,relation,boundary,__present__,735,administrative; military; disputed; protected_area; historic; place; claim; timezone,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,relation,bus,__present__,10,yes,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,relation,highway,__present__,101,tertiary; pedestrian; footway,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,relation,landuse,__present__,1290,forest; meadow; farmland; religious; industrial; residential; grass; quarry,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,relation,lanes,__present__,3,1; 4,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,relation,leisure,__present__,113,park; stadium; sports_centre; nature_reserve; swimming_pool; pitch; track; fitness_station,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,relation,lit,__present__,10,yes; no,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,relation,maxspeed,__present__,23,60; 90; 100; 50; 70,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,relation,name,__present__,3660,מגדל דוד; בן יהודה; הירקון; דב הוז; הרברט סמואל; الأردن; سوريا; لبنان,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,relation,name:en,__present__,2990,Tower of David; Ben Yehuda street; Hayarkon street; Frishman street; Herbert Samuel; Jordan; Syria; Lebanon,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,relation,name:he,__present__,3044,מגדל דוד; בן יהודה; הירקון; דב הוז; הרברט סמואל; ירדן; סוריה; לבנון,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,relation,network,__present__,3631,nwn; rwn; rcn; لبنان; Liban; lwn; lcn; חיפה,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,relation,oneway,__present__,3,yes,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,relation,operator,__present__,3655,itc; شركة الخطوط الحديدية اللبنانية; CEL; kkl; המועצה האזורית עמק הירדן; Egged; אגד; רכבת ישראל,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,relation,place,__present__,147,town; city; region; borough; village; public_place; suburb; neighbourhood,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,relation,public_transport,__present__,104,stop_area; station; 2; stop_area_group; platform,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,relation,surface,__present__,34,asphalt; paving_stones; paved; concrete; wood; grass; artificial_turf; sand,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,way,access,__present__,12621,no; private; permissive; designated; yes; destination; customers; agricultural,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,way,admin_level,__present__,1127,2; 10; 5; 8; 6; 4; 9; 7,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,way,amenity,__present__,24760,place_of_worship; townhall; parking; theatre; hospital; kindergarten; school; bus_station,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,way,bench,__present__,179,yes; no,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,way,bicycle,__present__,21263,no; designated; yes; dismount; permissive; permit; private; unknown,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,way,boundary,__present__,3118,administrative; political; civil; protected_area; historic; maritime; refugee_camp; marker,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,way,bus,__present__,1141,yes; designated; no; lane; only,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,way,button_operated,__present__,31,yes; no,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,way,crossing,__present__,6375,marked; uncontrolled; traffic_signals; zebra; pedestrian_signals; footway; unmarked; island,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,way,crossing:island,__present__,793,yes; no,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,way,crossing_ref,__present__,21,zebra,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,way,cycleway,__present__,413,track; lane; no; opposite_lane; crossing; yes; shared_lane; separate,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,way,cycleway:left,__present__,77,track; lane; opposite_lane; no,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,way,cycleway:right,__present__,281,track; no; lane; separate; shoulder; proposed,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,way,footway,__present__,12016,sidewalk; crossing; pedestrian; path; access_aisle; traffic_island; yes; designated,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,way,highway,__present__,524132,trunk; residential; pedestrian; secondary; trunk_link; tertiary; motorway; primary,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,way,kerb,__present__,289,lowered; no; raised; rolled; flush,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,way,landuse,__present__,46781,meadow; commercial; residential; cemetery; industrial; retail; recreation_ground; forest,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,way,lanes,__present__,51675,3; 2; 1; 4; 5; 6; 8; 0,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,way,leisure,__present__,37794,park; pitch; stadium; playground; garden; sports_centre; swimming_pool; resort,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,way,lit,__present__,10645,yes; no; automatic; 24/7; limited,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,way,maxspeed,__present__,42158,30; 50; 80; 90; 70; 60; 110; 40,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,way,name,__present__,138920,שמאי; יואל משה סלומון; לונץ; גן העצמאות; יצחק רבין; נחל ירקון; אבן ישראל; בן צבי,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,way,name:en,__present__,118029,Shammai; Yoel Moshe Salomon; Lonz; Independence Park; Yitzhak Rabin; Nahal Yarkon; Even Israel; Ben Zvi,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,way,name:he,__present__,122737,שמאי; יואל משה סלומון; לונץ; גן העצמאות; יצחק רבין; נחל ירקון; אבן ישראל; בן צבי,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,way,network,__present__,12,itc; Metronit; Israel Railways; lcn; lwn,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,way,oneway,__present__,113992,yes; no; -1; alternating,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,way,operator,__present__,978,IEC; עיריית נתניה; קיבוץ שפיים; עיריית תל אביב; עירית נתניה; חניון גמלא; School Bus; אחוזת החוף,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,way,place,__present__,1968,square; islet; suburb; neighbourhood; town; village; farm; plot,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,way,public_transport,__present__,435,platform; station; stop_position,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,way,school,__present__,15,high_school; junior high; secondary; elementary; agricultural; school,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,way,segregated,__present__,1655,yes; no,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,way,shelter,__present__,165,yes; no,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,way,sidewalk,__present__,5093,both; right; no; left; separate; yes; none; forward,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,way,sidewalk:left,__present__,367,no; separate; yes,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,way,sidewalk:right,__present__,403,yes; separate; no,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,way,smoothness,__present__,5433,good; excellent; intermediate; bad; very_bad; horrible; very_horrible; impassable,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,way,surface,__present__,126964,paving_stones; asphalt; stone; sett; paved; concrete; cobblestone; compacted,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,way,tactile_paving,__present__,532,yes; no; tes,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,way,traffic_calming,__present__,84,hump; table; yes; island; bump,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_presence,way,traffic_signals:sound,__present__,24,yes; no,Presence count among OSM elements; absence is not evidence that infrastructure is absent.
+osm_pbf_raw,whole_extract,tag_value,node,amenity,childcare,35,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,amenity,community_centre,651,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,amenity,kindergarten,1172,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,amenity,school,1895,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,bench,no,328,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,bench,yes,4992,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,bicycle,customers,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,bicycle,designated,108,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,bicycle,destination,4,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,bicycle,dismount,62,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,bicycle,military,5,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,bicycle,no,179,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,bicycle,permissive,11,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,bicycle,permit,3,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,bicycle,private,19,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,bicycle,yes,1393,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,bus,no,11,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,bus,yes,31011,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,button_operated,no,1524,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,button_operated,yes,606,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,crossing,marked,5390,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,crossing,traffic_signals,7591,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,crossing,uncontrolled,11112,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,crossing,unmarked,753,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,crossing:island,no,2501,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,crossing:island,yes,3338,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,cycleway,asl,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,cycleway,crossing,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,cycleway,no,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,cycleway:right,track,2,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,highway,bus_stop,30990,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,highway,crossing,26509,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,highway,footway,1105,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,highway,residential,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,highway,tertiary,2,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,highway,traffic_signals,10419,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,landuse,recreation_ground,24,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,leisure,park,209,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,leisure,playground,1023,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,lit,disused,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,lit,no,445,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,lit,yes,2072,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,maxspeed,35,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,maxspeed,40,2,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,maxspeed,50,13,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,maxspeed,70,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,maxspeed,90,6,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,public_transport,platform,30889,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,public_transport,stop_position,213,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,segregated,yes,8,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,shelter,no,583,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,shelter,yes,5259,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,smoothness,excellent,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,smoothness,horrible,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,smoothness,intermediate,2,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,smoothness,very_bad,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,surface,artificial_turf,5,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,surface,asphalt,462,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,surface,cemento,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,surface,cobblestone,2,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,surface,compacted,2,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,surface,concrete,14,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,surface,dirt,2,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,surface,fine_gravel,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,surface,grass,6,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,surface,grass_paver,25,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,surface,gravel,18,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,surface,ground,7,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,surface,paved,18,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,surface,paving_stones,12,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,surface,plastic,12,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,surface,rubber,3,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,surface,rubbercrumb,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,surface,sand,21,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,surface,tartan,29,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,surface,unpaved,20,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,surface,wood,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,tactile_paving,no,1268,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,tactile_paving,yes,2577,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,traffic_calming,bump,1637,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,traffic_calming,chicane,6,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,traffic_calming,cushion,9,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,traffic_calming,hump,970,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,traffic_calming,no,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,traffic_calming,rumble_strip,2,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,traffic_calming,table,81,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,node,traffic_calming,yes,121,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,relation,amenity,childcare,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,relation,amenity,community_centre,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,relation,amenity,school,12,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,relation,bicycle,designated,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,relation,bicycle,unknown,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,relation,bicycle,yes,12,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,relation,bus,yes,10,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,relation,highway,footway,2,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,relation,highway,pedestrian,97,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,relation,highway,tertiary,2,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,relation,leisure,park,66,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,relation,leisure,playground,6,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,relation,lit,no,2,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,relation,lit,yes,8,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,relation,maxspeed,100,5,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,relation,maxspeed,50,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,relation,maxspeed,60,2,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,relation,maxspeed,70,2,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,relation,maxspeed,90,13,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,relation,public_transport,platform,2,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,relation,surface,artificial_turf,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,relation,surface,asphalt,3,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,relation,surface,clay,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,relation,surface,compacted,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,relation,surface,concrete,3,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,relation,surface,concrete:plates,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,relation,surface,grass,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,relation,surface,paved,5,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,relation,surface,paving_stones,10,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,relation,surface,sand,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,relation,surface,sett,2,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,relation,surface,wood,4,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,relation,surface,woodchips,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,amenity,childcare,49,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,amenity,community_centre,350,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,amenity,kindergarten,900,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,amenity,school,3562,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,bench,no,2,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,bench,yes,177,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,bicycle,customers,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,bicycle,designated,7386,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,bicycle,destination,28,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,bicycle,dismount,75,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,bicycle,mtb,4,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,bicycle,no,2066,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,bicycle,permissive,78,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,bicycle,permit,4,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,bicycle,private,18,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,bicycle,unknown,8,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,bicycle,use_sidepath,2,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,bicycle,yes,11593,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,bus,no,15,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,bus,yes,1010,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,button_operated,no,3,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,button_operated,yes,28,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,crossing,marked,1758,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,crossing,traffic_signals,200,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,crossing,uncontrolled,3692,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,crossing,unmarked,184,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,crossing:island,no,265,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,crossing:island,yes,528,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,cycleway,crossing,248,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,cycleway,lane,17,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,cycleway,no,129,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,cycleway,opposite_lane,4,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,cycleway,separate,3,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,cycleway,shared_lane,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,cycleway,track,6,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,cycleway,yes,5,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,cycleway:left,lane,10,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,cycleway:left,no,38,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,cycleway:left,opposite_lane,4,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,cycleway:left,track,25,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,cycleway:right,lane,26,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,cycleway:right,no,47,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,cycleway:right,proposed,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,cycleway:right,separate,3,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,cycleway:right,shoulder,2,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,cycleway:right,track,202,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,highway,cycleway,3269,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,highway,footway,79862,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,highway,living_street,4495,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,highway,motorway,1320,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,highway,motorway_link,1790,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,highway,path,30738,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,highway,pedestrian,2672,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,highway,primary,6328,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,highway,primary_link,1327,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,highway,residential,128726,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,highway,secondary,17402,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,highway,secondary_link,2113,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,highway,service,88846,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,highway,tertiary,41441,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,highway,tertiary_link,1570,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,highway,trunk,6887,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,highway,trunk_link,3244,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,highway,unclassified,13065,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,landuse,recreation_ground,85,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,leisure,park,18830,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,leisure,playground,5107,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,lit,24/7,2,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,lit,automatic,2,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,lit,limited,3,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,lit,no,758,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,lit,yes,9880,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,maxspeed,1,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,maxspeed,10,34,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,maxspeed,100,272,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,maxspeed,110,507,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,maxspeed,120,167,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,maxspeed,15,11,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,maxspeed,160,532,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,maxspeed,20,2685,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,maxspeed,25,46,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,maxspeed,3 knots,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,maxspeed,30,4286,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,maxspeed,35,94,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,maxspeed,40,9383,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,maxspeed,45,6,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,maxspeed,5,18,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,maxspeed,5 mph,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,maxspeed,50,15613,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,maxspeed,50 mph,3,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,maxspeed,55,49,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,maxspeed,60,1577,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,maxspeed,60; 70,2,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,maxspeed,70,1713,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,maxspeed,70; 60,2,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,maxspeed,80,2193,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,maxspeed,90,2781,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,maxspeed,IL:urban,89,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,maxspeed,IL:zone30,91,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,maxspeed,yo,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,public_transport,platform,350,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,public_transport,stop_position,16,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,segregated,no,586,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,segregated,yes,1069,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,shelter,no,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,shelter,yes,164,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,sidewalk,both,2265,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,sidewalk,forward,7,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,sidewalk,left,248,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,sidewalk,no,727,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,sidewalk,none,33,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,sidewalk,right,1622,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,sidewalk,separate,170,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,sidewalk,yes,21,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,sidewalk:left,no,258,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,sidewalk:left,separate,81,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,sidewalk:left,yes,28,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,sidewalk:right,no,5,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,sidewalk:right,separate,266,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,sidewalk:right,yes,132,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,smoothness,bad,290,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,smoothness,excellent,1335,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,smoothness,good,3108,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,smoothness,horrible,73,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,smoothness,impassable,28,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,smoothness,intermediate,310,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,smoothness,off_road_wheels,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,smoothness,very_bad,185,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,smoothness,very_horrible,103,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,3,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,"Rubber-like,_springy_and_shockabsorbant",1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,acrylic,61,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,artificial_turf,118,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,asphalt,69391,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,boardwalk,2,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,brick,2,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,bricks,6,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,clay,29,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,cobblestone,85,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,compacted,663,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,compacted; gravel,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,concrete,1854,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,concrete:lanes,72,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,concrete:plates,55,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,construction,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,decoturf,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,dirt,1730,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,dirt/sand,8,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,earth,119,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,fine_gravel,112,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,footway,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,glass,3,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,grass,168,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,grass_paver,50,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,grass_paver;grass,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,grass_scrub,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,gravel,1764,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,ground,2206,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,interlock,1258,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,jerusalem_stone,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,metal,30,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,metal_grid,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,mud,9,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,paved,15495,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,paved;interlock,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,paved_parking,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,paving_stones,11171,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,pebblestone,45,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,promande,3,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,rock,36,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,rubber,24,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,rubber_mulch,2,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,rubbercrumb,13,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,sand,1157,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,sand;dirt,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,scree,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,scrub,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,sea_promande,4,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,sett,347,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,soil,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,stage,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,steel,2,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,stepping_stones,6,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,stone,101,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,stones,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,stony,3,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,synthetic,2,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,synthetic grass,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,tartan,103,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,track,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,unhewn_cobblestone,134,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,unpaved,18199,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,wood,296,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,woodchips,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,אבן_מרוצפת,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,דרדרת,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,מעבר_דרך_התלתלית,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,מעלות_סרטבה_הקדומים,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,surface,מעקף_של_השער_דרך_פרצה,1,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,tactile_paving,no,323,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,tactile_paving,yes,208,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,traffic_calming,bump,22,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,traffic_calming,hump,2,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,traffic_calming,island,42,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,traffic_calming,table,17,,Exact key/value count from raw PBF for relevant Safe Access tags.
+osm_pbf_raw,whole_extract,tag_value,way,traffic_calming,yes,1,,Exact key/value count from raw PBF for relevant Safe Access tags.

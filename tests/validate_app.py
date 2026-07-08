@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import sys
 import threading
@@ -67,7 +68,8 @@ def main() -> None:
     if scan.returncode != 0:
         fail(f"forbidden-term scan failed:\n{scan.stdout}\n{scan.stderr}")
 
-    # 3. Boot the app (full mode) and check the product + analysis surface.
+    # 3. Boot the app (product is the default; pin full mode to check the whole surface).
+    os.environ["GEOREVIEW_MODE"] = "full"
     sys.path.insert(0, str(BACKEND_DIR))
     import app  # noqa: PLC0415
 

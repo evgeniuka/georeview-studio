@@ -64,6 +64,21 @@ class AnalysisWorkflow:
 
         source = self.onboarding.source_detail(dataset_id)
         if "error" in source:
+            if source.get("error") == "dataset_not_found":
+                # Results-only store (e.g. the bundled demo): the raw source GIS is
+                # absent, so a new analysis cannot be planned - but the pre-computed
+                # workspaces stay fully browsable. Report a clean blocked state
+                # (HTTP 200) instead of a 404 that a browser SPA logs as an init
+                # failure. Stores that include the source GIS are unaffected.
+                return {
+                    "ok": False,
+                    "template_id": template_id,
+                    "dataset_id": dataset_id,
+                    "can_start_job": False,
+                    "blockers": ["source_gis_not_available_in_active_store"],
+                    "recommended_action": "browse_precomputed_results_or_point_data_root_at_a_store_with_source_gis",
+                    "source_gis_modified": False,
+                }
             return {"ok": False, **source, "source_gis_modified": False}
 
         pilot = self.pilots.detail(pilot_osm_id)

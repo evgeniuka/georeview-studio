@@ -1,0 +1,25 @@
+{
+  "workspace_id": "park_playground_access_kfar_saba_v001",
+  "profile_id": "park_playground_access",
+  "profile_workspace": true,
+  "base_workspace_id": "safe_access_kfar_saba_route_aware_v001",
+  "created_at_utc": "2026-07-06T19:17:12Z",
+  "analyzer": "park_playground_access_analyzer_v001",
+  "source_gis_modified": false,
+  "tables": [
+    {
+      "table": "park_playground_access_results",
+      "file": "analysis_output/georeview_studio_workspaces/park_playground_access_kfar_saba_v001/tables/park_playground_access_results.csv",
+      "rows": 145
+    },
+    {
+      "table": "park_playground_access_top20",
+      "file": "analysis_output/georeview_studio_workspaces/park_playground_access_kfar_saba_v001/tables/park_playground_access_top20.csv",
+      "rows": 20
+    }
+  ],
+  "reports": {
+    "park_playground_access_summary": "analysis_output/georeview_studio_workspaces/park_playground_access_kfar_saba_v001/reports/park_playground_access_summary.json",
+    "park_playground_access_markdown": "analysis_output/georeview_studio_workspaces/park_playground_access_kfar_saba_v001/reports/park_playground_access_summary.md"
+  }
+}

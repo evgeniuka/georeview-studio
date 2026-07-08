@@ -7,16 +7,18 @@ GeoReview Studio ships two layers behind one server:
   evidence bundles, repository-export packets, recruiter briefs, visual-QA
   ledgers, etc.) that exists to build and audit the project itself.
 
-By default the server runs in **full mode** and serves both layers (this is also
-what the two test suites exercise). To serve only the product surface — for a
-slimmer, more auditable deployable — start it in **product mode**:
+By default the server runs in **product mode** and serves only the product
+surface — a slimmer, more auditable deployable, and what a fresh clone launches
+into. To serve both layers (the product plus the internal tooling layer), start
+it in **full mode**:
 
 ```powershell
-$env:GEOREVIEW_MODE = "product"
+$env:GEOREVIEW_MODE = "full"
 python -B backend\app.py
 ```
 
-In product mode every request outside the product surface returns `404`
+The two test suites pin full mode so they exercise the whole surface. In product
+mode every request outside the product surface returns `404`
 (`served_in_product_mode()` in `backend/app.py`); the static frontend is always
 served, and its internal-tooling panels (already hidden behind the
 "Show advanced evidence operations" toggle) simply fail their data load

@@ -42,3 +42,7 @@ source_data/
 # Test-suite output artifacts (written by the suites, never read by the app)
 api_contract_summary.json
 validation_summary.json
+
+# Runtime state the app auto-creates when run against the bundled demo store
+demo_data/analysis_output/georeview_studio_review_decisions/
+demo_data/analysis_output/georeview_studio_runs/

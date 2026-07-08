@@ -1,0 +1,21 @@
+{
+  "workspace_id": "safe_access_kfar_saba_route_aware_v001",
+  "data_quality_principles": [
+    "Missing OSM tags are data-quality gaps, not proof that infrastructure is absent.",
+    "Risk flags are infrastructure risk indicators for field review prioritization.",
+    "The workspace is not a crash prediction model."
+  ],
+  "known_limitations": [
+    "Cycleway and surface-street classes are included as proxy network evidence where detailed sidewalk tags are incomplete.",
+    "PBF enrichment improves tag evidence, but OSM tag absence remains a data-quality gap only.",
+    "Pilot boundary is OSM/Geofabrik based, not an official municipal boundary.",
+    "Route-aware metrics are an OSM road-network proxy, not verified pedestrian routing.",
+    "The graph is built from simplified road segment geometry and does not prove legal or accessible walking paths.",
+    "This mapper still uses a simple nearest-distance model, not a routable pedestrian network."
+  ],
+  "route_aware_quality_principles": [
+    "Network distance is used as a review-priority indicator only.",
+    "Straight-line and network distances should both be shown because the network graph is incomplete.",
+    "Unreachable network results are data-quality flags unless confirmed on-site."
+  ]
+}

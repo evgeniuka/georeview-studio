@@ -66,6 +66,11 @@ def infer_maps_root(project_dir: Path) -> Path:
     for parent in project_dir.parents:
         if parent.name == "analysis_output":
             return parent.parent
+    # Last resort: a fresh public clone has no external analysis_output sibling, so
+    # fall back to the bundled demo store shipped inside the repo (demo_data/) if the
+    # normal location is empty. Never shadows a real sibling store (checked first).
+    if not (project_dir.parent / "analysis_output").exists() and (project_dir / "demo_data" / "analysis_output").exists():
+        return project_dir / "demo_data"
     return project_dir.parent
 
 
@@ -78,12 +83,12 @@ def is_within(path: Path, root: Path) -> bool:
     return True
 
 
-# Product vs internal tooling surface. With GEOREVIEW_MODE=product only the core
+# Product vs internal tooling surface. In the default product mode only the core
 # GIS-review endpoints (plus the static frontend) are served; the ~50 internal
-# publication/QA "tooling layer" endpoints return 404. Default ("full") serves
-# everything and is what the two test suites run against - so this gate is inert
-# unless explicitly opted into. See docs/product_mode.md.
-PRODUCT_MODE = os.environ.get("GEOREVIEW_MODE", "full").strip().lower() == "product"
+# publication/QA "tooling layer" endpoints return 404. Set GEOREVIEW_MODE=full to
+# serve everything - the two test suites pin full mode explicitly so they exercise
+# the whole surface. See docs/product_mode.md.
+PRODUCT_MODE = os.environ.get("GEOREVIEW_MODE", "product").strip().lower() == "product"
 PRODUCT_API_PREFIXES = (
     "/api/health",
     "/api/project-manifest",

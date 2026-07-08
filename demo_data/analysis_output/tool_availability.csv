@@ -1,0 +1,13 @@
+﻿tool,kind,available,detail
+python,runtime,yes,C:\Users\user\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe
+geopandas,python_module,no,
+fiona,python_module,no,
+pyogrio,python_module,no,
+shapely,python_module,no,
+pandas,python_module,yes,
+osmium,python_module,no,
+pyproj,python_module,no,
+ogrinfo,executable,no,
+ogr2ogr,executable,no,
+gdalinfo,executable,no,
+osmium,executable,no,

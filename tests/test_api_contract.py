@@ -1,6 +1,7 @@
 ﻿from __future__ import annotations
 
 import json
+import os
 from http.server import ThreadingHTTPServer
 from pathlib import Path
 import sys
@@ -56,6 +57,8 @@ def request_bytes(base_url: str, path: str, timeout: int = 120) -> tuple[int, by
 
 
 def main() -> None:
+    # Product is the default mode; pin full so the contract exercises every endpoint.
+    os.environ["GEOREVIEW_MODE"] = "full"
     sys.path.insert(0, str(BACKEND_DIR))
     import app  # noqa: PLC0415
 

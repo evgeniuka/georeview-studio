@@ -1,0 +1,8 @@
+{
+  "catalog_version": "pilot_area_catalog_v001",
+  "source_zip": "israel-and-palestine-260521-free.shp.zip",
+  "source_layer": "gis_osm_places_a_free_1",
+  "catalog_path": "analysis_output/georeview_studio_pilot_catalog/pilot_areas.csv",
+  "source_gis_modified": false,
+  "pilot_count": 1630
+}
