@@ -6,8 +6,7 @@
     "index.html",
     "assets/kfar_saba_static_map.svg",
     "sample_review_candidates_top20.csv",
-    "case_study.md",
-    "portfolio_pitch.md"
+    "case_study.md"
   ],
   "counts": {
     "pedestrian_generators": 391,

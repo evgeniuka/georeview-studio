@@ -67,4 +67,4 @@ Missing OSM tags are data-quality gaps, not proof that infrastructure is absent.
 - **Proxy distance.** The road-network distance is an OSM road-graph proxy, not verified pedestrian routing; simplified geometry can over- or under-estimate real walking distance.
 - **Region-shaped.** EPSG:2039 and the distance thresholds are Israel/OSM-specific; another region needs reprojection and recalibration, not just new data.
 - **Boundary.** The pilot boundary is OSM/Geofabrik-derived, not an official municipal boundary.
-- **Not bundled.** The multi-GB analysis artifact store behind these numbers lives outside the repository; a clone reproduces the app, not the Kfar Saba data, until the demo bundle ships.
+- **Not fully bundled.** The multi-GB analysis artifact store behind these numbers lives outside the repository. A clone ships a ~2 MB demo subset — this pilot workspace — so the app runs on real Kfar Saba data out of the box; the full store is not committed.

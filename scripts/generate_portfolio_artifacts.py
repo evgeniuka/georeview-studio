@@ -423,26 +423,6 @@ Missing OSM tags are data-quality flags, not proof that infrastructure is absent
 """
     (PORTFOLIO_DIR / "case_study.md").write_text(case_study, encoding="utf-8")
 
-    pitch = """# Portfolio Pitch
-
-GeoReview Studio demonstrates GIS data engineering, road safety domain modeling, and pragmatic software engineering.
-
-The project ingests OSM/Geofabrik data, builds canonical geospatial analysis tables, enriches simplified geometry with raw OSM PBF tags, adds route-aware road-network proxy metrics, and presents review-priority dashboards for field inspection planning.
-
-Strong portfolio signals:
-
-- real local GIS data;
-- reproducible data audit;
-- canonical data model;
-- PBF tag enrichment;
-- workspace registry;
-- workspace-aware dashboard;
-- route-aware network proxy analysis;
-- explicit separation between risk indicators and data-quality gaps;
-- validated local app and generated report artifacts.
-"""
-    (PORTFOLIO_DIR / "portfolio_pitch.md").write_text(pitch, encoding="utf-8")
-
     manifest = {
         "generated": True,
         "workspace_id": WORKSPACE_ID,
@@ -452,7 +432,6 @@ Strong portfolio signals:
             "assets/kfar_saba_static_map.svg",
             "sample_review_candidates_top20.csv",
             "case_study.md",
-            "portfolio_pitch.md",
         ],
         "counts": summary["counts"],
     }
